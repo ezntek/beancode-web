@@ -6,8 +6,10 @@
 		Terminal
 	} from '@battlefieldduck/xterm-svelte';
 	import { onMount } from 'svelte';
+
 	let pyodideReady = $state(false);
 	let worker: Worker;
+
 	const loadWorker = async () => {
 		const W = await import('$lib/workers/worker.ts?worker');
 		worker = new W.default();
