@@ -1,0 +1,27 @@
+CONSTANT Max <- 25000
+
+FUNCTION IsPrime(Num: INTEGER) RETURNS BOOLEAN
+    // Manually calculating the bound is faster!
+    DECLARE Bound: INTEGER
+    Bound <- INTEGER(SQRT(Num)) + 1
+
+    //FOR Counter <- 2 TO INTEGER(SQRT(Num))
+    FOR Counter <- 2 TO Bound
+        IF MOD(Num, Counter) = 0 THEN
+            RETURN FALSE
+        ENDIF
+    NEXT Counter
+
+    RETURN TRUE
+ENDFUNCTION
+
+PROCEDURE PrimeTorture(Num: INTEGER)
+    FOR Counter <- 1 TO Num
+        IF IsPrime(Counter) THEN
+            PRINT Counter, ", "
+        ENDIF
+    NEXT Counter
+ENDPROCEDURE
+
+CALL PrimeTorture(Max)
+OUTPUT ""

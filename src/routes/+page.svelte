@@ -96,6 +96,9 @@
 		<button onclick={() => run()}>do magic</button>
 		<button onclick={() => loadExample('HelloWorld')}>load hello world example</button>
 		<button onclick={() => loadExample('BubbleSort')}>load bubble sort example</button>
+		<button onclick={() => loadExample('BSortTorture')}>load bubble sort benchmark</button>
+		<button onclick={() => loadExample('QSortTorture')}>load quick sort benchmark</button>
+		<button onclick={() => loadExample('PrimeTorture')}>load prime torture benchmark</button>
 		<button onclick={() => (src = '')}>clear</button>
 	{:else}
 		<p>Loading Beancode</p>
