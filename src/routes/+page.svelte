@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Xterm } from '@battlefieldduck/xterm-svelte';
+	import { Xterm, XtermAddon } from '@battlefieldduck/xterm-svelte';
 	import type {
 		ITerminalOptions,
 		ITerminalInitOnlyOptions,
@@ -15,22 +15,27 @@
 		worker = new W.default();
 		console.log('imported worker ' + worker);
 		interface WorkerMessage {
-			type: 'ready' | 'output' | 'clear' | 'log';
+			type: 'ready' | 'output' | 'clear' | 'log' | 'error';
 			data: string;
 		}
 		worker.onmessage = (event: MessageEvent<WorkerMessage>) => {
 			switch (event.data.type) {
 				case 'ready':
 					pyodideReady = true;
+					terminal?.clear();
 					break;
 				case 'clear':
 					terminal?.clear();
 					break;
 				case 'output':
-					terminal?.writeln(event.data.data);
+					terminal?.writeln(String(event.data.data).replace(/\n/g, '\r\n'));
 					break;
 				case 'log':
 					log = event.data.data;
+					break;
+				case 'error':
+					terminal?.writeln('An error occurred whilst trying to interact with beancode:');
+					terminal?.writeln(String(event.data.data).replace(/\n/g, '\r\n'));
 					break;
 			}
 		};
@@ -39,12 +44,9 @@
 		await loadWorker();
 	});
 
-	let src = $state(`for i in range(5):
-    print(str(i+1) + " absolute BAJODING")
-import time
-time.sleep(2)
-print("we are done")
-`);
+	let src = $state(
+		`// Welcome to beanweb!\n// Start typing some code below, or load an example.\n`
+	);
 	let log = $state('Waiting for worker to launch');
 
 	let terminal = $state<Terminal>();
@@ -56,10 +58,10 @@ print("we are done")
 	async function onLoad() {
 		console.log('child component has loaded');
 
-		/*const fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
+		const fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
 		terminal?.loadAddon(fitAddon);
-		fitAddon.fit();*/
-		terminal?.writeln('\x1b[1mReady.\x1b[0m');
+		fitAddon.fit();
+		terminal?.writeln('Terminal loaded successfully');
 	}
 
 	function onData(data: string) {
@@ -76,17 +78,27 @@ print("we are done")
 	function run() {
 		worker.postMessage({ src: src });
 	}
+
+	async function loadExample(ex: string) {
+		const FILE_NAME = `${ex}.bean`;
+		const res = await fetch(`/bcdata/examples/${FILE_NAME}`);
+		if (res.status === 200) {
+			src = await res.text();
+			log = `loaded example ${FILE_NAME}`;
+		} else {
+			log = `could not load example ${FILE_NAME}`;
+		}
+	}
 </script>
 
 <div class="outer">
 	{#if pyodideReady}
-		<button
-			onclick={() => {
-				run();
-			}}>do magic</button
-		>
+		<button onclick={() => run()}>do magic</button>
+		<button onclick={() => loadExample('HelloWorld')}>load hello world example</button>
+		<button onclick={() => loadExample('BubbleSort')}>load bubble sort example</button>
+		<button onclick={() => (src = '')}>clear</button>
 	{:else}
-		<p>loading pyodide</p>
+		<p>Loading Beancode</p>
 	{/if}
 	<div class="main">
 		<textarea bind:value={src}></textarea>

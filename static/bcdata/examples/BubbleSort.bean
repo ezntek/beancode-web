@@ -1,0 +1,47 @@
+PROCEDURE BubbleSort(Array: ARRAY[1:End] of INTEGER, End: INTEGER)
+    DECLARE Last, Temp: INTEGER
+    DECLARE Swapped: BOOLEAN
+    Last <- End
+    REPEAT
+        Swapped <- FALSE
+        FOR I <- 1 TO Last - 1
+            IF Array[I] > Array[I+1]
+              THEN
+                Temp <- Array[I]
+                Array[I] <- Array[I+1]
+                Array[I+1] <- Temp
+                Swapped <- TRUE
+            ENDIF
+        NEXT I
+        Last <- Last - 1
+    UNTIL Last = 1 OR (NOT Swapped)  
+ENDPROCEDURE
+
+PROCEDURE PrintArray(Array: ARRAY[1:End] of INTEGER, End: INTEGER)
+    DECLARE Temp: STRING
+    Temp <- ""
+    FOR i <- 1 TO End
+        Temp <- Temp + Array[i]
+        IF i <> End
+          THEN
+            Temp <- Temp + ", "
+        ENDIF
+    NEXT i
+    OUTPUT Temp
+ENDPROCEDURE
+
+CONSTANT Max <- 20
+CONSTANT RandLow <- 1
+CONSTANT RandHigh <- 10000
+DECLARE Array: ARRAY[1:Max] OF INTEGER
+FOR I <- 1 TO Max
+    Array[I] <- ROUND(RANDOM() * (RandHigh - RandLow + 1) + RandLow, 0)
+NEXT I
+
+OUTPUT "Before Sorting: "
+CALL PrintArray(Array, Max)
+
+CALL BubbleSort(Array, Max)
+
+OUTPUT "After Sorting: "
+CALL PrintArray(Array, Max)
