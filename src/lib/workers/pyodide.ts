@@ -25,6 +25,7 @@ from beancode.runner import *`
         }
 
         postMessage({ type: 'ready' });
+        postMessage({ type: 'output', data: 'Ready.' });
         postMessage({ type: 'log', data: 'Ready.'});
     }
     pyodideOK = true;
