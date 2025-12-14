@@ -25,16 +25,12 @@
 	}
 
 	function run() {
-		pyState.worker?.postMessage({ src });
+		pyState.worker?.postMessage({ kind: 'run', data: src });
 	}
 
 	function clear() {
 		src = '';
 		termState.terminal?.write('\x1b[2J\x1b[H');
-	}
-
-	function toggleInput() {
-		termState.canInput = !termState.canInput;
 	}
 </script>
 
@@ -47,7 +43,6 @@
 		<button onclick={() => loadExample('QSortTorture')}>load quick sort benchmark</button>
 		<button onclick={() => loadExample('PrimeTorture')}>load prime torture benchmark</button>
 		<button onclick={() => clear()}>clear</button>
-		<button onclick={() => toggleInput()}>input {termState.canInput ? 'on' : 'off'}</button>
 	{:else}
 		<p>Loading Beancode</p>
 	{/if}

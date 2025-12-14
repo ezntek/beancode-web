@@ -1,10 +1,15 @@
 export type PyMessage =
     | { kind: 'ready' }
     | { kind: 'clear' }
-    | { kind: 'output', data: string; }
-    | { kind: 'log', data: string; }
-    | { kind: 'error', data: string; }
-    | { kind: 'pystdout', data: string; }
+    | { kind: 'output', data: string }
+    | { kind: 'log', data: string }
+    | { kind: 'error', data: string }
+    | { kind: 'pyout', data: string }
+    | { kind: 'pyin' }
+
+export type EditorMessage = 
+    | { kind: 'run', data: string }
+    | { kind: 'setup', data: SharedArrayBuffer }
  
 interface IPyState {
     ready: boolean,

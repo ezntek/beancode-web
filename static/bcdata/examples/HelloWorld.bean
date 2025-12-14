@@ -1,2 +1,7 @@
 OUTPUT "Hello, Bean!"
 OUTPUT "We are on the web :)"
+
+DECLARE Name: STRING
+OUTPUT "What is your name?"
+INPUT Name
+OUTPUT "Your name is ", Name

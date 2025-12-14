@@ -3,7 +3,12 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
+    server: {
+        headers: {
+          "Cross-Origin-Embedder-Policy": "require-corp",
+        }
+    },
     optimizeDeps: {
         include: ['@xterm/xterm', '@xterm/addon-fit', '@xterm/addon-search'],
-    }
+    },
 });
