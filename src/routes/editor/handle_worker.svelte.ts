@@ -1,9 +1,9 @@
-import { type EditorMessage, type PyMessage } from '$lib/workers/pyodide_state.svelte';
+import type { EditorMessage, PyMessage } from '$lib/workers/pyodide_state.svelte';
 import { pyState as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, sab } from './state.svelte';
+import { s, inputBuf, interruptBuf } from './state.svelte';
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     let ter = ts.terminal!;
@@ -31,7 +31,6 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'pyin':
             ts.canInput = true;
-            console.log("sent input"); 
             break;
     }
 }
@@ -40,5 +39,5 @@ export async function setupWorker() {
     const W = await import('$lib/workers/pyodide.ts?worker');
     ps.worker = new W.default();
     ps.worker.onmessage = handleWorkerEvent;
-    ps.worker.postMessage({ kind: 'setup', data: sab });
+    ps.worker.postMessage({ kind: 'setup', inputBuf, interruptBuf } as EditorMessage);
 };

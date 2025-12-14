@@ -3,12 +3,14 @@
 	import { onMount } from 'svelte';
 	import Terminal from './Terminal.svelte';
 	import { pyState } from '$lib/workers/pyodide_state.svelte';
-	import { s } from './state.svelte';
+	import { interruptBuf, s } from './state.svelte';
 	import { termState } from './terminal_state.svelte';
 
+	let ibuf: Uint8Array;
 	onMount(async () => {
 		await setupWorker();
 		s.log = 'Waiting to launch';
+		ibuf = new Uint8Array(interruptBuf);
 	});
 
 	let src = $state(`// Welcome to beanweb!\n// Start typing some code below, or load an example.`);
@@ -25,12 +27,18 @@
 	}
 
 	function run() {
-		pyState.worker?.postMessage({ kind: 'run', data: src });
+		ibuf[0] = 0;
+		pyState.worker!.postMessage({ kind: 'run', data: src });
 	}
 
 	function clear() {
 		src = '';
-		termState.terminal?.write('\x1b[2J\x1b[H');
+		termState.terminal!.write('\x1b[2J\x1b[H');
+	}
+
+	function stop() {
+		// SIGINT
+		ibuf[0] = 2;
 	}
 </script>
 
@@ -42,6 +50,7 @@
 		<button onclick={() => loadExample('BSortTorture')}>load bubble sort benchmark</button>
 		<button onclick={() => loadExample('QSortTorture')}>load quick sort benchmark</button>
 		<button onclick={() => loadExample('PrimeTorture')}>load prime torture benchmark</button>
+		<button onclick={() => stop()}>stop</button>
 		<button onclick={() => clear()}>clear</button>
 	{:else}
 		<p>Loading Beancode</p>

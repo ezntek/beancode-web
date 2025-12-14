@@ -5,14 +5,14 @@
 		type ITerminalInitOnlyOptions
 	} from '@battlefieldduck/xterm-svelte';
 	import { termState as ts } from './terminal_state.svelte';
-	import { sab } from './state.svelte';
+	import { inputBuf, interruptBuf } from './state.svelte';
 
 	const options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontFamily: 'monospace',
 		cursorBlink: true
 	};
 
-	let inputBuf = '';
+	let termInputBuf = '';
 	const encoder = new TextEncoder();
 
 	const write = (s: string) => ts.terminal?.write(s);
@@ -37,18 +37,18 @@
 		switch (ch) {
 			case '\r':
 				write('\r\n');
-				const flag = new Int32Array(sab, 0, 1);
-				Atomics.store(flag, 0, inputBuf.length);
-				const sabdata = new Uint8Array(sab, 4);
+				const flag = new Int32Array(inputBuf, 0, 1);
+				Atomics.store(flag, 0, termInputBuf.length);
+				const sabdata = new Uint8Array(inputBuf, 4);
 				// store string as well
-				const encoded = encoder.encode(inputBuf);
+				const encoded = encoder.encode(termInputBuf);
 				sabdata.set(encoded);
-				inputBuf = '';
+				termInputBuf = '';
 				Atomics.notify(flag, 0);
 				ts.canInput = false;
 				break;
 			case '\x7f':
-				inputBuf = inputBuf.substring(0, -1);
+				termInputBuf = termInputBuf.substring(0, -1);
 				write('\b \b');
 				break;
 			case '\u0004':
@@ -59,7 +59,7 @@
 			case '\u001b[D':
 				return;
 			default:
-				inputBuf += ch;
+				termInputBuf += ch;
 				write(ch);
 				break;
 		}

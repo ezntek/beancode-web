@@ -9,7 +9,7 @@ export type PyMessage =
 
 export type EditorMessage = 
     | { kind: 'run', data: string }
-    | { kind: 'setup', data: SharedArrayBuffer }
+    | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
  
 interface IPyState {
     ready: boolean,

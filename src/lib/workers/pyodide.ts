@@ -13,13 +13,15 @@ class XtermWriter {
     }
     
     write(buf: Uint8Array) {
-        const text = new TextDecoder("utf-8").decode(buf).replaceAll("\n", "\r\n");
+        let text = new TextDecoder("utf-8").decode(buf)
+        text = text.replaceAll("\n", "\r\n");
         post({ kind: 'pyout', data: text });
         return buf.length;
     }
 }
 
-let sab: SharedArrayBuffer;
+let inputBuf: SharedArrayBuffer;
+let interruptBuf: SharedArrayBuffer;
 
 class XtermStdinHandler {
     isatty: boolean
@@ -30,8 +32,8 @@ class XtermStdinHandler {
 
     stdin = (): string => {
         post({ kind: 'pyin' });
-        const flag = new Int32Array(sab, 0, 1);
-        const buf = new Uint8Array(sab, 4); 
+        const flag = new Int32Array(inputBuf, 0, 1);
+        const buf = new Uint8Array(inputBuf, 4); 
         Atomics.wait(flag, 0, 0);
         const sliced = buf.slice(0, flag[0]);
         const res = new TextDecoder('utf-8').decode(sliced);
@@ -47,7 +49,7 @@ async function loadBeancode() {
     if (!py) {
         // @ts-ignore
         const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs");
-        py = await PyodideModule.loadPyodide({});
+        py = await PyodideModule.loadPyodide({ args: [/*'-u'*/] });
         py.setStdout(new XtermWriter());
         py.setStderr(new XtermWriter());
         py.setStdin(new XtermStdinHandler());
@@ -117,7 +119,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             await handleRun(msg.data);
             break;
         case 'setup':
-            sab = msg.data;
+            inputBuf = msg.inputBuf;
+            interruptBuf = msg.interruptBuf;
+            py.setInterruptBuffer(new Uint8Array(interruptBuf));
             break;
     }
 }
