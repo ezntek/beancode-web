@@ -4,32 +4,53 @@
 		type ITerminalOptions,
 		type ITerminalInitOnlyOptions
 	} from '@battlefieldduck/xterm-svelte';
-	import { termState } from './terminal_state.svelte';
+	import { termState as ts } from './terminal_state.svelte';
 
 	const options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontFamily: 'monospace',
 		cursorBlink: true
 	};
 
+	const write = (s: string) => ts.terminal?.write(s);
+	const writeln = (s: string) => ts.terminal?.writeln(s);
+
 	async function onLoad() {
 		console.log('child component has loaded');
 
 		const fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
-		termState.terminal?.loadAddon(fitAddon);
+		ts.terminal?.loadAddon(fitAddon);
 		fitAddon.fit();
-		termState.terminal?.writeln('Terminal loaded successfully');
+		writeln('Terminal loaded successfully');
 	}
 
 	function onData(data: string) {
-		data;
-		//if (data == '\r') termState.terminal.writeln('');
-		//termState.terminal.write(data);
+		if (!ts.canInput) return;
+
+		switch (data) {
+			case '\r':
+				write('\r\n');
+				break;
+			case '\x7f':
+				write('\b \b');
+				break;
+			case '\u001b[3~':
+				write(' \b');
+				break;
+			case '\u0004':
+				write('\x1b[2J\x1b[H');
+				break;
+			case '\u001b[A':
+			case '\u001b[B':
+				return;
+			default:
+				write(data);
+				break;
+		}
 	}
 
 	function onKey(data: { key: string; domEvent: KeyboardEvent }) {
-		data;
-		//console.log('key: ', data);
+		console.log(data);
 	}
 </script>
 
-<Xterm bind:terminal={termState.terminal!} {options} {onLoad} {onData} {onKey} />
+<Xterm bind:terminal={ts.terminal!} {options} {onLoad} {onData} {onKey} />
