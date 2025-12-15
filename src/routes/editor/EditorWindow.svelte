@@ -4,13 +4,19 @@
 	import Terminal from './Terminal.svelte';
 	import { pyState } from '$lib/workers/pyodide_state.svelte';
 	import { interruptBuf, s } from './state.svelte';
-	import { termState } from './terminal_state.svelte';
+	import { termState as ts } from './terminal_state.svelte';
 
+	let terminalWidth = $state(400);
+	let terminalShown = $state(true);
 	let ibuf: Uint8Array;
+
 	onMount(async () => {
 		await setupWorker();
 		s.log = 'Waiting to launch';
 		ibuf = new Uint8Array(interruptBuf);
+
+		const width = localStorage.getItem('EditorTerminalWidth');
+		if (width !== null) terminalWidth = Number.parseInt(width);
 	});
 
 	let src = $state(`// Welcome to beanweb!\n// Start typing some code below, or load an example.`);
@@ -33,31 +39,71 @@
 
 	function clear() {
 		src = '';
-		termState.terminal!.write('\x1b[2J\x1b[H');
+		ts.terminal!.write('\x1b[2J\x1b[H');
 	}
 
 	function stop() {
 		// SIGINT
 		ibuf[0] = 2;
 	}
+
+	const MIN_RATIO = 0.1;
+	const MAX_RATIO = 0.5;
+
+	function startResize(e: any) {
+		const container = e.currentTarget.parentElement;
+		const rect = container.getBoundingClientRect();
+		const min = rect.width * MIN_RATIO;
+		const max = rect.width * MAX_RATIO;
+
+		e.preventDefault();
+		const startX = e.clientX;
+		const startWidth = terminalWidth;
+		e.target.setPointerCapture(e.pointerId);
+
+		function onMove(e: any) {
+			const delta = e.clientX - startX;
+			terminalWidth = Math.min(max, Math.max(min, startWidth - delta));
+		}
+
+		function onUp(e: any) {
+			e.target.releasePointerCapture(e.pointerId);
+			e.target.removeEventListener('pointermove', onMove);
+			e.target.removeEventListener('pointerup', onUp);
+			localStorage.setItem('EditorTerminalWidth', String(terminalWidth));
+			ts.termFitAddon!.fit();
+		}
+
+		e.target.addEventListener('pointermove', onMove);
+		e.target.addEventListener('pointerup', onUp);
+	}
+
+	function toggleTerminal() {
+		terminalShown = !terminalShown;
+	}
 </script>
 
 <div class="outer">
 	{#if pyState.ready}
 		<button onclick={() => run()}>do magic</button>
-		<button onclick={() => loadExample('HelloWorld')}>load hello world example</button>
 		<button onclick={() => loadExample('BubbleSort')}>load bubble sort example</button>
-		<button onclick={() => loadExample('BSortTorture')}>load bubble sort benchmark</button>
-		<button onclick={() => loadExample('QSortTorture')}>load quick sort benchmark</button>
 		<button onclick={() => loadExample('PrimeTorture')}>load prime torture benchmark</button>
 		<button onclick={() => stop()}>stop</button>
 		<button onclick={() => clear()}>clear</button>
+		<button onclick={() => toggleTerminal()}>toggle terminal</button>
 	{:else}
 		<p>Loading Beancode</p>
 	{/if}
 	<div class="main">
 		<textarea bind:value={src}></textarea>
-		<Terminal />
+		<div class="resize-handle" onpointerdown={startResize}></div>
+		<aside class="terminal" style="width: {terminalWidth}px">
+			{#if terminalShown}
+				<Terminal />
+			{:else}
+				<div style="background-color: cyan">a</div>
+			{/if}
+		</aside>
 	</div>
 	<p>{s.log}</p>
 </div>
@@ -65,8 +111,31 @@
 <style>
 	.main {
 		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
 		justify-content: space-between;
-		gap: 1em;
+		align-items: stretch;
+		gap: 0.2em;
+		height: 90vh;
+		overflow: hidden;
+	}
+
+	aside.terminal > * {
+		display: flex;
+		flex-direction: column;
+		flex-shrink: 0;
+		height: 100%;
+	}
+
+	.resize-handle {
+		flex: 0 0 auto;
+		position: relative;
+		box-sizing: border-box;
+		height: 100%;
+		width: 3px;
+		cursor: col-resize;
+		border-left: 1px solid black;
+		border-right: 1px solid black;
 	}
 
 	.main textarea {

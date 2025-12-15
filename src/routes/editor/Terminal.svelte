@@ -5,26 +5,32 @@
 		type ITerminalInitOnlyOptions
 	} from '@battlefieldduck/xterm-svelte';
 	import { termState as ts } from './terminal_state.svelte';
-	import { inputBuf, interruptBuf } from './state.svelte';
+	import { inputBuf } from './state.svelte';
+	import { onMount } from 'svelte';
 
+	let cols = 80;
+	onMount(() => {
+		const itm = localStorage.getItem('EditorTerminalColumns');
+		if (itm !== null) {
+			cols = Number.parseInt(itm);
+		}
+	});
+	console.log(cols);
 	const options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontFamily: 'monospace',
-		cursorBlink: true
+		cursorBlink: true,
+		cols: cols
 	};
 
 	let termInputBuf = '';
 	const encoder = new TextEncoder();
 
 	const write = (s: string) => ts.terminal?.write(s);
-	const writeln = (s: string) => ts.terminal?.writeln(s);
 
 	async function onLoad() {
-		console.log('child component has loaded');
-
-		const fitAddon = new (await XtermAddon.FitAddon()).FitAddon();
-		ts.terminal?.loadAddon(fitAddon);
-		fitAddon.fit();
-		writeln('Terminal loaded successfully');
+		ts.termFitAddon = new (await XtermAddon.FitAddon()).FitAddon();
+		ts.terminal!.loadAddon(ts.termFitAddon!);
+		ts.termFitAddon!.fit();
 	}
 
 	function onData(data: string) {
