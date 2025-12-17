@@ -5,6 +5,7 @@
 	import { pyState } from '$lib/workers/pyodide_state.svelte';
 	import { interruptBuf, s } from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
+	import Editor from './Editor.svelte';
 
 	let terminalWidth = $state(400);
 	let terminalShown = $state(true);
@@ -19,13 +20,11 @@
 		if (width !== null) terminalWidth = Number.parseInt(width);
 	});
 
-	let src = $state(`// Welcome to beanweb!\n// Start typing some code below, or load an example.`);
-
 	async function loadExample(ex: string) {
 		const FILE_NAME = `${ex}.bean`;
 		const res = await fetch(`/bcdata/examples/${FILE_NAME}`);
 		if (res.status === 200) {
-			src = await res.text();
+			s.editorSrc = await res.text();
 			s.log = `loaded example ${FILE_NAME}`;
 		} else {
 			s.log = `could not load example ${FILE_NAME}`;
@@ -34,11 +33,11 @@
 
 	function run() {
 		ibuf[0] = 0;
-		pyState.worker!.postMessage({ kind: 'run', data: src });
+		pyState.worker!.postMessage({ kind: 'run', data: s.editorSrc });
 	}
 
 	function clear() {
-		src = '';
+		s.editorSrc = '';
 		ts.terminal!.write('\x1b[2J\x1b[H');
 	}
 
@@ -95,7 +94,7 @@
 		<p>Loading Beancode</p>
 	{/if}
 	<div class="main">
-		<textarea bind:value={src}></textarea>
+		<Editor />
 		<div class="resize-handle" onpointerdown={startResize}></div>
 		<aside class="terminal" style="width: {terminalWidth}px">
 			{#if terminalShown}
@@ -136,11 +135,5 @@
 		cursor: col-resize;
 		border-left: 1px solid black;
 		border-right: 1px solid black;
-	}
-
-	.main textarea {
-		flex: 1;
-		resize: none;
-		box-sizing: border-box;
 	}
 </style>

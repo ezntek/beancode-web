@@ -9,6 +9,10 @@ export default defineConfig({
         }
     },
     optimizeDeps: {
-        include: ['@xterm/xterm', '@xterm/addon-fit', '@xterm/addon-search'],
+        include: [
+            '@xterm/xterm', '@xterm/addon-fit', '@xterm/addon-search',
+            "svelte-codemirror-editor", "codemirror", "@codemirror/language-javascript",
+            "@codemirror/theme-one-dark"
+        ],
     },
 });
