@@ -1,50 +1,54 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { createEditor, type PrismEditor } from 'prism-code-editor';
 	import { s } from './state.svelte';
-	import 'prism-code-editor/layout.css';
-	import 'prism-code-editor/themes/github-dark.css';
-	import { defaultCommands } from 'prism-code-editor/commands';
+	import { basicSetup, EditorView } from 'codemirror';
+	import { EditorState } from '@codemirror/state';
 
-	let editorContainer: HTMLDivElement | null = null;
-	let editor: PrismEditor;
-
-	const placeholder = '// welcome to beanweb!\n// start typing some code, or load an example.';
+	let editor: HTMLDivElement;
 
 	onMount(() => {
-		editor = createEditor(
-			editorContainer,
-			{
-				lineNumbers: true,
-				value: placeholder,
-				tabSize: 4,
-				// @ts-ignore
-				theme: 'github-dark'
-			},
-			() => {
-				console.log('loaded editor');
-			},
-			defaultCommands()
-		);
+		const updateListener = EditorView.updateListener.of((update) => {
+			if (update.docChanged) {
+				const newValue = update.state.doc.toString();
+				if (newValue !== s.editorSrc) s.editorSrc = newValue;
+			}
+		});
 
-		editor.textarea.addEventListener('input', () => {
-			s.editorSrc = editor.value;
+		const style = EditorView.theme({
+			'&': { height: '100%' },
+			'.cm-scroller': { overflow: 'auto' }
+		});
+
+		const startState = EditorState.create({
+			doc: '',
+			extensions: [basicSetup, updateListener, style]
+		});
+
+		const view = new EditorView({
+			// @ts-ignore
+			parent: editor,
+			state: startState
 		});
 
 		$effect(() => {
-			if (editor.value !== s.editorSrc) {
-				editor.textarea.value = s.editorSrc;
-				editor.update();
+			if (view && s.editorSrc !== view.state.doc.toString()) {
+				view.dispatch({
+					changes: {
+						from: 0,
+						to: view.state.doc.length,
+						insert: s.editorSrc
+					}
+				});
 			}
 		});
 
 		return () => {
-			editor?.remove();
+			view.destroy();
 		};
 	});
 </script>
 
-<div class="editor-wrapper" bind:this={editorContainer}></div>
+<div class="editor-wrapper" bind:this={editor}></div>
 
 <style>
 	.editor-wrapper {
