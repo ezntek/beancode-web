@@ -1,29 +1,52 @@
 <script lang="ts">
-	import { basicSetup, EditorView } from 'codemirror';
-	import CodeMirror from 'svelte-codemirror-editor';
+	import { onMount } from 'svelte';
+	import { createEditor, type PrismEditor } from 'prism-code-editor';
 	import { s } from './state.svelte';
-	import { oneDark } from '@codemirror/theme-one-dark';
-	const placeholder =
-		'// welcome to beanweb!\n// start typing some code, or load one of the examples.';
+	import 'prism-code-editor/layout.css';
+	import 'prism-code-editor/themes/github-dark.css';
+
+	let editorContainer: HTMLDivElement | null = null;
+	let editor: PrismEditor;
+
+	const placeholder = '// welcome to beanweb!\n// start typing some code, or load an example.';
+
+	onMount(() => {
+		editor = createEditor(
+			editorContainer,
+			{
+				lineNumbers: true,
+				value: s.editorSrc || placeholder,
+				// @ts-ignore
+				theme: 'github-dark'
+			},
+			() => {
+				console.log('loaded editor');
+			}
+		);
+
+		editor.textarea.addEventListener('input', () => {
+			s.editorSrc = editor.value;
+		});
+
+		$effect(() => {
+			editor.setOptions({ value: s.editorSrc });
+		});
+
+		return () => {
+			editor?.remove();
+		};
+	});
 </script>
 
-<div class="editor">
-	<CodeMirror bind:value={s.editorSrc} theme={oneDark} extensions={[basicSetup]} {placeholder} />
-</div>
+<div class="editor-wrapper" bind:this={editorContainer}></div>
 
 <style>
-	.editor {
-		flex-direction: column;
-		flex-shrink: 0;
-		flex: 1;
-		overflow: auto;
-	}
-	.cm-editor {
-		display: flex;
-		width: 100% !important;
+	.editor-wrapper {
+		width: 100%;
 		height: 100%;
 	}
-	.cm-scroller {
-		overflow: auto;
+
+	.editor-wrapper :global(.prism-code-editor) {
+		height: 100%;
 	}
 </style>

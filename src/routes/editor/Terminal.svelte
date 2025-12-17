@@ -8,20 +8,22 @@
 	import { inputBuf } from './state.svelte';
 	import { onMount } from 'svelte';
 
-	let cols = 80;
 	onMount(() => {
-		const itm = localStorage.getItem('EditorTerminalColumns');
-		if (itm !== null) {
-			cols = Number.parseInt(itm);
-		}
+		const handleResize = () => {
+			ts.termFitAddon!.fit();
+		};
+		window.addEventListener('resize', handleResize);
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
 	});
-	console.log(cols);
+
 	const options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontFamily: 'monospace',
-		cursorBlink: true,
-		cols: cols
+		cursorBlink: true
 	};
 
+	let terminalContainer: HTMLDivElement;
 	let termInputBuf = '';
 	const encoder = new TextEncoder();
 
@@ -30,7 +32,13 @@
 	async function onLoad() {
 		ts.termFitAddon = new (await XtermAddon.FitAddon()).FitAddon();
 		ts.terminal!.loadAddon(ts.termFitAddon!);
-		ts.termFitAddon!.fit();
+		console.log('Container height:', terminalContainer?.offsetHeight);
+		console.log('Container width:', terminalContainer?.offsetWidth);
+		requestAnimationFrame(() => {
+			ts.termFitAddon!.fit();
+			console.log('Terminal rows:', ts.terminal?.rows);
+			console.log('Terminal cols:', ts.terminal?.cols);
+		});
 	}
 
 	function onData(data: string) {
@@ -54,7 +62,7 @@
 				ts.canInput = false;
 				break;
 			case '\x7f':
-				termInputBuf = termInputBuf.substring(0, -1);
+				termInputBuf = termInputBuf.slice(0, -1);
 				write('\b \b');
 				break;
 			case '\u0004':
@@ -72,4 +80,29 @@
 	}
 </script>
 
-<Xterm bind:terminal={ts.terminal!} {options} {onLoad} {onData} {onKey} />
+<div class="terminal-container" bind:this={terminalContainer}>
+	<Xterm bind:terminal={ts.terminal!} {options} {onLoad} {onData} {onKey} />
+</div>
+
+<style>
+	.terminal-container {
+		display: flex;
+		flex: 0 0 auto;
+		flex-direction: column;
+		background: red;
+	}
+
+	/* very gross hack*/
+	.terminal-container :global(> div) {
+		flex: 1;
+		height: 100%;
+	}
+
+	.terminal-container :global(.xterm) {
+		height: 100% !important;
+	}
+
+	.terminal-container :global(.xterm-screen) {
+		height: 100% !important;
+	}
+</style>

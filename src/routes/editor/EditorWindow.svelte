@@ -70,7 +70,9 @@
 			e.target.removeEventListener('pointermove', onMove);
 			e.target.removeEventListener('pointerup', onUp);
 			localStorage.setItem('EditorTerminalWidth', String(terminalWidth));
-			ts.termFitAddon!.fit();
+			setTimeout(() => {
+				ts.termFitAddon?.fit();
+			}, 0);
 		}
 
 		e.target.addEventListener('pointermove', onMove);
@@ -94,7 +96,9 @@
 		<p>Loading Beancode</p>
 	{/if}
 	<div class="main">
-		<Editor />
+		<div class="editor">
+			<Editor />
+		</div>
 		<div class="resize-handle" onpointerdown={startResize}></div>
 		<aside class="terminal" style="width: {terminalWidth}px">
 			{#if terminalShown}
@@ -119,11 +123,11 @@
 		overflow: hidden;
 	}
 
-	aside.terminal > * {
+	.editor {
 		display: flex;
+		flex: 1 0 50%;
 		flex-direction: column;
-		flex-shrink: 0;
-		height: 100%;
+		min-width: none;
 	}
 
 	.resize-handle {
@@ -135,5 +139,16 @@
 		cursor: col-resize;
 		border-left: 1px solid black;
 		border-right: 1px solid black;
+	}
+
+	aside.terminal {
+		display: flex;
+		flex: 0 0 auto;
+		flex-direction: column;
+	}
+
+	aside.terminal > :global(*) {
+		flex: 1;
+		min-height: 0;
 	}
 </style>
