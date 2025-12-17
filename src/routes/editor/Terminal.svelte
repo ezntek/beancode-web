@@ -89,12 +89,10 @@
 		display: flex;
 		flex: 0 0 auto;
 		flex-direction: column;
-		background: red;
 	}
 
 	/* very gross hack*/
 	.terminal-container :global(> div) {
-		flex: 1;
 		height: 100%;
 	}
 

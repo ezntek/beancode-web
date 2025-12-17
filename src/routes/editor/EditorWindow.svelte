@@ -125,6 +125,7 @@
 
 	.editor {
 		display: flex;
+		flex: 1;
 		flex: 1 0 50%;
 		flex-direction: column;
 		min-width: none;

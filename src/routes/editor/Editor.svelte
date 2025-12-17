@@ -4,6 +4,7 @@
 	import { s } from './state.svelte';
 	import 'prism-code-editor/layout.css';
 	import 'prism-code-editor/themes/github-dark.css';
+	import { defaultCommands } from 'prism-code-editor/commands';
 
 	let editorContainer: HTMLDivElement | null = null;
 	let editor: PrismEditor;
@@ -15,13 +16,15 @@
 			editorContainer,
 			{
 				lineNumbers: true,
-				value: s.editorSrc || placeholder,
+				value: placeholder,
+				tabSize: 4,
 				// @ts-ignore
 				theme: 'github-dark'
 			},
 			() => {
 				console.log('loaded editor');
-			}
+			},
+			defaultCommands()
 		);
 
 		editor.textarea.addEventListener('input', () => {
@@ -29,7 +32,10 @@
 		});
 
 		$effect(() => {
-			editor.setOptions({ value: s.editorSrc });
+			if (editor.value !== s.editorSrc) {
+				editor.textarea.value = s.editorSrc;
+				editor.update();
+			}
 		});
 
 		return () => {
@@ -44,6 +50,7 @@
 	.editor-wrapper {
 		width: 100%;
 		height: 100%;
+		overflow: hidden;
 	}
 
 	.editor-wrapper :global(.prism-code-editor) {
