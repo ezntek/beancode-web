@@ -47,7 +47,7 @@
 	}
 
 	const MIN_RATIO = 0.1;
-	const MAX_RATIO = 0.5;
+	const MAX_RATIO = 0.9;
 
 	function startResize(e: any) {
 		const container = e.currentTarget.parentElement;
@@ -85,17 +85,19 @@
 </script>
 
 <div class="outer">
-	{#if pyState.ready}
-		<button onclick={() => run()}>do magic</button>
-		<button onclick={() => loadExample('BubbleSort')}>load bubble sort example</button>
-		<button onclick={() => loadExample('PrimeTorture')}>load prime torture benchmark</button>
-		<button onclick={() => stop()}>stop</button>
-		<button onclick={() => clear()}>clear</button>
-		<button onclick={() => toggleTerminal()}>toggle terminal</button>
-	{:else}
-		<p>Loading Beancode</p>
-	{/if}
-	<div class="main">
+	<div class="toolbar">
+		{#if pyState.ready}
+			<button onclick={() => run()}>do magic</button>
+			<button onclick={() => loadExample('BubbleSort')}>load bubble sort example</button>
+			<button onclick={() => loadExample('PrimeTorture')}>load prime torture benchmark</button>
+			<button onclick={() => stop()}>stop</button>
+			<button onclick={() => clear()}>clear</button>
+			<button onclick={() => toggleTerminal()}>toggle terminal</button>
+		{:else}
+			<p>Loading Beancode</p>
+		{/if}
+	</div>
+	<div class="middle">
 		<div class="editor">
 			<Editor />
 		</div>
@@ -108,27 +110,42 @@
 			{/if}
 		</aside>
 	</div>
-	<p>{s.log}</p>
+	<div class="bottom">
+		<p>{s.log}</p>
+	</div>
 </div>
 
 <style>
-	.main {
+	.outer {
 		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		min-height: 0;
+	}
+
+	.middle {
+		display: flex;
+		flex: 1;
 		flex-direction: row;
 		flex-wrap: nowrap;
 		justify-content: space-between;
 		align-items: stretch;
 		gap: 0.2em;
-		height: 90vh;
 		overflow: hidden;
+		min-height: 0;
+	}
+
+	.bottom {
+		flex: 0 0 auto;
+		min-height: 0;
+		overflow-y: hidden;
 	}
 
 	.editor {
 		display: flex;
 		flex: 1;
-		flex: 1 0 50%;
 		flex-direction: column;
-		min-width: none;
+		min-width: 0;
 	}
 
 	.resize-handle {
