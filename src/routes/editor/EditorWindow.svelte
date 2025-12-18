@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import Terminal from './Terminal.svelte';
 	import { pyState } from '$lib/workers/pyodide_state.svelte';
-	import { interruptBuf, s } from './state.svelte';
+	import { inputBuf, interruptBuf, s } from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import Editor from './Editor.svelte';
 
@@ -44,6 +44,9 @@
 	function stop() {
 		// SIGINT
 		ibuf[0] = 2;
+		const flag = new Int32Array(inputBuf, 0, 1);
+		Atomics.store(flag, 0, 0);
+		Atomics.notify(flag, 0);
 	}
 
 	const MIN_RATIO = 0.1;

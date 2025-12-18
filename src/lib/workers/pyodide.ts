@@ -35,6 +35,13 @@ class XtermStdinHandler {
         const flag = new Int32Array(inputBuf, 0, 1);
         const buf = new Uint8Array(inputBuf, 4); 
         Atomics.wait(flag, 0, 0);
+        if (flag[0] == 0) {
+            // KeyboardInterrupt
+            flag.fill(0);
+            buf.fill(0);
+            post({ kind: 'output', data: '' });
+            return "";
+        }
         const sliced = buf.slice(0, flag[0]);
         const res = new TextDecoder('utf-8').decode(sliced);
         Atomics.store(flag, 0, 0);
