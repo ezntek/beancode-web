@@ -7,7 +7,7 @@
 	import { termState as ts } from './terminal_state.svelte';
 	import Editor from './Editor.svelte';
 
-	let terminalWidth = $state(400);
+	let terminalWidth = $state(0);
 	let terminalShown = $state(true);
 	let ibuf: Uint8Array;
 
@@ -17,7 +17,11 @@
 		ibuf = new Uint8Array(interruptBuf);
 
 		const width = localStorage.getItem('EditorTerminalWidth');
-		if (width !== null) terminalWidth = Number.parseInt(width);
+		if (width !== null) {
+			terminalWidth = Number.parseInt(width);
+		} else {
+			terminalWidth = window.innerWidth * 0.45;
+		}
 	});
 
 	async function loadExample(ex: string) {
@@ -124,6 +128,7 @@
 		flex-direction: column;
 		height: 100vh;
 		min-height: 0;
+		overflow: hidden;
 	}
 
 	.middle {

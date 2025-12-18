@@ -1,0 +1,31 @@
+import type { ThemeSpec } from "./themes";
+
+export const DEFAULT_DARK: ThemeSpec = {
+	base1: "#0f1416",
+	base2: "#141b1f",
+	base3: "#1b2429",
+	surface1: "#202c31",
+	surface2: "#26353b",
+	surface3: "#2c3e45",
+	overlay1: "#3a5058",
+	overlay2: "#4a6670",
+	overlay3: "#5c7d88",
+	subtext1: "#7f9aa4",
+	subtext2: "#9bb4bd",
+	text: "#d6e1e6",
+	red: "#e06c75",
+	green: "#7ec7a2",
+	yellow: "#e5c890",
+	blue: "#6cb6eb",
+	magenta: "#c99bf0",
+	cyan: "#5fb3b3",
+	brightRed: "#f08a92",
+	brightGreen: "#9adbb5",
+	brightYellow: "#f0d9a6",
+	brightBlue: "#8fc9ff",
+	brightMagenta: "#ddb6ff",
+	brightCyan: "#7fd4d4",
+	orange: "#f4a261",
+	purple: "#b48ead",
+}
+

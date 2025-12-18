@@ -1,0 +1,31 @@
+import type { ThemeSpec } from "./themes";
+
+export const CATPPUCCIN_MACCHIATO: ThemeSpec = {
+    base1: "#181926",
+    base2: "#1e2030",
+    base3: "#24273a",
+    surface1: "#363a4f",
+    surface2: "#494d64",
+    surface3: "#5b6078",
+    overlay1: "#6e738d",
+    overlay2: "#8087a2",
+    overlay3: "#939ab7",
+    subtext1: "#b8c0e0",
+    subtext2: "#a5adcb",
+    text: "#cad3f5",    
+	red: "#ed8796",
+	green: "#a6da95",
+	yellow: "#eed49f",
+	blue: "#8aadf4",
+	magenta: "#c6a0f6",
+	cyan: "#8bd5ca",
+	brightRed: "#ed8796",
+	brightGreen: "#a6da95",
+	brightYellow: "#eed49f",
+	brightBlue: "#8aadf4",
+	brightMagenta: "#c6a0f6",
+	brightCyan: "#8bd5ca",
+	orange: "#f5a97f",
+	purple: "#c6a0f6",
+};
+
