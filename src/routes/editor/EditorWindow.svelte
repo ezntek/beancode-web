@@ -126,9 +126,8 @@
 	.outer {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: 100%;
 		min-height: 0;
-		overflow: hidden;
 	}
 
 	.middle {
@@ -139,14 +138,12 @@
 		justify-content: space-between;
 		align-items: stretch;
 		gap: 0.2em;
-		overflow: hidden;
 		min-height: 0;
 	}
 
 	.bottom {
 		flex: 0 0 auto;
 		min-height: 0;
-		overflow-y: hidden;
 	}
 
 	.editor {

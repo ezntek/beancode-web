@@ -10,6 +10,7 @@ export interface ThemeSpec {
     overlay3: string,
     subtext1: string,
     subtext2: string,
+    text: string,
 	red: string
 	green: string
 	yellow: string
