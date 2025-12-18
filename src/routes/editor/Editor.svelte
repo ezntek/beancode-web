@@ -3,6 +3,7 @@
 	import { s } from './state.svelte';
 	import { basicSetup, EditorView } from 'codemirror';
 	import { EditorState } from '@codemirror/state';
+	import { catppuccinMacchiato } from '@catppuccin/codemirror';
 
 	let editor: HTMLDivElement;
 
@@ -16,12 +17,14 @@
 
 		const style = EditorView.theme({
 			'&': { height: '100%' },
-			'.cm-scroller': { overflow: 'auto' }
+			'.cm-scroller': { overflow: 'auto' },
+			'.cm-content': { fontFamily: 'IBM Plex Mono', fontSize: '15pt' },
+			'.cm-gutterElement': { display: 'flex', alignItems: 'center' }
 		});
 
 		const startState = EditorState.create({
 			doc: '',
-			extensions: [basicSetup, updateListener, style]
+			extensions: [basicSetup, updateListener, style, catppuccinMacchiato]
 		});
 
 		const view = new EditorView({
@@ -55,9 +58,5 @@
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
-	}
-
-	.editor-wrapper :global(.prism-code-editor) {
-		height: 100%;
 	}
 </style>

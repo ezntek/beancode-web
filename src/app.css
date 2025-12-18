@@ -3,6 +3,5 @@
 }
 html,
 body {
-    height: calc(100vh - 0.4em);
-    margin: 0.2em;
+    margin: 0;
 }

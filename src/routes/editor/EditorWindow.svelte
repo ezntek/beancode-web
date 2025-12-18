@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { setupWorker } from './handle_worker.svelte';
 	import { onMount } from 'svelte';
+
+	import Editor from './Editor.svelte';
+	import Button from '$lib/components/Button.svelte';
+
+	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';
 	import { pyState } from '$lib/workers/pyodide_state.svelte';
 	import { inputBuf, interruptBuf, s } from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
-	import Editor from './Editor.svelte';
 
 	let terminalWidth = $state(0);
-	let terminalShown = $state(true);
 	let ibuf: Uint8Array;
 
 	onMount(async () => {
@@ -40,9 +42,8 @@
 		pyState.worker!.postMessage({ kind: 'run', data: s.editorSrc });
 	}
 
-	function clear() {
+	function clearEditor() {
 		s.editorSrc = '';
-		ts.terminal!.write('\x1b[2J\x1b[H');
 	}
 
 	function stop() {
@@ -51,6 +52,11 @@
 		const flag = new Int32Array(inputBuf, 0, 1);
 		Atomics.store(flag, 0, 0);
 		Atomics.notify(flag, 0);
+	}
+
+	function clearTerminal() {
+		ts.terminal!.clear();
+		ts.terminal!.write('\x1b[2J\x1b[H');
 	}
 
 	const MIN_RATIO = 0.1;
@@ -85,21 +91,16 @@
 		e.target.addEventListener('pointermove', onMove);
 		e.target.addEventListener('pointerup', onUp);
 	}
-
-	function toggleTerminal() {
-		terminalShown = !terminalShown;
-	}
 </script>
 
 <div class="outer">
 	<div class="toolbar">
 		{#if pyState.ready}
-			<button onclick={() => run()}>do magic</button>
-			<button onclick={() => loadExample('BubbleSort')}>load bubble sort example</button>
-			<button onclick={() => loadExample('PrimeTorture')}>load prime torture benchmark</button>
-			<button onclick={() => stop()}>stop</button>
-			<button onclick={() => clear()}>clear</button>
-			<button onclick={() => toggleTerminal()}>toggle terminal</button>
+			<Button onclick={run}>do magic</Button>
+			<Button onclick={stop}>stop</Button>
+			<Button onclick={() => loadExample('HelloWorld')}>load some code</Button>
+			<Button onclick={clearEditor}>clear editor</Button>
+			<Button onclick={clearTerminal}>clear terminal</Button>
 		{:else}
 			<p>Loading Beancode</p>
 		{/if}
@@ -110,11 +111,7 @@
 		</div>
 		<div class="resize-handle" onpointerdown={startResize}></div>
 		<aside class="terminal" style="width: {terminalWidth}px">
-			{#if terminalShown}
-				<Terminal />
-			{:else}
-				<div style="background-color: cyan">a</div>
-			{/if}
+			<Terminal />
 		</aside>
 	</div>
 	<div class="bottom">
@@ -130,6 +127,10 @@
 		min-height: 0;
 	}
 
+	.toolbar {
+		display: flex;
+	}
+
 	.middle {
 		display: flex;
 		flex: 1;
@@ -139,6 +140,8 @@
 		align-items: stretch;
 		gap: 0.2em;
 		min-height: 0;
+		margin-top: 0.3em;
+		margin-bottom: 0.3em;
 	}
 
 	.bottom {

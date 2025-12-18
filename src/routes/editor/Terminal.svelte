@@ -5,8 +5,10 @@
 		type ITerminalInitOnlyOptions
 	} from '@battlefieldduck/xterm-svelte';
 	import { termState as ts } from './terminal_state.svelte';
-	import { inputBuf } from './state.svelte';
+	import { inputBuf, s } from './state.svelte';
 	import { onMount } from 'svelte';
+	import { type ITheme } from '@xterm/xterm';
+	import { THEMES, type ThemeSpec } from '$lib/themes/themes';
 
 	onMount(() => {
 		const handleResize = () => {
@@ -18,9 +20,41 @@
 		};
 	});
 
+	function hexToEsc(code: string): string {
+		const r = parseInt(code.slice(1, 3), 16);
+		const g = parseInt(code.slice(3, 5), 16);
+		const b = parseInt(code.slice(5, 7), 16);
+		return `\x1b[38;2;${r};${g};${b}m`;
+	}
+
+	// @ts-ignore
+	const t: ThemeSpec = THEMES[s.themeName];
+	const termTheme: ITheme = {
+		background: hexToEsc(t.base3),
+		black: hexToEsc(t.base3),
+		red: hexToEsc(t.red),
+		green: hexToEsc(t.green),
+		yellow: hexToEsc(t.yellow),
+		blue: hexToEsc(t.blue),
+		magenta: hexToEsc(t.magenta),
+		cyan: hexToEsc(t.cyan),
+		white: hexToEsc(t.text),
+		brightRed: hexToEsc(t.brightRed),
+		brightGreen: hexToEsc(t.brightGreen),
+		brightYellow: hexToEsc(t.brightYellow),
+		brightBlue: hexToEsc(t.brightBlue),
+		brightMagenta: hexToEsc(t.brightMagenta),
+		brightCyan: hexToEsc(t.brightCyan),
+		brightBlack: hexToEsc(t.surface1),
+		brightWhite: hexToEsc(t.text)
+	};
+	console.log(termTheme);
+
 	const options: ITerminalOptions & ITerminalInitOnlyOptions = {
-		fontFamily: 'monospace',
-		cursorBlink: true
+		fontFamily: 'IBM Plex Mono',
+		cursorBlink: true,
+		fontSize: 24,
+		theme: termTheme
 	};
 
 	let terminalContainer: HTMLDivElement;
@@ -32,13 +66,11 @@
 	async function onLoad() {
 		ts.termFitAddon = new (await XtermAddon.FitAddon()).FitAddon();
 		ts.terminal!.loadAddon(ts.termFitAddon!);
-		console.log('Container height:', terminalContainer?.offsetHeight);
-		console.log('Container width:', terminalContainer?.offsetWidth);
-		requestAnimationFrame(() => {
+		ts.terminal!.options.theme = termTheme;
+
+		setTimeout(() => {
 			ts.termFitAddon!.fit();
-			console.log('Terminal rows:', ts.terminal?.rows);
-			console.log('Terminal cols:', ts.terminal?.cols);
-		});
+		}, 0);
 	}
 
 	function onData(data: string) {

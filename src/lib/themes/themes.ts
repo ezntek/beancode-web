@@ -39,8 +39,12 @@ export const THEMES = {
     'default_light': DEFAULT_LIGHT,
 }
 
-export function applyTheme(theme: ThemeSpec) { 
-    for (let [prop, color] of Object.entries(theme)) {
+export function applyTheme(themeName: string) { 
+    if (!(themeName in THEMES))
+        console.error(`could not find theme ${themeName}!`);
+
+    // @ts-ignore
+    for (let [prop, color] of Object.entries(THEMES[themeName] as ThemeSpec)) {
         let v = "--bw-" + String(prop);
         document.documentElement.style.setProperty(v, color);
     }
