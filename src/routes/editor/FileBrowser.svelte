@@ -47,5 +47,6 @@
 		font-size: 1em;
 		background-color: var(--bw-surface1);
 		color: var(--bw-text);
+		overflow: hidden;
 	}
 </style>

@@ -39,7 +39,6 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'listdir-response':
             s.curdir = msg.data;
-            console.log(s.curdir);
             break;
         case 'readfile-response':
             const rkind = msg.data.kind;

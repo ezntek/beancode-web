@@ -76,7 +76,7 @@
 	}
 
 	let terminalWidth = $state(0);
-	let fileBrowserWidth = $state(100);
+	let fileBrowserWidth = $state(120);
 
 	function startResizeTerm(e: any) {
 		const container = e.currentTarget.parentElement;

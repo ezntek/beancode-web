@@ -55,7 +55,6 @@ class XtermStdinHandler {
 function listDir(path: string): Dir {
     let fs: Dir = new Map(); 
     const listing = py.FS.readdir(path);
-    console.log("got listing: ", listing);
     for (const item of listing) {
         const itemPath = path + '/' + item;
         const stat = py.FS.stat(itemPath);
