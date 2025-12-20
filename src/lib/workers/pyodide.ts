@@ -1,5 +1,7 @@
 import { type VarTable, gen_beancode_wrapper, gen_py_wrapper } from "$lib/run_wrapper";
+import { FileResponseKind, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
+import type { FileResponse } from "$lib/fstypes";
 
 function post(msg: PyMessage) {
     postMessage(msg satisfies PyMessage);
@@ -50,6 +52,48 @@ class XtermStdinHandler {
     }
 }
 
+function listDir(path: string): Dir {
+    let fs: Dir = new Map(); 
+    const listing = py.FS.readdir(path);
+    console.log("got listing: ", listing);
+    for (const item of listing) {
+        const itemPath = path + '/' + item;
+        const stat = py.FS.stat(itemPath);
+        fs.set(item, py.FS.isDir(stat.mode));
+    }
+    return fs;
+}
+
+function readFile(path: string): FileResponse {
+    let data: Uint8Array;
+    let decoded: string;
+
+    try { 
+        data = py.FS.readFile(path);
+    } catch (exc: any) {
+        if (typeof exc.errno !== 'number') {
+            return { kind: FileResponseKind.Exception, data: exc };
+        }
+
+        if (exc.errno === 2) {
+            return { kind: FileResponseKind.NotFound };
+        } else if (exc.errno === 21) {
+            return { kind: FileResponseKind.IsDir };
+        } else {
+            return { kind: FileResponseKind.Errno, errno: exc.errno, msg: py.FS.strerror(exc.errno) };
+        }
+    }
+
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+
+    try {
+        decoded = decoder.decode(data);
+    } catch (exc: any) {
+        return { kind: FileResponseKind.NotText };
+    }
+
+    return { kind: FileResponseKind.Ok, data: decoded };
+}
 
 let py: any;
 async function loadBeancode() {
@@ -142,23 +186,39 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
     if (!pyOK)
         return;
     
-    const msg = event.data;
-    switch (msg.kind) {
-        case 'run':
-            (new Uint8Array(interruptBuf))[0] = 0;
-            post({ kind: 'clear' });
-            await handleRun(msg.data);
-            break;
-        case 'runpy':
-            (new Uint8Array(interruptBuf))[0] = 0;
-            post({ kind: 'clear' });
-            await handleRunPy(msg.data);
-            break;
-        case 'setup':
-            inputBuf = msg.inputBuf;
-            interruptBuf = msg.interruptBuf;
-            py.setInterruptBuffer(new Uint8Array(interruptBuf));
-            break;
+    try {
+        const msg = event.data;
+        switch (msg.kind) {
+            case 'run':
+                (new Uint8Array(interruptBuf))[0] = 0;
+                post({ kind: 'clear' });
+                await handleRun(msg.data);
+                break;
+            case 'runpy':
+                (new Uint8Array(interruptBuf))[0] = 0;
+                post({ kind: 'clear' });
+                await handleRunPy(msg.data);
+                break;
+            case 'setup':
+                inputBuf = msg.inputBuf;
+                interruptBuf = msg.interruptBuf;
+                py.setInterruptBuffer(new Uint8Array(interruptBuf));
+                break;
+            case 'listdir':
+                post({ kind: 'listdir-response', data: listDir(msg.path) });
+                break
+            case 'readfile':
+                post({ kind: 'readfile-response', path: msg.path, data: readFile(msg.path) });
+                break;
+        }
+    } catch (exc: any) {
+        console.error("worker error: ", exc);
+        let data = String(exc);
+        if (exc.name === "ErrnoError") {
+            data = `Errno ${exc.errno}`;
+        }
+
+        post({ kind: 'error', data: data });
     }
 }
 

@@ -3,7 +3,8 @@ import { pyState as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, inputBuf, interruptBuf } from './state.svelte';
+import { s, inputBuf, interruptBuf, readFileCallback } from './state.svelte';
+import { FileResponseKind } from '$lib/fstypes';
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     let ter = ts.terminal!;
@@ -36,6 +37,16 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
         case 'pyexit':
             s.exitCode = msg.code;
             break;
+        case 'listdir-response':
+            s.curdir = msg.data;
+            console.log(s.curdir);
+            break;
+        case 'readfile-response':
+            const rkind = msg.data.kind;
+            if (rkind === FileResponseKind.Ok) {
+                readFileCallback!(msg.path, msg.data.data);
+            }
+            break;
     }
 }
 
@@ -44,4 +55,5 @@ export async function setupWorker() {
     ps.worker = new W.default();
     ps.worker.onmessage = handleWorkerEvent;
     ps.worker.postMessage({ kind: 'setup', inputBuf, interruptBuf } as EditorMessage);
+    ps.worker.postMessage({ kind: 'listdir', path: s.cwd } as EditorMessage);
 };

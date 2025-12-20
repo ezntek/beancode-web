@@ -1,3 +1,5 @@
+import type { FileResponse, Dir } from '$lib/fstypes';
+
 export type PyMessage =
     | { kind: 'ready', version: string }
     | { kind: 'clear' }
@@ -7,11 +9,17 @@ export type PyMessage =
     | { kind: 'pyout', data: string }
     | { kind: 'pyin' }
     | { kind: 'pyexit', code: number }
+    | { kind: 'listdir-response', data: Dir }
+    // path that file was read from
+    | { kind: 'readfile-response', path: string, data: FileResponse }
 
 export type EditorMessage = 
     | { kind: 'run', data: string }
     | { kind: 'runpy', data: string }
     | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
+    | { kind: 'listdir', path: string }
+    | { kind: 'readfile', path: string }
+
  
 interface IPyState {
     ready: boolean,
@@ -22,3 +30,7 @@ export const pyState: IPyState = $state({
     ready: false,
     worker: null,
 })
+
+export function post(msg: EditorMessage) {
+    pyState.worker!.postMessage(msg);
+}

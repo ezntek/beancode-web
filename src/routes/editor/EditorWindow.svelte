@@ -6,11 +6,18 @@
 
 	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';
-	import { pyState } from '$lib/workers/pyodide_state.svelte';
-	import { inputBuf, interruptBuf, s } from './state.svelte';
+	import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
+	import {
+		inputBuf,
+		interruptBuf,
+		s,
+		setReadFileCallback,
+		type ReadFileCallback
+	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
+	import FileBrowser from './FileBrowser.svelte';
+	import ResizeBar from '$lib/components/ResizeBar.svelte';
 
-	let terminalWidth = $state(0);
 	let ibuf: Uint8Array;
 
 	onMount(async () => {
@@ -24,6 +31,12 @@
 		} else {
 			terminalWidth = window.innerWidth * 0.45;
 		}
+
+		function readFileCallback(path: string, data: string) {
+			path;
+			s.editorSrc = data;
+		}
+		setReadFileCallback(readFileCallback as ReadFileCallback);
 	});
 
 	async function loadExample(ex: string) {
@@ -38,11 +51,11 @@
 	}
 
 	function run() {
-		pyState.worker!.postMessage({ kind: 'run', data: s.editorSrc });
+		post({ kind: 'run', data: s.editorSrc });
 	}
 
 	function runPy() {
-		pyState.worker!.postMessage({ kind: 'runpy', data: s.editorSrc });
+		post({ kind: 'runpy', data: s.editorSrc });
 	}
 
 	function clearEditor() {
@@ -62,14 +75,14 @@
 		ts.terminal!.write('\x1b[2J\x1b[H');
 	}
 
-	const MIN_RATIO = 0.1;
-	const MAX_RATIO = 0.9;
+	let terminalWidth = $state(0);
+	let fileBrowserWidth = $state(100);
 
-	function startResize(e: any) {
+	function startResizeTerm(e: any) {
 		const container = e.currentTarget.parentElement;
 		const rect = container.getBoundingClientRect();
-		const min = rect.width * MIN_RATIO;
-		const max = rect.width * MAX_RATIO;
+		const min = rect.width * 0.1;
+		const max = rect.width * 0.6;
 
 		e.preventDefault();
 		const startX = e.clientX;
@@ -87,8 +100,35 @@
 			e.target.removeEventListener('pointerup', onUp);
 			localStorage.setItem('EditorTerminalWidth', String(terminalWidth));
 			setTimeout(() => {
-				ts.termFitAddon?.fit();
+				ts.termFitAddon!.fit();
 			}, 0);
+		}
+
+		e.target.addEventListener('pointermove', onMove);
+		e.target.addEventListener('pointerup', onUp);
+	}
+
+	function startResizeFileBrowser(e: any) {
+		const container = e.currentTarget.parentElement;
+		const rect = container.getBoundingClientRect();
+		const min = rect.width * 0.05;
+		const max = rect.width * 0.2;
+
+		e.preventDefault();
+		const startX = e.clientX;
+		const startWidth = fileBrowserWidth;
+		e.target.setPointerCapture(e.pointerId);
+
+		function onMove(e: any) {
+			const delta = e.clientX - startX;
+			fileBrowserWidth = Math.min(max, Math.max(min, startWidth + delta));
+		}
+
+		function onUp(e: any) {
+			e.target.releasePointerCapture(e.pointerId);
+			e.target.removeEventListener('pointermove', onMove);
+			e.target.removeEventListener('pointerup', onUp);
+			localStorage.setItem('EditorFileBrowserWidth', String(fileBrowserWidth));
 		}
 
 		e.target.addEventListener('pointermove', onMove);
@@ -98,7 +138,7 @@
 
 <div class="outer">
 	<div class="toolbar">
-		{#if pyState.ready}
+		{#if ps.ready}
 			<Button onclick={run}>do magic</Button>
 			<Button onclick={runPy}>run python</Button>
 			<Button onclick={stop}>stop</Button>
@@ -108,21 +148,21 @@
 		{:else}{/if}
 	</div>
 	<div class="middle">
+		<aside style="display: flex; width: {fileBrowserWidth}px;">
+			<FileBrowser />
+		</aside>
+		<ResizeBar resize={startResizeFileBrowser} />
 		<div class="editor">
 			<Editor />
 		</div>
-		<div class="resize-handle-outer" onpointerdown={startResize}>
-			<div class="resize-handle-line">
-				<div class="resize-handle-handle"></div>
-			</div>
-		</div>
-		<aside class="terminal" style="width: {terminalWidth}px">
+		<ResizeBar resize={startResizeTerm} />
+		<aside class="terminal" style="width: {terminalWidth}px;">
 			<Terminal />
 		</aside>
 	</div>
 	<div class="bottom">
-		<p>{s.versionText}</p>
 		<p style="font-weight: bold;">{s.status}</p>
+		<p>{s.versionText}</p>
 	</div>
 </div>
 
@@ -170,40 +210,6 @@
 		flex: 1;
 		flex-direction: column;
 		min-width: 0;
-	}
-
-	.resize-handle-outer {
-		flex: 0 0 auto;
-		flex-direction: column;
-		position: relative;
-		box-sizing: border-box;
-		height: 100%;
-		width: 8px;
-		cursor: col-resize;
-		margin-left: 1px;
-		margin-right: 1px;
-		align-items: center;
-		justify-content: center;
-		display: flex;
-	}
-
-	.resize-handle-line {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background-color: var(--bw-surface1);
-		height: 100%;
-		width: 3px;
-		border-radius: 1px;
-		overflow: visible;
-	}
-
-	.resize-handle-handle {
-		display: flex;
-		height: 45px;
-		background-color: var(--bw-surface2);
-		border-radius: 1px;
-		min-width: 6px;
 	}
 
 	aside.terminal {
