@@ -113,7 +113,11 @@
 		<div class="editor">
 			<Editor />
 		</div>
-		<div class="resize-handle" onpointerdown={startResize}></div>
+		<div class="resize-handle-outer" onpointerdown={startResize}>
+			<div class="resize-handle-line">
+				<div class="resize-handle-handle"></div>
+			</div>
+		</div>
 		<aside class="terminal" style="width: {terminalWidth}px">
 			<Terminal />
 		</aside>
@@ -160,15 +164,38 @@
 		min-width: 0;
 	}
 
-	.resize-handle {
+	.resize-handle-outer {
 		flex: 0 0 auto;
+		flex-direction: column;
 		position: relative;
 		box-sizing: border-box;
 		height: 100%;
-		width: 3px;
+		width: 8px;
 		cursor: col-resize;
-		border-left: 1px solid black;
-		border-right: 1px solid black;
+		margin-left: 1px;
+		margin-right: 1px;
+		align-items: center;
+		justify-content: center;
+		display: flex;
+	}
+
+	.resize-handle-line {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--bw-surface1);
+		height: 100%;
+		width: 3px;
+		border-radius: 1px;
+		overflow: visible;
+	}
+
+	.resize-handle-handle {
+		display: flex;
+		height: 45px;
+		background-color: var(--bw-surface2);
+		border-radius: 1px;
+		min-width: 6px;
 	}
 
 	aside.terminal {

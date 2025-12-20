@@ -10,11 +10,26 @@
 	import { type ITheme } from '@xterm/xterm';
 	import { THEMES, type ThemeSpec } from '$lib/themes/themes';
 
+	let fontSize = 25;
+	let options: ITerminalOptions & ITerminalInitOnlyOptions;
 	onMount(() => {
 		const handleResize = () => {
 			ts.termFitAddon!.fit();
 		};
 		window.addEventListener('resize', handleResize);
+
+		console.log(window.innerWidth, window.innerHeight);
+		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
+			fontSize = 20;
+		}
+
+		options = {
+			fontFamily: 'IBM Plex Mono',
+			cursorBlink: true,
+			fontSize: fontSize,
+			theme: termTheme
+		};
+
 		return () => {
 			window.removeEventListener('resize', handleResize);
 		};
@@ -43,13 +58,6 @@
 		brightCyan: t.brightCyan,
 		brightBlack: t.surface1,
 		brightWhite: t.text
-	};
-
-	const options: ITerminalOptions & ITerminalInitOnlyOptions = {
-		fontFamily: 'IBM Plex Mono',
-		cursorBlink: true,
-		fontSize: 24,
-		theme: termTheme
 	};
 
 	let terminalContainer: HTMLDivElement;
@@ -86,10 +94,6 @@
 			}
 			return false;
 		});
-
-		const clipAddonLoader = await XtermAddon.ClipboardAddon();
-		const clipAddon = new clipAddonLoader.ClipboardAddon();
-		ts.terminal!.loadAddon(clipAddon);
 
 		setTimeout(() => {
 			ts.termFitAddon!.fit();

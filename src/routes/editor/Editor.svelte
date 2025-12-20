@@ -15,10 +15,16 @@
 			}
 		});
 
+		let fontSize = 21;
+		console.log(window.innerWidth, window.innerHeight);
+		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
+			fontSize = 18;
+		}
+
 		const style = EditorView.theme({
 			'&': { height: '100%' },
 			'.cm-scroller': { overflow: 'auto' },
-			'.cm-content': { fontFamily: 'IBM Plex Mono', fontSize: '15pt' },
+			'.cm-content': { fontFamily: 'IBM Plex Mono', fontSize: `${fontSize}px` },
 			'.cm-gutterElement': { display: 'flex', alignItems: 'center' }
 		});
 

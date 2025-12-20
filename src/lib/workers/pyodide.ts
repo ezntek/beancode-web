@@ -79,7 +79,7 @@ print(f"loaded beancode {__version__}")`
 
         post({ kind: 'ready' });
         post({ kind: 'output', data: 'Ready.' });
-        post({ kind: 'status', data: 'Ready.'});
+        post({ kind: 'status', data: 'Ready.' });
     }
     pyOK = true;
 }
