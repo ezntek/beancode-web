@@ -10,7 +10,7 @@
 	import { type ITheme } from '@xterm/xterm';
 	import { THEMES, type ThemeSpec } from '$lib/themes/themes';
 
-	let fontSize = 25;
+	let fontSize = 23;
 	let options: ITerminalOptions & ITerminalInitOnlyOptions;
 	onMount(() => {
 		const handleResize = () => {

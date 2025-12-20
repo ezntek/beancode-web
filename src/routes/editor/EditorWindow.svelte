@@ -105,9 +105,7 @@
 			<Button onclick={() => loadExample('HelloWorld')}>load some code</Button>
 			<Button onclick={clearEditor}>clear editor</Button>
 			<Button onclick={clearTerminal}>clear terminal</Button>
-		{:else}
-			<p>Loading Beancode</p>
-		{/if}
+		{:else}{/if}
 	</div>
 	<div class="middle">
 		<div class="editor">
@@ -123,7 +121,8 @@
 		</aside>
 	</div>
 	<div class="bottom">
-		<p>{s.status}</p>
+		<p>{s.versionText}</p>
+		<p style="font-weight: bold;">{s.status}</p>
 	</div>
 </div>
 
@@ -154,7 +153,16 @@
 
 	.bottom {
 		flex: 0 0 auto;
+		display: flex;
 		min-height: 0;
+		justify-content: space-between;
+	}
+
+	.bottom p {
+		color: var(--bw-text);
+		font-family: 'IBM Plex Mono', 'monospace';
+		font-size: 0.8em;
+		margin: 0.2em;
 	}
 
 	.editor {

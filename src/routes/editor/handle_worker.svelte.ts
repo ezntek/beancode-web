@@ -11,6 +11,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     switch (msg.kind) {
         case 'ready':
             ps.ready = true;
+            s.versionText = "beancode v" + msg.version;
             ter.write('\x1b[2J\x1b[H')
             break;
         case 'clear':

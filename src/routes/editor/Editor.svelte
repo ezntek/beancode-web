@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { s } from './state.svelte';
-	import { basicSetup, EditorView } from 'codemirror';
+	import { basicSetup } from 'codemirror';
+	import { EditorView, keymap } from '@codemirror/view';
+	import { indentWithTab } from '@codemirror/commands';
 	import { EditorState } from '@codemirror/state';
 	import { catppuccinMacchiato } from '@catppuccin/codemirror';
 
@@ -30,7 +32,13 @@
 
 		const startState = EditorState.create({
 			doc: '',
-			extensions: [basicSetup, updateListener, style, catppuccinMacchiato]
+			extensions: [
+				basicSetup,
+				updateListener,
+				style,
+				catppuccinMacchiato,
+				keymap.of([indentWithTab])
+			]
 		});
 
 		const view = new EditorView({

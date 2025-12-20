@@ -77,9 +77,10 @@ print(f"loaded beancode {__version__}")`
             return;
         }
 
-        post({ kind: 'ready' });
-        post({ kind: 'output', data: 'Ready.' });
-        post({ kind: 'status', data: 'Ready.' });
+        const version = py.globals.get("__version__")
+        post({ kind: 'ready', version: version });
+        post({ kind: 'output', data: 'Ready' });
+        post({ kind: 'status', data: 'Ready' });
     }
     pyOK = true;
 }
@@ -102,7 +103,7 @@ async function handleRun(src: string) {
         const exit_code = py.globals.get(t.exit_code);
         post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
-            post({ kind: 'status', data: 'Ready.'});
+            post({ kind: 'status', data: 'Ready'});
         }, 500);
         for (const value of Object.values(t)) {
             await py.runPythonAsync(`del ${value}`);
@@ -110,7 +111,7 @@ async function handleRun(src: string) {
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
-            post({ kind: 'status', data: 'An error occurred.'});
+            post({ kind: 'status', data: 'An error occurred'});
         }, 500);
     }
 }
@@ -125,12 +126,12 @@ async function handleRunPy(src: string){
         };
         await py.runPythonAsync(gen_py_wrapper(t));
         setTimeout(() => {
-            post({ kind: 'status', data: 'Ready.'});
+            post({ kind: 'status', data: 'Ready'});
         }, 500);
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
-            post({ kind: 'status', data: 'An error occurred.'});
+            post({ kind: 'status', data: 'An error occurred'});
         }, 500);
     }
 }

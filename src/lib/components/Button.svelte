@@ -15,7 +15,7 @@
 <style>
 	.bw-button {
 		font-family: 'Inter', sans-serif;
-		font-size: 13pt;
+		font-size: 1em;
 		background-color: var(--bw-surface1);
 		color: var(--bw-text);
 		border: 1px solid var(--bw-surface3);

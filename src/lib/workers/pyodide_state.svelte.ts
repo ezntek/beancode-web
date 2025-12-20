@@ -1,5 +1,5 @@
 export type PyMessage =
-    | { kind: 'ready' }
+    | { kind: 'ready', version: string }
     | { kind: 'clear' }
     | { kind: 'output', data: string }
     | { kind: 'status', data: string }

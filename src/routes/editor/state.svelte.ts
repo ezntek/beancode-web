@@ -7,11 +7,13 @@ interface IState {
     editorSrc: string,
     themeName: string,
     exitCode: number,
+    versionText: string,
 };
 
 export const s: IState = $state({
     status: "",
     editorSrc: "",
     themeName: "catppuccin_macchiato",
+    versionText: "loading beancode",
     exitCode: 0,
 });
