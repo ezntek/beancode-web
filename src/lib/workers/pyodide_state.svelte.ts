@@ -2,13 +2,15 @@ export type PyMessage =
     | { kind: 'ready' }
     | { kind: 'clear' }
     | { kind: 'output', data: string }
-    | { kind: 'log', data: string }
+    | { kind: 'status', data: string }
     | { kind: 'error', data: string }
     | { kind: 'pyout', data: string }
     | { kind: 'pyin' }
+    | { kind: 'pyexit', code: number }
 
 export type EditorMessage = 
     | { kind: 'run', data: string }
+    | { kind: 'runpy', data: string }
     | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
  
 interface IPyState {

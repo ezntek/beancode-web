@@ -1,4 +1,4 @@
-import { type VarTable, gen_wrapper } from "$lib/run_wrapper";
+import { type VarTable, gen_beancode_wrapper, gen_py_wrapper } from "$lib/run_wrapper";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 
 function post(msg: PyMessage) {
@@ -62,7 +62,7 @@ async function loadBeancode() {
         py.setStdin(new XtermStdinHandler());
         await py.loadPackage("micropip")
 
-        const BEANCODE_VERSION = "0.6.0a2";
+        const BEANCODE_VERSION = "0.7.0a1";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
         const SCRIPT = `import micropip
 await micropip.install(\"${PATH}\")
@@ -79,7 +79,7 @@ print(f"loaded beancode {__version__}")`
 
         post({ kind: 'ready' });
         post({ kind: 'output', data: 'Ready.' });
-        post({ kind: 'log', data: 'Ready.'});
+        post({ kind: 'status', data: 'Ready.'});
     }
     pyOK = true;
 }
@@ -89,7 +89,7 @@ let pyBeancodePromise = loadBeancode();
 
 async function handleRun(src: string) {
     try {
-        post({ kind: 'log', data: 'Running Beancode'});
+        post({ kind: 'status', data: 'Running Beancode'});
         const t: VarTable = {
             file_name: "___beanweb_file_name",
             src: "___beanweb_src",
@@ -98,9 +98,11 @@ async function handleRun(src: string) {
         py.globals.set(t.file_name, "(beanweb)");
         py.globals.set(t.src, src);
         py.globals.set(t.exit_code, 0);
-        await py.runPythonAsync(gen_wrapper(t));
+        await py.runPythonAsync(gen_beancode_wrapper(t));
+        const exit_code = py.globals.get(t.exit_code);
+        post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
-            post({ kind: 'log', data: 'Ready.'});
+            post({ kind: 'status', data: 'Ready.'});
         }, 500);
         for (const value of Object.values(t)) {
             await py.runPythonAsync(`del ${value}`);
@@ -108,7 +110,27 @@ async function handleRun(src: string) {
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
-            post({ kind: 'log', data: 'An error occurred.'});
+            post({ kind: 'status', data: 'An error occurred.'});
+        }, 500);
+    }
+}
+
+async function handleRunPy(src: string){
+    try {
+        post({ kind: 'status', data: 'Running Python'});
+        const t: VarTable = {
+            file_name: "___beanweb_file_name",
+            src: src,
+            exit_code: "___beanweb_exit_code",
+        };
+        await py.runPythonAsync(gen_py_wrapper(t));
+        setTimeout(() => {
+            post({ kind: 'status', data: 'Ready.'});
+        }, 500);
+    } catch (e: any) {
+        post({ kind: 'error', data: String(e) });
+        setTimeout(() => {
+            post({ kind: 'status', data: 'An error occurred.'});
         }, 500);
     }
 }
@@ -122,8 +144,14 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
     const msg = event.data;
     switch (msg.kind) {
         case 'run':
+            (new Uint8Array(interruptBuf))[0] = 0;
             post({ kind: 'clear' });
             await handleRun(msg.data);
+            break;
+        case 'runpy':
+            (new Uint8Array(interruptBuf))[0] = 0;
+            post({ kind: 'clear' });
+            await handleRunPy(msg.data);
             break;
         case 'setup':
             inputBuf = msg.inputBuf;

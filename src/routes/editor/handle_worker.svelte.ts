@@ -19,11 +19,11 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
         case 'output':
             ter.writeln(String(msg.data).replaceAll("\n", "\r\n"));
             break;
-        case 'log':
-            s.log = msg.data;
+        case 'status':
+            s.status = msg.data;
             break;
         case 'error':
-            ter.writeln('An error occurred whilst trying to interact with beancode:');
+            ter.writeln('An error occurred whilst trying to interact with the Python backend:');
             ter.writeln(String(msg.data).replaceAll("\n", "\r\n"));
             break;
         case 'pyout':
@@ -31,6 +31,9 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'pyin':
             ts.canInput = true;
+            break;
+        case 'pyexit':
+            s.exitCode = msg.code;
             break;
     }
 }

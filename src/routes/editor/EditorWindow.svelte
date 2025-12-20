@@ -15,7 +15,7 @@
 
 	onMount(async () => {
 		await setupWorker();
-		s.log = 'Waiting to launch';
+		s.status = 'Waiting to launch';
 		ibuf = new Uint8Array(interruptBuf);
 
 		const width = localStorage.getItem('EditorTerminalWidth');
@@ -31,15 +31,18 @@
 		const res = await fetch(`/bcdata/examples/${FILE_NAME}`);
 		if (res.status === 200) {
 			s.editorSrc = await res.text();
-			s.log = `loaded example ${FILE_NAME}`;
+			s.status = `loaded example ${FILE_NAME}`;
 		} else {
-			s.log = `could not load example ${FILE_NAME}`;
+			s.status = `could not load example ${FILE_NAME}`;
 		}
 	}
 
 	function run() {
-		ibuf[0] = 0;
 		pyState.worker!.postMessage({ kind: 'run', data: s.editorSrc });
+	}
+
+	function runPy() {
+		pyState.worker!.postMessage({ kind: 'runpy', data: s.editorSrc });
 	}
 
 	function clearEditor() {
@@ -97,6 +100,7 @@
 	<div class="toolbar">
 		{#if pyState.ready}
 			<Button onclick={run}>do magic</Button>
+			<Button onclick={runPy}>run python</Button>
 			<Button onclick={stop}>stop</Button>
 			<Button onclick={() => loadExample('HelloWorld')}>load some code</Button>
 			<Button onclick={clearEditor}>clear editor</Button>
@@ -115,7 +119,7 @@
 		</aside>
 	</div>
 	<div class="bottom">
-		<p>{s.log}</p>
+		<p>{s.status}</p>
 	</div>
 </div>
 

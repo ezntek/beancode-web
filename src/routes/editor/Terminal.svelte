@@ -20,35 +20,30 @@
 		};
 	});
 
-	function hexToEsc(code: string): string {
-		const r = parseInt(code.slice(1, 3), 16);
-		const g = parseInt(code.slice(3, 5), 16);
-		const b = parseInt(code.slice(5, 7), 16);
-		return `\x1b[38;2;${r};${g};${b}m`;
-	}
-
 	// @ts-ignore
 	const t: ThemeSpec = THEMES[s.themeName];
 	const termTheme: ITheme = {
-		background: hexToEsc(t.base3),
-		black: hexToEsc(t.base3),
-		red: hexToEsc(t.red),
-		green: hexToEsc(t.green),
-		yellow: hexToEsc(t.yellow),
-		blue: hexToEsc(t.blue),
-		magenta: hexToEsc(t.magenta),
-		cyan: hexToEsc(t.cyan),
-		white: hexToEsc(t.text),
-		brightRed: hexToEsc(t.brightRed),
-		brightGreen: hexToEsc(t.brightGreen),
-		brightYellow: hexToEsc(t.brightYellow),
-		brightBlue: hexToEsc(t.brightBlue),
-		brightMagenta: hexToEsc(t.brightMagenta),
-		brightCyan: hexToEsc(t.brightCyan),
-		brightBlack: hexToEsc(t.surface1),
-		brightWhite: hexToEsc(t.text)
+		background: t.base3,
+		foreground: t.text,
+		selectionBackground: t.blue,
+		cursor: t.text,
+		black: t.base3,
+		red: t.red,
+		green: t.green,
+		yellow: t.yellow,
+		blue: t.blue,
+		magenta: t.magenta,
+		cyan: t.cyan,
+		white: t.text,
+		brightRed: t.brightRed,
+		brightGreen: t.brightGreen,
+		brightYellow: t.brightYellow,
+		brightBlue: t.brightBlue,
+		brightMagenta: t.brightMagenta,
+		brightCyan: t.brightCyan,
+		brightBlack: t.surface1,
+		brightWhite: t.text
 	};
-	console.log(termTheme);
 
 	const options: ITerminalOptions & ITerminalInitOnlyOptions = {
 		fontFamily: 'IBM Plex Mono',
@@ -67,6 +62,34 @@
 		ts.termFitAddon = new (await XtermAddon.FitAddon()).FitAddon();
 		ts.terminal!.loadAddon(ts.termFitAddon!);
 		ts.terminal!.options.theme = termTheme;
+		ts.terminal!.attachCustomKeyEventHandler((data) => {
+			if (!data.ctrlKey) {
+				return true;
+			}
+			switch (data.key) {
+				case 'c':
+					if (!ts.terminal!.hasSelection()) break;
+					const sel = ts.terminal!.getSelection();
+					window.navigator.clipboard.writeText(sel);
+					break;
+				case 'v':
+					if (!ts.canInput) break;
+					window.navigator.clipboard
+						.readText()
+						.then((data) => {
+							if (ts.canInput) {
+								ts.terminal!.write(data);
+								termInputBuf += data;
+							}
+						})
+						.catch(() => {});
+			}
+			return false;
+		});
+
+		const clipAddonLoader = await XtermAddon.ClipboardAddon();
+		const clipAddon = new clipAddonLoader.ClipboardAddon();
+		ts.terminal!.loadAddon(clipAddon);
 
 		setTimeout(() => {
 			ts.termFitAddon!.fit();
@@ -94,8 +117,10 @@
 				ts.canInput = false;
 				break;
 			case '\x7f':
-				termInputBuf = termInputBuf.slice(0, -1);
-				write('\b \b');
+				if (termInputBuf.length > 0) {
+					termInputBuf = termInputBuf.slice(0, -1);
+					write('\b \b');
+				}
 				break;
 			case '\u0004':
 			case '\u001b[3~':
