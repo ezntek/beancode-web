@@ -1,5 +1,5 @@
 import { type VarTable, gen_beancode_wrapper, gen_py_wrapper } from "$lib/run_wrapper";
-import { FileResponseKind, type Dir } from "$lib/fstypes";
+import { FileResponseKind, strerror, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
 
@@ -79,7 +79,7 @@ function readFile(path: string): FileResponse {
         } else if (exc.errno === 21) {
             return { kind: FileResponseKind.IsDir };
         } else {
-            return { kind: FileResponseKind.Errno, errno: exc.errno, msg: py.FS.strerror(exc.errno) };
+            return { kind: FileResponseKind.Errno, errno: exc.errno, msg: strerror(exc.errno) };
         }
     }
 

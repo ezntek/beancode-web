@@ -19,7 +19,19 @@
 
 <div class="file-browser">
 	{#each s.curdir.keys() as item}
-		<button class="file-browser-item" onclick={() => clickFile(item)}>{item}</button>
+		{#if item !== '.'}
+			<button class="file-browser-item" onclick={() => clickFile(item)}>
+				{#if item === '..'}
+					<span class="fa-solid fa-arrow-left"></span>
+				{:else if s.curdir.get(item)}
+					<span class="fa-regular fa-folder"></span>
+					{item}
+				{:else}
+					<span class="fa-regular fa-file"></span>
+					{item}
+				{/if}
+			</button>
+		{/if}
 	{/each}
 </div>
 

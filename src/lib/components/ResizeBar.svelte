@@ -17,11 +17,11 @@
 		height: 100%;
 		width: 8px;
 		cursor: col-resize;
-		margin-left: 1px;
-		margin-right: 1px;
 		align-items: center;
 		justify-content: center;
 		display: flex;
+		padding-left: 1px;
+		padding-right: 1px;
 	}
 
 	.resize-handle-line {

@@ -19,17 +19,26 @@
 	import ResizeBar from '$lib/components/ResizeBar.svelte';
 
 	let ibuf: Uint8Array;
+	let terminalWidth = $state(0);
+	let fileBrowserWidth = $state(0);
 
 	onMount(async () => {
 		await setupWorker();
 		s.status = 'Waiting to launch';
 		ibuf = new Uint8Array(interruptBuf);
 
-		const width = localStorage.getItem('EditorTerminalWidth');
-		if (width !== null) {
-			terminalWidth = Number.parseInt(width);
+		const twidth = localStorage.getItem('EditorTerminalWidth');
+		if (twidth !== null) {
+			terminalWidth = Number.parseInt(twidth);
 		} else {
-			terminalWidth = window.innerWidth * 0.45;
+			terminalWidth = window.innerWidth * 0.3;
+		}
+
+		const fbwidth = localStorage.getItem('EditorFileBrowserWidth');
+		if (fbwidth !== null) {
+			fileBrowserWidth = Number.parseInt(fbwidth);
+		} else {
+			fileBrowserWidth = window.innerWidth * 0.1;
 		}
 
 		function readFileCallback(path: string, data: string) {
@@ -74,9 +83,6 @@
 		ts.terminal!.clear();
 		ts.terminal!.write('\x1b[2J\x1b[H');
 	}
-
-	let terminalWidth = $state(0);
-	let fileBrowserWidth = $state(120);
 
 	function startResizeTerm(e: any) {
 		const container = e.currentTarget.parentElement;
@@ -136,29 +142,33 @@
 	}
 </script>
 
-<div class="outer">
-	<div class="toolbar">
-		{#if ps.ready}
-			<Button onclick={run}>do magic</Button>
-			<Button onclick={runPy}>run python</Button>
-			<Button onclick={stop}>stop</Button>
-			<Button onclick={() => loadExample('HelloWorld')}>load some code</Button>
-			<Button onclick={clearEditor}>clear editor</Button>
-			<Button onclick={clearTerminal}>clear terminal</Button>
-		{:else}{/if}
-	</div>
-	<div class="middle">
-		<aside style="display: flex; width: {fileBrowserWidth}px;">
+<div class="editor-window">
+	<div class="outer-wrapper">
+		<aside style="display: flex; margin-right: 0.15em; width: {fileBrowserWidth}px;">
 			<FileBrowser />
 		</aside>
 		<ResizeBar resize={startResizeFileBrowser} />
-		<div class="editor">
-			<Editor />
+		<div class="editor-group">
+			<div class="editor-toolbar">
+				{#if ps.ready}
+					<Button onclick={run}>do magic</Button>
+					<Button onclick={runPy}>run python</Button>
+					<Button onclick={stop}>stop</Button>
+					<Button onclick={() => loadExample('HelloWorld')}>load some code</Button>
+					<Button onclick={clearEditor}>clear editor</Button>
+					<Button onclick={clearTerminal}>clear terminal</Button>
+				{:else}{/if}
+			</div>
+			<div class="middle">
+				<div class="editor">
+					<Editor />
+				</div>
+				<ResizeBar resize={startResizeTerm} />
+				<aside class="terminal" style="width: {terminalWidth}px;">
+					<Terminal />
+				</aside>
+			</div>
 		</div>
-		<ResizeBar resize={startResizeTerm} />
-		<aside class="terminal" style="width: {terminalWidth}px;">
-			<Terminal />
-		</aside>
 	</div>
 	<div class="bottom">
 		<p style="font-weight: bold;">{s.status}</p>
@@ -167,14 +177,30 @@
 </div>
 
 <style>
-	.outer {
+	.editor-window {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
 		min-height: 0;
 	}
 
-	.toolbar {
+	.outer-wrapper {
+		display: flex;
+		height: 100%;
+		min-height: 0;
+		flex-direction: row;
+	}
+
+	.editor-group {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		width: 100%;
+		min-width: 0;
+		margin-left: 0.15em;
+	}
+
+	.editor-toolbar {
 		display: flex;
 	}
 
@@ -187,8 +213,6 @@
 		align-items: stretch;
 		gap: 0.2em;
 		min-height: 0;
-		margin-top: 0.3em;
-		margin-bottom: 0.3em;
 	}
 
 	.bottom {
@@ -202,6 +226,7 @@
 		color: var(--bw-text);
 		font-family: 'IBM Plex Mono', 'monospace';
 		font-size: 0.8em;
+		margin-top: 0.5em;
 		margin: 0.2em;
 	}
 
