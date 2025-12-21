@@ -15,7 +15,7 @@ except SystemExit as e:
 \t${vars.exit_code} = e.code
 except KeyboardInterrupt:
 \twarn("Caught keyboard interrupt")
-\t${vars.exit_code} = 1 
+\t${vars.exit_code} = 1
 except EOFError:
 \twarn("Caught EOF")
 \t${vars.exit_code} = 1 

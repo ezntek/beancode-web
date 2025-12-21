@@ -49,33 +49,14 @@
 		setReadFileCallback(readFileCallback as ReadFileCallback);
 	});
 
-	async function loadExample(ex: string) {
-		const FILE_NAME = `${ex}.bean`;
-		const res = await fetch(`/bcdata/examples/${FILE_NAME}`);
-		if (res.status === 200) {
-			s.editorSrc = await res.text();
-			s.status = `loaded example ${FILE_NAME}`;
-		} else {
-			s.status = `could not load example ${FILE_NAME}`;
+	function runStop() {
+		if (s.running) {
+			stop();
+			return;
 		}
-	}
-
-	function run() {
-		if (s.running) return;
 
 		s.running = true;
 		post({ kind: 'run', data: s.editorSrc });
-	}
-
-	function runPy() {
-		if (s.running) return;
-
-		s.running = true;
-		post({ kind: 'runpy', data: s.editorSrc });
-	}
-
-	function clearEditor() {
-		s.editorSrc = '';
 	}
 
 	function stop() {
@@ -84,11 +65,8 @@
 		const flag = new Int32Array(inputBuf, 0, 1);
 		Atomics.store(flag, 0, 0);
 		Atomics.notify(flag, 0);
-	}
-
-	function clearTerminal() {
-		ts.terminal!.clear();
-		ts.terminal!.write('\x1b[2J\x1b[H');
+		s.running = false;
+		ts.canInput = false;
 	}
 
 	function startResizeTerm(e: any) {
@@ -150,10 +128,8 @@
 
 	function buttonStyle(name: string): string {
 		switch (name) {
-			case 'run':
-				return s.running ? 'editor-button-grayed' : 'editor-button-run';
-			case 'stop':
-				return s.running ? 'editor-button-stop' : 'editor-button-grayed';
+			case 'runstop':
+				return s.running ? 'editor-button-stop' : 'editor-button-run';
 			default:
 				return '';
 		}
@@ -168,15 +144,16 @@
 		<ResizeBar resize={startResizeFileBrowser} />
 		<div class="editor-group">
 			<div class="editor-toolbar">
-				<button aria-label="run" class="editor-toolbar-button {buttonStyle('run')}" onclick={run}
-					><span class="icon fa-solid fa-play"></span> Run</button
-				>
 				<button
-					aria-label="stop"
-					class="editor-toolbar-button {buttonStyle('stop')}"
-					onclick={stop}
+					aria-label="run"
+					class="editor-toolbar-button {buttonStyle('runstop')}"
+					onclick={runStop}
 				>
-					<span class="icon fa-solid fa-stop"></span> Stop
+					{#if !s.running}
+						<span class="icon fa-solid fa-play"></span> Run
+					{:else}
+						<span class="icon fa-solid fa-stop"></span> Stop
+					{/if}
 				</button>
 			</div>
 			<div class="middle">

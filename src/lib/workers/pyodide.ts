@@ -123,7 +123,7 @@ print(f"loaded beancode {__version__}")`
         const version = py.globals.get("__version__")
         post({ kind: 'ready', version: version });
         post({ kind: 'output', data: 'Ready' });
-        post({ kind: 'status', data: 'Ready' });
+        post({ kind: 'status', data: 'Ready', positive: true });
     }
     pyOK = true;
 }
@@ -133,7 +133,7 @@ let pyBeancodePromise = loadBeancode();
 
 async function handleRun(src: string) {
     try {
-        post({ kind: 'status', data: 'Running Beancode'});
+        post({ kind: 'status', data: 'Running Beancode', positive: true});
         const t: VarTable = {
             file_name: "___beanweb_file_name",
             src: "___beanweb_src",
@@ -146,22 +146,22 @@ async function handleRun(src: string) {
         const exit_code = py.globals.get(t.exit_code);
         post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
-            post({ kind: 'status', data: 'Ready'});
+            post({ kind: 'status', data: 'Ready', positive: true });
         }, 500);
         for (const value of Object.values(t)) {
-            await py.runPythonAsync(`del ${value}`);
+            await py.runPythonAsync(`try:del ${value}\nexcept NameError:pass`);
         }
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
-            post({ kind: 'status', data: 'An error occurred'});
+            post({ kind: 'status', data: 'An error occurred', positive: false });
         }, 500);
     }
 }
 
 async function handleRunPy(src: string){
     try {
-        post({ kind: 'status', data: 'Running Python'});
+        post({ kind: 'status', data: 'Running Python', positive: true});
         const t: VarTable = {
             file_name: "___beanweb_file_name",
             src: src,
@@ -169,12 +169,12 @@ async function handleRunPy(src: string){
         };
         await py.runPythonAsync(gen_py_wrapper(t));
         setTimeout(() => {
-            post({ kind: 'status', data: 'Ready'});
+            post({ kind: 'status', data: 'Ready', positive: true});
         }, 500);
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
-            post({ kind: 'status', data: 'An error occurred'});
+            post({ kind: 'status', data: 'An error occurred', positive: false});
         }, 500);
     }
 }
