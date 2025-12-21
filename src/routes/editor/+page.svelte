@@ -28,7 +28,7 @@
 		min-height: 0;
 		padding: 0.4em;
 		overflow: hidden;
-		background-color: var(--bw-base2);
+		background-color: var(--bw-base1);
 		scrollbar-width: 0;
 
 		font-family: 'Inter', sans-serif;

@@ -4,6 +4,8 @@
 	import Editor from './Editor.svelte';
 	import Button from '$lib/components/Button.svelte';
 
+	import { BEANCODE_WEB_VERSION } from '$lib/version';
+
 	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';
 	import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
@@ -171,8 +173,12 @@
 		</div>
 	</div>
 	<div class="bottom">
-		<p style="font-weight: bold;">{s.status}</p>
-		<p>{s.versionText}</p>
+		<p>Beancode Web version {BEANCODE_WEB_VERSION}</p>
+		{#if ps.ready}
+			<p>loaded <strong>{s.versionText}</strong></p>
+		{:else}
+			<p>loading</p>
+		{/if}
 	</div>
 </div>
 
@@ -223,7 +229,7 @@
 	}
 
 	.bottom p {
-		color: var(--bw-text);
+		color: var(--bw-subtext1);
 		font-family: 'IBM Plex Mono', 'monospace';
 		font-size: 0.8em;
 		margin-top: 0.5em;

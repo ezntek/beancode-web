@@ -138,29 +138,109 @@
 				break;
 		}
 	}
+
+	function clear() {
+		write('\x1b[2J\x1b[H');
+		ts.terminal!.clear();
+	}
+
+	let inputColor = $derived(ts.canInput ? 'var(--bw-green)' : 'var(--bw-red)');
 </script>
 
-<div class="terminal-container" bind:this={terminalContainer}>
-	<Xterm bind:terminal={ts.terminal!} {options} {onLoad} {onData} {onKey} />
+<div class="terminal-wrapper">
+	<div class="terminal-toolbar">
+		<p id="terminal-label">TERMINAL</p>
+		<button class="terminal-toolbar-input" style="background-color: {inputColor};">
+			{#if ts.canInput}
+				<strong>input on</strong>
+			{:else}
+				input off
+			{/if}
+		</button>
+		<button class="terminal-toolbar-button" onclick={clear}>clear</button>
+	</div>
+	<div class="terminal-container" bind:this={terminalContainer}>
+		<Xterm bind:terminal={ts.terminal!} {options} {onLoad} {onData} {onKey} />
+	</div>
 </div>
 
 <style>
+	.terminal-wrapper {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.terminal-toolbar {
+		background-color: var(--bw-base2);
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	.terminal-toolbar-input {
+		border: 0px solid black;
+		margin: 0.2em;
+		color: var(--bw-base1);
+		font-family: 'IBM Plex Mono', monospace;
+		border-radius: 0.2em;
+	}
+
+	.terminal-toolbar-button {
+		border: 0px solid black;
+		margin: 0.2em;
+		background-color: var(--bw-purple);
+		color: var(--bw-base1);
+		font-family: 'IBM Plex Mono', monospace;
+		border-radius: 0.2em;
+		transition:
+			background-color 150ms ease,
+			color 150ms ease,
+			font-weight 150ms ease;
+	}
+
+	.terminal-toolbar-button:hover {
+		background-color: var(--bw-surface1);
+		color: var(--bw-purple);
+		font-weight: bold;
+	}
+
+	#terminal-label {
+		color: var(--bw-subtext2);
+		font-family: 'IBM Plex Mono', monospace;
+		padding: 0;
+		padding-bottom: 0.1em;
+		padding-left: 0.3em;
+		padding: 0.3em;
+		margin: 0;
+		margin-right: auto;
+	}
+
 	.terminal-container {
 		display: flex;
-		flex: 0 0 auto;
+		flex: 1 1 auto;
+		min-height: 0px;
 		flex-direction: column;
+		height: 100%;
 	}
 
 	/* very gross hack*/
 	.terminal-container :global(> div) {
+		display: flex;
+		width: 100%;
 		height: 100%;
 	}
 
 	.terminal-container :global(.xterm) {
+		display: flex;
+		width: 100%;
 		height: 100% !important;
 	}
 
 	.terminal-container :global(.xterm-screen) {
+		display: flex;
+		width: 100%;
 		height: 100% !important;
 	}
 </style>

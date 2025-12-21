@@ -4,7 +4,7 @@ export type PyMessage =
     | { kind: 'ready', version: string }
     | { kind: 'clear' }
     | { kind: 'output', data: string }
-    | { kind: 'status', data: string }
+    | { kind: 'status', data: string, positive: boolean }
     | { kind: 'error', data: string }
     | { kind: 'pyout', data: string }
     | { kind: 'pyin' }

@@ -22,7 +22,7 @@ export function pathJoin(...parts: string[]): string {
     let newParts = [];
 
     for (const part of parts.flatMap(p => p.split('/'))) {
-        if (part === '..' && newParts.length != 0) {
+        if (part === '..') {
             newParts.pop();
         } else if (part !== '' && part != '.') {
             newParts.push(part);
