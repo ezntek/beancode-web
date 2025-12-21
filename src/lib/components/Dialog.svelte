@@ -3,6 +3,10 @@
 
 	let dialog: HTMLDialogElement | null = $state(null);
 
+	export function getInnerDialog() {
+		return dialog;
+	}
+
 	export function open() {
 		dialog?.showModal();
 	}
@@ -18,7 +22,7 @@
 	}
 </script>
 
-<dialog class="dialog" bind:this={dialog} onclick={handleBackdropClick}>
+<dialog class="dialog" tabindex="-1" bind:this={dialog} onclick={handleBackdropClick}>
 	<div class="dialog-content">
 		{@render children()}
 	</div>

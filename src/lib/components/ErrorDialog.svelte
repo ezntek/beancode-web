@@ -1,15 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import Dialog from './Dialog.svelte';
 
 	let innerDialog: Dialog;
+	let submitButton: HTMLButtonElement;
 	let message = $state('');
-
-	onMount(() => {
-		window.addEventListener('keydown', (e: KeyboardEvent) => {
-			if (e.key === 'enter') close();
-		});
-	});
 
 	// @ts-ignore
 	export const close = () => {
@@ -19,7 +13,12 @@
 	export const open = (msg: string) => {
 		message = msg;
 		innerDialog.open();
+		setTimeout(() => focus(), 0);
 	};
+
+	export function focus() {
+		submitButton.focus();
+	}
 </script>
 
 <Dialog bind:this={innerDialog}>
@@ -36,6 +35,7 @@
 		<div class="bottom">
 			<button
 				class="ok"
+				bind:this={submitButton}
 				onclick={() => {
 					close();
 				}}

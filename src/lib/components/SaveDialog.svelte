@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Dialog from './Dialog.svelte';
+	import { tick } from 'svelte';
+	import ErrorDialog from './ErrorDialog.svelte';
 
 	interface IProps {
 		ok: (fileName: string, fileType: string) => void;
@@ -7,7 +9,32 @@
 	}
 	let { ok, cancel }: IProps = $props();
 
+	function submitOk() {
+		// throw it on the event loop for good measure
+		if (fileName === '') {
+			errorDialog.open('Cannot save to empty file name!');
+			return;
+		}
+
+		setTimeout(() => {
+			ok(String(fileName), String(fileType));
+			innerDialog.close();
+		}, 0);
+		fileName = '';
+	}
+
+	function submitCancel() {
+		fileName = '';
+		fileType = 'bean';
+		setTimeout(() => {
+			cancel();
+			innerDialog.close();
+		}, 0);
+	}
+
 	let innerDialog: Dialog;
+	let errorDialog: ErrorDialog;
+	let submitButton: HTMLButtonElement;
 	let fileName = $state('');
 	let fileType = $state('bean');
 
@@ -17,7 +44,14 @@
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = () => innerDialog.open();
+	export const open = () => {
+		innerDialog.open();
+		setTimeout(() => focus(), 0);
+	};
+
+	export function focus() {
+		submitButton.focus();
+	}
 </script>
 
 <Dialog bind:this={innerDialog}>
@@ -43,27 +77,16 @@
 			</div>
 		</div>
 		<div class="bottom">
-			<button
-				class="ok"
-				onclick={() => {
-					ok(fileName, fileType);
-					close();
-				}}
-			>
+			<button class="ok" onclick={submitOk} bind:this={submitButton}>
 				<span class="fa-solid fa-check" style="margin-right: 0.4em;"></span>Ok
 			</button>
-			<button
-				class="cancel"
-				onclick={() => {
-					cancel();
-					close();
-				}}
-			>
+			<button class="cancel" onclick={submitCancel}>
 				<span class="fa-solid fa-x" style="margin-right: 0.4em;"></span>Cancel
 			</button>
 		</div>
 	</div>
 </Dialog>
+<ErrorDialog bind:this={errorDialog} />
 
 <style>
 	.vstack {
