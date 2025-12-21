@@ -64,10 +64,42 @@
 	});
 </script>
 
-<div class="editor-wrapper" bind:this={editor}></div>
+<div class="editor-wrapper">
+	{#if s.curFileName !== ''}
+		<div class="toolbar">
+			<p class="label">{s.curFileName}</p>
+		</div>
+	{/if}
+	<div class="editor" bind:this={editor}></div>
+</div>
 
 <style>
 	.editor-wrapper {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.toolbar {
+		background-color: var(--bw-base2);
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	.label {
+		color: var(--bw-text);
+		font-family: 'IBM Plex Mono', monospace;
+		padding: 0;
+		padding-bottom: 0.1em;
+		padding-left: 0.3em;
+		padding: 0.3em;
+		margin: 0;
+		margin-right: auto;
+	}
+
+	.editor {
 		width: 100%;
 		height: 100%;
 		overflow: hidden;

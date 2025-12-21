@@ -146,17 +146,17 @@
 </script>
 
 <div class="terminal-wrapper">
-	<div class="terminal-toolbar">
+	<div class="toolbar">
 		<p id="terminal-label">TERMINAL</p>
 		{#if ts.canInput}
 			<button
-				class="terminal-toolbar-input"
+				class="toolbar-input"
 				style="background-color: var(--bw-yellow); color: var(--bw-base1);"
 			>
 				<strong>waiting for input</strong>
 			</button>
 		{/if}
-		<button class="terminal-toolbar-button" onclick={clear}>clear</button>
+		<button class="toolbar-button" onclick={clear}>clear</button>
 	</div>
 	<div class="terminal-container" bind:this={terminalContainer}>
 		<Xterm bind:terminal={ts.terminal!} {options} {onLoad} {onData} {onKey} />
@@ -170,7 +170,7 @@
 		height: 100%;
 	}
 
-	.terminal-toolbar {
+	.toolbar {
 		background-color: var(--bw-base2);
 		display: flex;
 		flex-direction: row;
@@ -178,7 +178,7 @@
 		flex-shrink: 0;
 	}
 
-	.terminal-toolbar-input {
+	.toolbar-input {
 		border: 0px solid black;
 		margin: 0.2em;
 		color: var(--bw-base1);
@@ -186,7 +186,7 @@
 		border-radius: 0.2em;
 	}
 
-	.terminal-toolbar-button {
+	.toolbar-button {
 		border: 0px solid black;
 		margin: 0.2em;
 		background-color: var(--bw-purple);
@@ -199,7 +199,7 @@
 			font-weight 130ms ease;
 	}
 
-	.terminal-toolbar-button:hover {
+	.toolbar-button:hover {
 		background-color: var(--bw-surface1);
 		color: var(--bw-purple);
 		font-weight: bold;

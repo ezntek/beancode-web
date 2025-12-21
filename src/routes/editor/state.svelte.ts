@@ -11,6 +11,7 @@ interface IState {
     exitCode: number,
     versionText: string,
     cwd: string,
+    curFileName: string,
     curdir: Dir,
     running: boolean,
 };
@@ -22,6 +23,7 @@ export const s: IState = $state({
     versionText: "loading beancode",
     exitCode: 0,
     cwd: "/",
+    curFileName: '',
     curdir: new Map(), 
     running: false,
 });

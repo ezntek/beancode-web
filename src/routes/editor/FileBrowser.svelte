@@ -7,12 +7,12 @@
 	onMount(() => {});
 
 	function clickFile(name: string) {
-		// is dir
 		if (s.curdir.get(name)) {
 			s.cwd = pathJoin(s.cwd, name);
 			post({ kind: 'listdir', path: s.cwd });
 		} else {
-			post({ kind: 'readfile', path: pathJoin(s.cwd, name) });
+			s.curFileName = pathJoin(s.cwd, name);
+			post({ kind: 'readfile', path: s.curFileName });
 		}
 	}
 
@@ -29,7 +29,9 @@
 					style="background-color: var(--bw-surface1);"
 					onclick={() => clickFile(item)}
 				>
-					<span class="fa-solid fa-arrow-left"></span>
+					{#if s.cwd !== '/'}
+						<span class="fa-solid fa-arrow-left"></span>
+					{/if}
 					{cwd}
 				</button>
 			{:else if s.curdir.get(item)}
