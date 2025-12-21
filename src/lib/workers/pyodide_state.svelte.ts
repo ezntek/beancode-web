@@ -12,6 +12,7 @@ export type PyMessage =
     | { kind: 'listdir-response', data: Dir }
     // path that file was read from
     | { kind: 'readfile-response', path: string, data: FileResponse }
+    | { kind: 'newfile-response', data: FileResponse }
 
 export type EditorMessage = 
     | { kind: 'run', data: string }
@@ -19,6 +20,7 @@ export type EditorMessage =
     | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
     | { kind: 'listdir', path: string }
     | { kind: 'readfile', path: string }
+    | { kind: 'newfile', path: string, contents: string }
 
  
 interface IPyState {

@@ -19,11 +19,13 @@
 	import FileBrowser from './FileBrowser.svelte';
 	import ResizeBar from '$lib/components/ResizeBar.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
+	import MessageDialog from '$lib/components/MessageDialog.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
 	let saveDialog: SaveDialog;
+	let messageDialog: MessageDialog;
 
 	onMount(async () => {
 		await setupWorker();
@@ -142,7 +144,7 @@
 	}
 
 	function saveFile(fileName: string, fileType: string) {
-		console.log(`saving to: ${fileName}.${fileType}`);
+		messageDialog.open(`saved to: ${fileName}.${fileType}`);
 	}
 </script>
 
@@ -193,6 +195,7 @@
 		{/if}
 	</div>
 	<SaveDialog bind:this={saveDialog} cancel={() => saveDialog.close()} ok={saveFile} />
+	<MessageDialog bind:this={messageDialog} />
 </div>
 
 <style>
