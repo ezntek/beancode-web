@@ -12,6 +12,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     switch (msg.kind) {
         case 'ready':
             ps.ready = true;
+            s.running = false;
             s.versionText = "beancode v" + msg.version;
             ter.write('\x1b[2J\x1b[H')
             break;
@@ -35,6 +36,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             ts.canInput = true;
             break;
         case 'pyexit':
+            s.running = false;
             s.exitCode = msg.code;
             break;
         case 'listdir-response':

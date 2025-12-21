@@ -144,13 +144,17 @@
 		ts.terminal!.clear();
 	}
 
-	let inputColor = $derived(ts.canInput ? 'var(--bw-green)' : 'var(--bw-red)');
+	let inputStyle = $derived(
+		ts.canInput
+			? 'background-color: var(--bw-green); color: var(--bw-base1)'
+			: 'background-color: var(--bw-base1); color: var(--bw-subtext1)'
+	);
 </script>
 
 <div class="terminal-wrapper">
 	<div class="terminal-toolbar">
 		<p id="terminal-label">TERMINAL</p>
-		<button class="terminal-toolbar-input" style="background-color: {inputColor};">
+		<button class="terminal-toolbar-input" style={inputStyle}>
 			{#if ts.canInput}
 				<strong>input on</strong>
 			{:else}
@@ -195,9 +199,9 @@
 		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
 		transition:
-			background-color 150ms ease,
-			color 150ms ease,
-			font-weight 150ms ease;
+			background-color 130ms ease,
+			color 130ms ease,
+			font-weight 130ms ease;
 	}
 
 	.terminal-toolbar-button:hover {

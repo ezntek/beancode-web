@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 
 	import Editor from './Editor.svelte';
-	import Button from '$lib/components/Button.svelte';
 
 	import { BEANCODE_WEB_VERSION } from '$lib/version';
 
@@ -62,10 +61,16 @@
 	}
 
 	function run() {
+		if (s.running) return;
+
+		s.running = true;
 		post({ kind: 'run', data: s.editorSrc });
 	}
 
 	function runPy() {
+		if (s.running) return;
+
+		s.running = true;
 		post({ kind: 'runpy', data: s.editorSrc });
 	}
 
@@ -142,6 +147,17 @@
 		e.target.addEventListener('pointermove', onMove);
 		e.target.addEventListener('pointerup', onUp);
 	}
+
+	function buttonStyle(name: string): string {
+		switch (name) {
+			case 'run':
+				return s.running ? 'editor-button-grayed' : 'editor-button-run';
+			case 'stop':
+				return s.running ? 'editor-button-stop' : 'editor-button-grayed';
+			default:
+				return '';
+		}
+	}
 </script>
 
 <div class="editor-window">
@@ -152,14 +168,16 @@
 		<ResizeBar resize={startResizeFileBrowser} />
 		<div class="editor-group">
 			<div class="editor-toolbar">
-				{#if ps.ready}
-					<Button onclick={run}>do magic</Button>
-					<Button onclick={runPy}>run python</Button>
-					<Button onclick={stop}>stop</Button>
-					<Button onclick={() => loadExample('HelloWorld')}>load some code</Button>
-					<Button onclick={clearEditor}>clear editor</Button>
-					<Button onclick={clearTerminal}>clear terminal</Button>
-				{:else}{/if}
+				<button aria-label="run" class="editor-toolbar-button {buttonStyle('run')}" onclick={run}
+					><span class="icon fa-solid fa-play"></span> Run</button
+				>
+				<button
+					aria-label="stop"
+					class="editor-toolbar-button {buttonStyle('stop')}"
+					onclick={stop}
+				>
+					<span class="icon fa-solid fa-stop"></span> Stop
+				</button>
 			</div>
 			<div class="middle">
 				<div class="editor">
@@ -183,6 +201,10 @@
 </div>
 
 <style>
+	.icon {
+		margin-right: 0.4em;
+	}
+
 	.editor-window {
 		display: flex;
 		flex-direction: column;
@@ -204,10 +226,6 @@
 		width: 100%;
 		min-width: 0;
 		margin-left: 0.15em;
-	}
-
-	.editor-toolbar {
-		display: flex;
 	}
 
 	.middle {
@@ -241,6 +259,63 @@
 		flex: 1;
 		flex-direction: column;
 		min-width: 0;
+	}
+
+	.editor-toolbar {
+		display: flex;
+		margin-bottom: 0.2em;
+	}
+
+	.editor-toolbar-button {
+		display: inline-flex;
+		height: 2em;
+		justify-content: center;
+		align-items: center;
+		font-family: 'Inter', sans-serif;
+		font-size: 1em;
+		background-color: var(--bw-surface1);
+		color: var(--bw-text);
+		border: 0px solid black;
+		padding: 0.3em;
+		padding-left: 0.5em;
+		padding-right: 0.5em;
+		margin: 0.2em;
+		border-radius: 0.5em;
+		transition:
+			background-color 130ms ease,
+			color 130ms ease,
+			font-weight 130ms ease;
+	}
+
+	.editor-button-run {
+		background-color: var(--bw-green);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-run:hover {
+		background-color: var(--bw-base2);
+		color: var(--bw-green);
+		font-weight: bold;
+	}
+
+	.editor-button-stop {
+		background-color: var(--bw-red);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-stop:hover {
+		background-color: var(--bw-base2);
+		color: var(--bw-red);
+		font-weight: bold;
+	}
+
+	.editor-button-grayed {
+		background-color: var(--bw-surface1);
+		color: var(--bw-subtext1);
+	}
+
+	.editor-button-grayed:hover {
+		cursor: not-allowed;
 	}
 
 	aside.terminal {

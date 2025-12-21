@@ -12,6 +12,7 @@ interface IState {
     versionText: string,
     cwd: string,
     curdir: Dir,
+    running: boolean,
 };
 
 export const s: IState = $state({
@@ -22,6 +23,7 @@ export const s: IState = $state({
     exitCode: 0,
     cwd: "/",
     curdir: new Map(), 
+    running: false,
 });
 
 // AFTER finished reading files
