@@ -18,10 +18,12 @@
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
 	import ResizeBar from '$lib/components/ResizeBar.svelte';
+	import SaveDialog from '$lib/components/SaveDialog.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
+	let saveDialog: SaveDialog;
 
 	onMount(async () => {
 		await setupWorker();
@@ -134,11 +136,19 @@
 				return '';
 		}
 	}
+
+	function openSaveDialog() {
+		saveDialog.open();
+	}
+
+	function saveFile(fileName: string, fileType: string) {
+		console.log(`saving to: ${fileName}.${fileType}`);
+	}
 </script>
 
 <div class="editor-window">
 	<div class="outer-wrapper">
-		<aside style="display: flex; margin-right: 0.15em; width: {fileBrowserWidth}px;">
+		<aside style="display: flex; width: {fileBrowserWidth}px;">
 			<FileBrowser />
 		</aside>
 		<ResizeBar resize={startResizeFileBrowser} />
@@ -154,6 +164,13 @@
 					{:else}
 						<span class="icon fa-solid fa-stop"></span> Stop
 					{/if}
+				</button>
+				<button
+					aria-label="save"
+					class="editor-toolbar-button editor-button-save"
+					onclick={openSaveDialog}
+				>
+					<span class="icon fa-solid fa-floppy-disk"></span> Save
 				</button>
 			</div>
 			<div class="middle">
@@ -175,6 +192,7 @@
 			<p>loading</p>
 		{/if}
 	</div>
+	<SaveDialog bind:this={saveDialog} cancel={() => saveDialog.close()} ok={saveFile} />
 </div>
 
 <style>
@@ -202,7 +220,6 @@
 		height: 100%;
 		width: 100%;
 		min-width: 0;
-		margin-left: 0.15em;
 	}
 
 	.middle {
@@ -212,7 +229,6 @@
 		flex-wrap: nowrap;
 		justify-content: space-between;
 		align-items: stretch;
-		gap: 0.2em;
 		min-height: 0;
 	}
 
@@ -293,6 +309,16 @@
 
 	.editor-button-grayed:hover {
 		cursor: not-allowed;
+	}
+
+	.editor-button-save {
+		background: var(--bw-cyan);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-save:hover {
+		background: var(--bw-base1);
+		color: var(--bw-cyan);
 	}
 
 	aside.terminal {

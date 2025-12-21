@@ -143,24 +143,19 @@
 		write('\x1b[2J\x1b[H');
 		ts.terminal!.clear();
 	}
-
-	let inputStyle = $derived(
-		ts.canInput
-			? 'background-color: var(--bw-green); color: var(--bw-base1)'
-			: 'background-color: var(--bw-base1); color: var(--bw-subtext1)'
-	);
 </script>
 
 <div class="terminal-wrapper">
 	<div class="terminal-toolbar">
 		<p id="terminal-label">TERMINAL</p>
-		<button class="terminal-toolbar-input" style={inputStyle}>
-			{#if ts.canInput}
-				<strong>input on</strong>
-			{:else}
-				input off
-			{/if}
-		</button>
+		{#if ts.canInput}
+			<button
+				class="terminal-toolbar-input"
+				style="background-color: var(--bw-yellow); color: var(--bw-base1);"
+			>
+				<strong>waiting for input</strong>
+			</button>
+		{/if}
 		<button class="terminal-toolbar-button" onclick={clear}>clear</button>
 	</div>
 	<div class="terminal-container" bind:this={terminalContainer}>

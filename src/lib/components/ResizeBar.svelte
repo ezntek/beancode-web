@@ -16,12 +16,11 @@
 		box-sizing: border-box;
 		height: 100%;
 		width: 8px;
+		margin: 0.16em;
 		cursor: col-resize;
 		align-items: center;
 		justify-content: center;
 		display: flex;
-		padding-left: 1px;
-		padding-right: 1px;
 	}
 
 	.resize-handle-line {
@@ -40,8 +39,7 @@
 		height: 40px;
 		background-color: var(--bw-surface2);
 		border-radius: 1px;
-		min-width: 4px;
-		width: 6px;
+		min-width: 5px;
 		padding: 0px;
 	}
 </style>
