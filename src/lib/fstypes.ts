@@ -77,6 +77,11 @@ export function pathName(path: string): string {
     return parts[parts.length - 1];
 }
 
+export function pathExtension(path: string): string {
+    const parts = path.split('.');
+    return parts.length !== 1 ? parts[parts.length - 1] : '';
+}
+
 const ERRNO_MESSAGES: { [errno: number]: string } = {
     1: "Operation not permitted",
     2: "No such file or directory",

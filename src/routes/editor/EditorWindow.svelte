@@ -23,6 +23,7 @@
 	import {
 		displayFileResponse,
 		FileResponseKind,
+		pathExtension,
 		pathJoin,
 		pathName,
 		type FileResponse
@@ -94,7 +95,11 @@
 		}
 
 		s.running = true;
-		post({ kind: 'run', data: es.src });
+		if (pathExtension(es.curFilePath) === 'py') {
+			post({ kind: 'runpy', data: es.src });
+		} else {
+			post({ kind: 'run', data: es.src });
+		}
 	}
 
 	function stop() {
@@ -167,7 +172,12 @@
 	function buttonStyle(name: string): string {
 		switch (name) {
 			case 'runstop':
-				return s.running ? 'editor-button-stop' : 'editor-button-run';
+				if (s.running) {
+					return 'editor-button-stop';
+				} else {
+					if (pathExtension(es.curFilePath) === 'py') return 'editor-button-runpy';
+					else return 'editor-button-run';
+				}
 			default:
 				return '';
 		}
@@ -219,7 +229,11 @@
 					onclick={runStop}
 				>
 					{#if !s.running}
-						<span class="icon fa-solid fa-play"></span> Run
+						<span
+							class="icon {pathExtension(es.curFilePath) === 'py'
+								? 'fa-brands fa-python'
+								: 'fa-solid fa-play'}"
+						></span> Run
 					{:else}
 						<span class="icon fa-solid fa-stop"></span> Stop
 					{/if}
@@ -357,6 +371,17 @@
 	.editor-button-run:hover {
 		background-color: var(--bw-base2);
 		color: var(--bw-green);
+		font-weight: bold;
+	}
+
+	.editor-button-runpy {
+		background-color: var(--bw-blue);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-runpy:hover {
+		background-color: var(--bw-base2);
+		color: var(--bw-blue);
 		font-weight: bold;
 	}
 

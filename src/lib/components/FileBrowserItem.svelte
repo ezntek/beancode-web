@@ -1,0 +1,62 @@
+<script lang="ts">
+	interface IProps {
+		onClick: Function;
+		onInfo?: Function;
+		cwdDisplay?: boolean;
+		children: any;
+	}
+	let { onClick, onInfo = () => {}, cwdDisplay = false, children }: IProps = $props();
+	const bgcol = (() => cwdDisplay)() ? '--bw-surface1' : '--bw-base3';
+	const bgstyle = `background-color: var(${bgcol});`;
+</script>
+
+<div class="item" style={bgstyle}>
+	<button class="button" style={bgstyle} onclick={() => onClick()}>
+		{@render children()}
+	</button>
+	{#if !cwdDisplay}
+		<button aria-label="info" class="info" style={bgstyle} onclick={() => onInfo()}>
+			<span class="fa-solid fa-circle-info"></span>
+		</button>
+	{/if}
+</div>
+
+<style>
+	.item {
+		display: flex;
+		margin-left: 0.5em;
+		margin-right: 0.5em;
+		margin-top: 0.5em;
+		border-radius: 0.15em;
+	}
+	.info {
+		display: none;
+		border-width: 0px;
+		background-color: var(--bw-base3);
+		color: var(--bw-text);
+	}
+	.button {
+		flex: 1;
+		border-radius: 0.15em;
+		border-width: 0px;
+		padding: 0.3em;
+		padding-left: 0.5em;
+		text-align: left;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 1em;
+		background-color: var(--bw-base3);
+		color: var(--bw-text);
+		overflow: hidden;
+	}
+	.item:hover {
+		background-color: var(--bw-surface1) !important;
+	}
+	.item:hover > :global(button) {
+		background-color: var(--bw-surface1) !important;
+	}
+	.item:hover > .info {
+		display: block;
+		border-top-right-radius: 0.15em;
+		border-bottom-right-radius: 0.15em;
+	}
+</style>

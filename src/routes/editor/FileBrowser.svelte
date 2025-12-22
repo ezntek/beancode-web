@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { post } from '$lib/workers/pyodide_state.svelte';
-	import { pathJoin } from '$lib/fstypes';
+	import { pathExtension, pathJoin } from '$lib/fstypes';
 	import { es } from './editor_state.svelte';
 	import { s } from './state.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
+	import FileBrowserItem from '$lib/components/FileBrowserItem.svelte';
 
 	let saveDialog: SaveDialog;
 	let lastClicked: string = '';
@@ -32,6 +33,25 @@
 
 	onMount(() => {});
 
+	function determineIcon(name: string): string {
+		if (s.curdir.get(name)) return 'fa-regular fa-folder';
+
+		const ext = pathExtension(name);
+		switch (ext) {
+			case 'bean':
+			case 'pseudocode':
+			case 'pseudo':
+			case 'psc':
+				return 'fa-regular fa-file-code';
+			case 'py':
+				return 'fa-brands fa-python';
+			case 'txt':
+				return 'fa-regular fa-file-lines';
+			default:
+				return 'fa-regular fa-file';
+		}
+	}
+
 	function clickItem(name: string) {
 		lastClicked = name;
 		if (s.curdir.get(name)) {
@@ -47,6 +67,8 @@
 		}
 	}
 
+	function infoItem(name: string) {}
+
 	let cwd = $derived(pathJoin(s.cwd, '.'));
 </script>
 
@@ -54,27 +76,17 @@
 	{#each s.curdir.keys() as item}
 		{#if item !== '.'}
 			{#if item === '..'}
-				<button
-					aria-label="goback"
-					class="file-browser-item"
-					style="background-color: var(--bw-surface1);"
-					onclick={() => clickItem(item)}
-				>
+				<FileBrowserItem cwdDisplay onClick={() => clickItem(item)}>
 					{#if s.cwd !== '/'}
 						<span class="fa-solid fa-arrow-left"></span>
 					{/if}
 					{cwd}
-				</button>
-			{:else if s.curdir.get(item)}
-				<button class="file-browser-item" onclick={() => clickItem(item)}>
-					<span class="fa-regular fa-folder"></span>
-					{item}
-				</button>
+				</FileBrowserItem>
 			{:else}
-				<button class="file-browser-item" onclick={() => clickItem(item)}>
-					<span class="fa-regular fa-file"></span>
+				<FileBrowserItem onClick={() => clickItem(item)} onInfo={() => infoItem(item)}>
+					<span class={determineIcon(item)}></span>
 					{item}
-				</button>
+				</FileBrowserItem>
 			{/if}
 		{/if}
 	{/each}
@@ -91,23 +103,5 @@
 		height: 100%;
 		width: 100%;
 		width: 18.5%;
-	}
-	.file-browser-item {
-		border-width: 0px;
-		margin-left: 0.5em;
-		margin-right: 0.5em;
-		margin-top: 0.5em;
-		border-radius: 0.15em;
-		padding: 0.3em;
-		padding-left: 0.5em;
-		text-align: left;
-		font-family: 'IBM Plex Mono', monospace;
-		font-size: 1em;
-		background-color: var(--bw-base3);
-		color: var(--bw-text);
-		overflow: hidden;
-	}
-	.file-browser-item:hover {
-		background-color: var(--bw-surface1);
 	}
 </style>

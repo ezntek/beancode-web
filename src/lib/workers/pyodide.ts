@@ -206,6 +206,8 @@ async function handleRunPy(src: string){
             exit_code: "___beanweb_exit_code",
         };
         await py.runPythonAsync(gen_py_wrapper(t));
+        const exit_code = py.globals.get(t.exit_code);
+        post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
             post({ kind: 'status', data: 'Ready', positive: true});
         }, 500);

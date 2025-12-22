@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { pathExtension } from '$lib/fstypes';
 	import Dialog from './Dialog.svelte';
 	import ErrorDialog from './ErrorDialog.svelte';
 
@@ -18,8 +19,11 @@
 
 		setTimeout(() => {
 			const n = fileName.slice();
-			const t = fileType.slice();
-			let name = n + (t !== '' ? '.' + t : '');
+			let name = n;
+			if (pathExtension(n) !== fileType) {
+				const t = fileType.slice();
+				name += t !== '' ? '.' + t : '';
+			}
 			ok(name);
 			innerDialog.close();
 			fileName = '';
