@@ -11,6 +11,25 @@ export enum FileResponseKind {
     Exception,
 }
 
+export function displayFileResponseKind(k: FileResponseKind): string {
+    switch (k) {
+        case FileResponseKind.Ok:
+            return "Successful"
+        case FileResponseKind.NotFound:
+            return "File not found (no such file or directory)"
+        case FileResponseKind.IsDir:
+            return "Is a folder, not a file (is a directory)"
+        case FileResponseKind.NotText:
+            return "File does not contain text, and cannot be opened"
+        case FileResponseKind.AlreadyExists:
+            return "File already exists"
+        case FileResponseKind.Errno:
+            return "Error code"
+        case FileResponseKind.Exception:
+            return "Exception"
+    }
+}
+
 export type FileResponse = 
     | { kind: FileResponseKind.Ok, data: string }
     | { kind: FileResponseKind.NotFound }
@@ -19,6 +38,25 @@ export type FileResponse =
     | { kind: FileResponseKind.AlreadyExists }
     | { kind: FileResponseKind.Errno, errno: number, msg: string }
     | { kind: FileResponseKind.Exception, data: any }
+
+export function displayFileResponse(r: FileResponse): string {
+    let base = displayFileResponseKind(r.kind);
+    switch (r.kind) {
+        case FileResponseKind.Ok:
+        case FileResponseKind.NotFound:
+        case FileResponseKind.IsDir:
+        case FileResponseKind.NotText:
+        case FileResponseKind.AlreadyExists:
+            break;
+        case FileResponseKind.Errno:
+            base += `: ${r.msg}`;
+            break;
+        case FileResponseKind.Exception:
+            base += `: ${String(r.data)}`
+            break;
+    }
+    return base;
+}
 
 export function pathJoin(...parts: string[]): string {
     let newParts = [];
@@ -32,6 +70,11 @@ export function pathJoin(...parts: string[]): string {
     }
 
     return '/' + newParts.join('/');
+}
+
+export function pathName(path: string): string {
+    const parts = path.split('/');
+    return parts[parts.length - 1];
 }
 
 const ERRNO_MESSAGES: { [errno: number]: string } = {

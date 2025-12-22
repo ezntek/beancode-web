@@ -3,7 +3,7 @@ import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, inputBuf, interruptBuf, readFileCallback } from './state.svelte';
+import { s, inputBuf, interruptBuf, fileResponseCallback } from './state.svelte';
 import { FileResponseKind } from '$lib/fstypes';
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
@@ -47,10 +47,8 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'readfile-response':
             rkind = msg.data.kind;
-            if (rkind === FileResponseKind.Ok) {
-                // @ts-ignore
-                readFileCallback!(msg.path, msg.data.data);
-            }
+            s.curFileStatus = rkind;
+            fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
         case 'newfile-response':
             rkind = msg.data.kind;
@@ -59,6 +57,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 // gotta update the FS listing on the frontend!
                 post({ kind: 'listdir', path: s.cwd });
             }
+            fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
     }
 }

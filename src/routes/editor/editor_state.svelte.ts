@@ -8,6 +8,6 @@ interface IEditorState {
 export const es: IEditorState = $state({
     curFileName: "",
     curFilePath: "",
-    saved: false,
+    saved: true,
     src: "",
 });

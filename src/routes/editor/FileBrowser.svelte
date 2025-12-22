@@ -9,17 +9,16 @@
 	let saveDialog: SaveDialog;
 	let lastClicked: string = '';
 
-	function saveOk(fileName: string, fileType: string) {
-		let name = fileName;
-		name += fileType !== '' ? '.' + fileType : '';
-		es.curFilePath = pathJoin(s.cwd, name);
-		es.curFileName = name;
+	function saveOk(fileName: string) {
+		es.curFilePath = pathJoin(s.cwd, fileName);
+		es.curFileName = fileName;
 		save();
 	}
 
 	function saveCancel() {
 		// just for good measure
 		es.saved = false;
+		read(lastClicked);
 	}
 
 	function save() {
@@ -29,11 +28,7 @@
 	}
 
 	function read(name: string) {
-		if (!es.saved) return;
-
-		es.curFilePath = pathJoin(s.cwd, name);
-		es.curFileName = name;
-		post({ kind: 'readfile', path: es.curFilePath });
+		post({ kind: 'readfile', path: pathJoin(s.cwd, name) });
 	}
 
 	onMount(() => {});

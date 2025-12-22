@@ -12,21 +12,29 @@
 		inputBuf,
 		interruptBuf,
 		s,
-		setReadFileCallback,
-		type ReadFileCallback
+		setFileResponseCallback,
+		type FileResponseCallback
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
 	import ResizeBar from '$lib/components/ResizeBar.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
-	import { pathJoin } from '$lib/fstypes';
+	import {
+		displayFileResponse,
+		FileResponseKind,
+		pathJoin,
+		pathName,
+		type FileResponse
+	} from '$lib/fstypes';
 	import { es } from './editor_state.svelte';
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
 	let saveDialog: SaveDialog;
+	let errorDialog: ErrorDialog;
 	let messageDialog: MessageDialog;
 
 	onMount(async () => {
@@ -48,14 +56,37 @@
 			fileBrowserWidth = window.innerWidth * 0.1;
 		}
 
-		function readFileCallback(path: string, data: string) {
-			path;
-			es.src = data;
-			tick().then(() => {
-				es.saved = true;
-			});
+		function fileResponseCallback(msgKind: string, path: string, response: FileResponse) {
+			if (response.kind != FileResponseKind.Ok) {
+				errorDialog.open(
+					'An error occurred while interacting with the file system:',
+					displayFileResponse(response)
+				);
+				return;
+			}
+
+			switch (msgKind) {
+				case 'readfile-response':
+					es.src = response.data;
+					tick().then(() => {
+						es.curFileName = pathName(path);
+						es.curFilePath = path;
+						es.saved = true;
+					});
+
+					break;
+				case 'newfile-response':
+					tick().then(() => {
+						es.curFileName = pathName(path);
+						es.curFilePath = path;
+						es.saved = true;
+					});
+					break;
+				default:
+					break;
+			}
 		}
-		setReadFileCallback(readFileCallback as ReadFileCallback);
+		setFileResponseCallback(fileResponseCallback as FileResponseCallback);
 	});
 
 	function runStop() {
@@ -153,18 +184,20 @@
 	}
 
 	function saveOk(fileName: string) {
-		es.curFilePath = pathJoin(s.cwd, fileName);
-		es.curFileName = fileName;
-		saveFile(false);
+		saveFile(false, pathJoin(s.cwd, fileName));
 	}
 
-	function saveFile(overwrite: boolean) {
-		post({ kind: 'newfile', path: es.curFilePath, contents: es.src, overwrite: overwrite });
-		es.saved = true;
+	function saveFile(overwrite: boolean, path?: string) {
+		post({
+			kind: 'newfile',
+			path: path ?? es.curFilePath,
+			contents: es.src,
+			overwrite: overwrite
+		});
 	}
 
 	function newFile() {
-		if (!es.saved) {
+		if (!es.saved && es.curFileName !== '') {
 			saveFile(true);
 		}
 		// reset to untitled
@@ -224,8 +257,14 @@
 			<p>loading</p>
 		{/if}
 	</div>
-	<SaveDialog bind:this={saveDialog} cancel={() => saveDialog.close()} ok={saveOk} />
+	<SaveDialog
+		bind:this={saveDialog}
+		cancel={() => saveDialog.close()}
+		ok={saveOk}
+		title="Save Current File"
+	/>
 	<MessageDialog bind:this={messageDialog} />
+	<ErrorDialog bind:this={errorDialog} />
 </div>
 
 <style>

@@ -1,4 +1,4 @@
-import { FileResponseKind, type Dir } from '$lib/fstypes';
+import { FileResponseKind, type FileResponse, type Dir } from '$lib/fstypes';
 
 const INPUT_MAX = 1024;
 export const inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
@@ -27,8 +27,8 @@ export const s: IState = $state({
 });
 
 // AFTER finished reading files
-export type ReadFileCallback = (path: string, contents: string) => void;
-export let readFileCallback: ReadFileCallback | null = null;
-export function setReadFileCallback(cb: ReadFileCallback) {
-    readFileCallback = cb;
+export type FileResponseCallback = (msgKind: string, path: string, response: FileResponse) => void;
+export let fileResponseCallback: FileResponseCallback | null = null;
+export function setFileResponseCallback(cb: FileResponseCallback) {
+    fileResponseCallback = cb;
 }

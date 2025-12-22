@@ -3,15 +3,16 @@
 
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
-	let message = $state('');
+	let messages: string[] = $state([]);
 
 	// @ts-ignore
 	export const close = () => {
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = (msg: string) => {
-		message = msg;
+	export const open = (...msgs: string[]) => {
+		messages = [];
+		msgs.forEach((itm) => messages.push(itm));
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
 	};
@@ -30,7 +31,12 @@
 			<p class="title"><strong>Error</strong></p>
 		</div>
 		<div class="middle">
-			<p class="label">{message}</p>
+			{#each messages as msg, i}
+				<p class="label">{msg}</p>
+				{#if i !== messages.length}
+					<br />
+				{/if}
+			{/each}
 		</div>
 		<div class="bottom">
 			<button
@@ -51,7 +57,6 @@
 		font-family: 'IBM Plex Mono', monospace !important;
 		display: flex;
 		flex-direction: column;
-		width: 20vw;
 	}
 
 	.top {
@@ -104,7 +109,6 @@
 	}
 
 	.label {
-		font-weight: bold;
 		color: var(--bw-text);
 		margin: 0;
 		margin-right: 0.8em;

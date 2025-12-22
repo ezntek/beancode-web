@@ -74,7 +74,7 @@
 				[Untitled]
 			{/if}
 			{#if !es.saved}
-				<strong>*</strong>
+				<strong style="color: var(--bw-yellow)">*</strong>
 			{/if}
 		</p>
 	</div>

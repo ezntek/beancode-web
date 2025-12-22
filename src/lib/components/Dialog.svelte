@@ -64,5 +64,6 @@
 		background-color: var(--bw-base2);
 		border: 0px;
 		border-radius: 5px;
+		min-width: 20vw;
 	}
 </style>

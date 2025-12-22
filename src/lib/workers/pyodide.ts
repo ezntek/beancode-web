@@ -235,7 +235,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 post({ kind: 'readfile-response', path: msg.path, data: readFile(msg.path) });
                 break;
             case 'newfile':
-                post({ kind: 'newfile-response', data: newFile(msg.path, msg.contents, msg.overwrite) });
+                post({ kind: 'newfile-response', path: msg.path, data: newFile(msg.path, msg.contents, msg.overwrite) });
                 break;
         }
     } catch (exc: any) {

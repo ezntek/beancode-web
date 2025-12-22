@@ -12,7 +12,7 @@ export type PyMessage =
     | { kind: 'listdir-response', data: Dir }
     // path that file was read from
     | { kind: 'readfile-response', path: string, data: FileResponse }
-    | { kind: 'newfile-response', data: FileResponse }
+    | { kind: 'newfile-response', path: string, data: FileResponse }
 
 export type EditorMessage = 
     | { kind: 'run', data: string }
