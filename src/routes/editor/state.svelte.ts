@@ -6,24 +6,20 @@ export const interruptBuf = new SharedArrayBuffer(1);
 
 interface IState {
     status: string,
-    editorSrc: string,
     themeName: string,
     exitCode: number,
     versionText: string,
     cwd: string,
-    curFileName: string,
     curdir: Dir,
     running: boolean,
 };
 
 export const s: IState = $state({
     status: "",
-    editorSrc: "",
     themeName: "catppuccin_macchiato",
     versionText: "loading beancode",
     exitCode: 0,
     cwd: "/",
-    curFileName: '',
     curdir: new Map(), 
     running: false,
 });

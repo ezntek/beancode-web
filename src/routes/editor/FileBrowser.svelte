@@ -1,18 +1,64 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { s } from './state.svelte';
+	import { onMount, tick } from 'svelte';
 	import { post } from '$lib/workers/pyodide_state.svelte';
 	import { pathJoin } from '$lib/fstypes';
+	import { es } from './editor_state.svelte';
+	import { s } from './state.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
+	import SaveDialog from '$lib/components/SaveDialog.svelte';
+
+	let confirmDialog: ConfirmDialog;
+	let saveDialog: SaveDialog;
+	let lastClicked: string = '';
+
+	function confirmOk() {
+		save();
+	}
+
+	function confirmCancel() {
+		// just for good measure
+		es.saved = false;
+	}
+
+	function saveOk(fileName: string, fileType: string) {
+		let name = fileName;
+		name += fileType !== '' ? '.' + fileType : '';
+		es.curFilePath = pathJoin(s.cwd, name);
+		es.curFileName = name;
+		save();
+	}
+
+	function saveCancel() {
+		// just for good measure
+		es.saved = false;
+	}
+
+	function save() {
+		post({ kind: 'newfile', path: es.curFilePath, contents: es.editorSrc, overwrite: true });
+		es.saved = true;
+		read(lastClicked);
+	}
+
+	function read(name: string) {
+		if (!es.saved) return;
+
+		es.curFilePath = pathJoin(s.cwd, name);
+		es.curFileName = name;
+		post({ kind: 'readfile', path: es.curFilePath });
+	}
 
 	onMount(() => {});
 
-	function clickFile(name: string) {
+	function clickItem(name: string) {
+		lastClicked = name;
 		if (s.curdir.get(name)) {
 			s.cwd = pathJoin(s.cwd, name);
 			post({ kind: 'listdir', path: s.cwd });
 		} else {
-			s.curFileName = pathJoin(s.cwd, name);
-			post({ kind: 'readfile', path: s.curFileName });
+			if (!es.saved) {
+				confirmDialog.open('File has not been saved. Should we save it for you?');
+			}
+			read(name);
 		}
 	}
 
@@ -27,7 +73,7 @@
 					aria-label="goback"
 					class="file-browser-item"
 					style="background-color: var(--bw-surface1);"
-					onclick={() => clickFile(item)}
+					onclick={() => clickItem(item)}
 				>
 					{#if s.cwd !== '/'}
 						<span class="fa-solid fa-arrow-left"></span>
@@ -35,12 +81,12 @@
 					{cwd}
 				</button>
 			{:else if s.curdir.get(item)}
-				<button class="file-browser-item" onclick={() => clickFile(item)}>
+				<button class="file-browser-item" onclick={() => clickItem(item)}>
 					<span class="fa-regular fa-folder"></span>
 					{item}
 				</button>
 			{:else}
-				<button class="file-browser-item" onclick={() => clickFile(item)}>
+				<button class="file-browser-item" onclick={() => clickItem(item)}>
 					<span class="fa-regular fa-file"></span>
 					{item}
 				</button>
@@ -48,6 +94,14 @@
 		{/if}
 	{/each}
 </div>
+<ConfirmDialog
+	bind:this={confirmDialog}
+	ok={confirmOk}
+	cancel={confirmCancel}
+	okText="Yes"
+	cancelText="No"
+/>
+<SaveDialog bind:this={saveDialog} ok={saveOk} cancel={saveCancel} />
 
 <style>
 	.file-browser {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	import Editor from './Editor.svelte';
 
@@ -20,6 +20,8 @@
 	import ResizeBar from '$lib/components/ResizeBar.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
+	import { pathJoin } from '$lib/fstypes';
+	import { es } from './editor_state.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
@@ -48,7 +50,10 @@
 
 		function readFileCallback(path: string, data: string) {
 			path;
-			s.editorSrc = data;
+			es.editorSrc = data;
+			tick().then(() => {
+				es.saved = true;
+			});
 		}
 		setReadFileCallback(readFileCallback as ReadFileCallback);
 	});
@@ -60,7 +65,7 @@
 		}
 
 		s.running = true;
-		post({ kind: 'run', data: s.editorSrc });
+		post({ kind: 'run', data: es.editorSrc });
 	}
 
 	function stop() {
@@ -140,11 +145,24 @@
 	}
 
 	function openSaveDialog() {
-		saveDialog.open();
+		if (es.curFileName === '') {
+			saveDialog.open();
+		} else {
+			saveFile(true);
+		}
 	}
 
-	function saveFile(fileName: string, fileType: string) {
-		messageDialog.open(`saved to: ${fileName}.${fileType}`);
+	function saveOk(fileName: string, fileType: string) {
+		let name = fileName;
+		name += fileType !== '' ? '.' + fileType : '';
+		es.curFilePath = pathJoin(s.cwd, name);
+		es.curFileName = name;
+		saveFile(false);
+	}
+
+	function saveFile(overwrite: boolean) {
+		post({ kind: 'newfile', path: es.curFilePath, contents: es.editorSrc, overwrite: overwrite });
+		es.saved = true;
 	}
 </script>
 
@@ -194,7 +212,7 @@
 			<p>loading</p>
 		{/if}
 	</div>
-	<SaveDialog bind:this={saveDialog} cancel={() => saveDialog.close()} ok={saveFile} />
+	<SaveDialog bind:this={saveDialog} cancel={() => saveDialog.close()} ok={saveOk} />
 	<MessageDialog bind:this={messageDialog} />
 </div>
 

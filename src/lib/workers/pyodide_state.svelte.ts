@@ -20,7 +20,7 @@ export type EditorMessage =
     | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
     | { kind: 'listdir', path: string }
     | { kind: 'readfile', path: string }
-    | { kind: 'newfile', path: string, contents: string }
+    | { kind: 'newfile', path: string, contents: string, overwrite: boolean }
 
  
 interface IPyState {

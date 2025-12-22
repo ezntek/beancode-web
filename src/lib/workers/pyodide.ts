@@ -94,6 +94,31 @@ function readFile(path: string): FileResponse {
     return { kind: FileResponseKind.Ok, data: decoded };
 }
 
+function newFile(path: string, contents: string, overwrite: boolean): FileResponse {
+    if (py.FS.analyzePath(path).exists && !overwrite) {
+        return { kind: FileResponseKind.AlreadyExists };
+    }
+
+    let stream: any;
+    try {
+        stream = py.FS.writeFile(path, contents);
+    } catch (exc: any) {
+        if (typeof exc.errno !== 'number') {
+            return { kind: FileResponseKind.Exception, data: exc };
+        }
+
+        if (exc.errno === 2) {
+            return { kind: FileResponseKind.NotFound };
+        } else if (exc.errno === 21) {
+            return { kind: FileResponseKind.IsDir };
+        } else {
+            return { kind: FileResponseKind.Errno, errno: exc.errno, msg: strerror(exc.errno) };
+        }
+    }
+
+    return { kind: FileResponseKind.Ok, data: "" };
+}
+
 let py: any;
 async function loadBeancode() {
     if (!py) {
@@ -208,6 +233,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break
             case 'readfile':
                 post({ kind: 'readfile-response', path: msg.path, data: readFile(msg.path) });
+                break;
+            case 'newfile':
+                post({ kind: 'newfile-response', data: newFile(msg.path, msg.contents, msg.overwrite) });
                 break;
         }
     } catch (exc: any) {

@@ -1,5 +1,5 @@
 import type { EditorMessage, PyMessage } from '$lib/workers/pyodide_state.svelte';
-import { pyState as ps } from '$lib/workers/pyodide_state.svelte';
+import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
@@ -9,6 +9,7 @@ import { FileResponseKind } from '$lib/fstypes';
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     let ter = ts.terminal!;
     const msg = event.data;
+    let rkind: any;
     switch (msg.kind) {
         case 'ready':
             ps.ready = true;
@@ -45,9 +46,18 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.curdir = msg.data;
             break;
         case 'readfile-response':
-            const rkind = msg.data.kind;
+            rkind = msg.data.kind;
             if (rkind === FileResponseKind.Ok) {
+                // @ts-ignore
                 readFileCallback!(msg.path, msg.data.data);
+            }
+            break;
+        case 'newfile-response':
+            rkind = msg.data.kind;
+            if (rkind === FileResponseKind.Ok) {
+                post({ kind: 'listdir', path: s.cwd });
+            } else {
+                console.error(msg.data);
             }
             break;
     }

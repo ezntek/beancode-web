@@ -3,11 +3,12 @@ export type Dir = Map<string, boolean>
 
 export enum FileResponseKind {
     Ok = 0,
-    NotFound = 1,
-    IsDir = 2,
-    NotText = 3,
-    Errno = 4,
-    Exception = 5
+    NotFound,
+    IsDir,
+    NotText,
+    AlreadyExists,
+    Errno,
+    Exception,
 }
 
 export type FileResponse = 
@@ -15,6 +16,7 @@ export type FileResponse =
     | { kind: FileResponseKind.NotFound }
     | { kind: FileResponseKind.IsDir }
     | { kind: FileResponseKind.NotText }
+    | { kind: FileResponseKind.AlreadyExists }
     | { kind: FileResponseKind.Errno, errno: number, msg: string }
     | { kind: FileResponseKind.Exception, data: any }
 

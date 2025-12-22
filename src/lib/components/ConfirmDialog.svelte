@@ -1,55 +1,41 @@
 <script lang="ts">
 	import Dialog from './Dialog.svelte';
-	import ErrorDialog from './ErrorDialog.svelte';
-
-	interface IProps {
-		ok: (fileName: string, fileType: string) => void;
-		cancel: Function;
-	}
-	let { ok, cancel }: IProps = $props();
-
-	function submitOk() {
-		// throw it on the event loop for good measure
-		if (fileName === '') {
-			errorDialog.open('Cannot save to empty file name!');
-			return;
-		}
-
-		setTimeout(() => {
-			ok(fileName.slice(), fileType.slice());
-			innerDialog.close();
-			fileName = '';
-		}, 0);
-	}
-
-	function submitCancel() {
-		fileName = '';
-		fileType = 'bean';
-		setTimeout(() => {
-			cancel();
-			innerDialog.close();
-		}, 0);
-	}
 
 	let innerDialog: Dialog;
-	let errorDialog: ErrorDialog;
 	let submitButton: HTMLButtonElement;
-	let fileName = $state('');
-	let fileType = $state('bean');
+	let message = $state('');
+
+	interface IProps {
+		ok: Function;
+		cancel: Function;
+		okText: string;
+		cancelText: string;
+	}
+	let { ok, cancel, okText = 'Ok', cancelText = 'Cancel' }: IProps = $props();
 
 	// @ts-ignore
 	export const close = () => {
-		fileName = '';
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = () => {
+	export const open = (msg: string) => {
+		message = msg;
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
 	};
 
 	export function focus() {
 		submitButton.focus();
+	}
+
+	function submitOk() {
+		ok();
+		close();
+	}
+
+	function submitCancel() {
+		cancel();
+		close();
 	}
 </script>
 
@@ -59,33 +45,21 @@
 			<button aria-label="close" class="exit-button" onclick={() => close()}>
 				<span class="fa-solid fa-x"></span>
 			</button>
-			<p class="title"><strong>Save</strong></p>
+			<p class="title"><strong>Confirmation</strong></p>
 		</div>
 		<div class="middle">
-			<div class="row">
-				<p class="label">Name:</p>
-				<input type="text" bind:value={fileName} />
-			</div>
-			<div class="row">
-				<p class="label">Type:</p>
-				<select class="picker" style="flex: 1;" bind:value={fileType}>
-					<option value="bean" selected>Pseudocode (.bean)</option>
-					<option value="py">Python (.py)</option>
-					<option value="txt">Text (.txt)</option>
-				</select>
-			</div>
+			<p class="label">{message}</p>
 		</div>
 		<div class="bottom">
-			<button class="ok" onclick={submitOk} bind:this={submitButton}>
-				<span class="fa-solid fa-check" style="margin-right: 0.4em;"></span>Ok
+			<button class="ok" bind:this={submitButton} onclick={() => submitOk()}>
+				<span class="fa-solid fa-check" style="margin-right: 0.4em;"></span>{okText}
 			</button>
-			<button class="cancel" onclick={submitCancel}>
-				<span class="fa-solid fa-x" style="margin-right: 0.4em;"></span>Cancel
+			<button class="cancel" onclick={() => submitCancel()}>
+				<span class="fa-solid fa-x" style="margin-right: 0.4em;"></span>{cancelText}
 			</button>
 		</div>
 	</div>
 </Dialog>
-<ErrorDialog bind:this={errorDialog} />
 
 <style>
 	.vstack {
@@ -127,7 +101,7 @@
 		padding: 0.3em;
 		border-width: 0px;
 		border-radius: 3px;
-		color: var(--bw-base1);
+		color: var(--bw-text);
 		font-weight: bold;
 		transition:
 			background-color 130ms ease,
@@ -137,6 +111,7 @@
 
 	.bottom .ok {
 		background-color: var(--bw-green);
+		color: var(--bw-base1);
 	}
 
 	.bottom .ok:hover {
@@ -146,43 +121,12 @@
 
 	.bottom .cancel {
 		background-color: var(--bw-red);
+		color: var(--bw-base1);
 	}
 
 	.bottom .cancel:hover {
 		background-color: var(--bw-base1);
 		color: var(--bw-red);
-	}
-
-	.row {
-		display: flex;
-		flex-direction: row;
-	}
-
-	.row input {
-		font-family: 'IBM Plex Mono', monospace !important;
-		background-color: var(--bw-base1);
-		border-radius: 5px;
-		border: 0px solid black;
-		flex: 1;
-		color: var(--bw-text);
-		font-size: 13pt;
-	}
-
-	.row input:focus {
-		background-color: var(--bw-surface1);
-		outline: 0px solid black;
-		caret-shape: block;
-		caret-color: var(--bw-blue);
-	}
-
-	.picker {
-		font-family: 'IBM Plex Mono', monospace !important;
-		font-size: 12pt;
-		border-width: 0px;
-		border-radius: 3px;
-		background-color: var(--bw-surface1);
-		color: var(--bw-text);
-		font-weight: bold;
 	}
 
 	.label {
@@ -194,7 +138,7 @@
 	}
 
 	.title {
-		color: var(--bw-text);
+		color: var(--bw-yellow);
 		padding: 0px;
 		margin: 0px;
 		margin-left: 0.8em;

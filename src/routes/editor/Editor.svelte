@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { s } from './state.svelte';
 	import { basicSetup } from 'codemirror';
 	import { EditorView, keymap } from '@codemirror/view';
 	import { indentWithTab } from '@codemirror/commands';
 	import { EditorState } from '@codemirror/state';
 	import { catppuccinMacchiato } from '@catppuccin/codemirror';
+	import { es } from './editor_state.svelte';
 
 	let editor: HTMLDivElement;
 
@@ -13,7 +13,8 @@
 		const updateListener = EditorView.updateListener.of((update) => {
 			if (update.docChanged) {
 				const newValue = update.state.doc.toString();
-				if (newValue !== s.editorSrc) s.editorSrc = newValue;
+				if (newValue !== es.editorSrc) es.editorSrc = newValue;
+				es.saved = false;
 			}
 		});
 
@@ -47,12 +48,12 @@
 		});
 
 		$effect(() => {
-			if (view && s.editorSrc !== view.state.doc.toString()) {
+			if (view && es.editorSrc !== view.state.doc.toString()) {
 				view.dispatch({
 					changes: {
 						from: 0,
 						to: view.state.doc.length,
-						insert: s.editorSrc
+						insert: es.editorSrc
 					}
 				});
 			}
@@ -65,11 +66,18 @@
 </script>
 
 <div class="editor-wrapper">
-	{#if s.curFileName !== ''}
-		<div class="toolbar">
-			<p class="label">{s.curFileName}</p>
-		</div>
-	{/if}
+	<div class="toolbar">
+		<p class="label">
+			{#if es.curFileName !== ''}
+				{es.curFileName}
+			{:else}
+				[Untitled]
+			{/if}
+			{#if !es.saved}
+				<strong>*</strong>
+			{/if}
+		</p>
+	</div>
 	<div class="editor" bind:this={editor}></div>
 </div>
 
