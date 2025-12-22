@@ -11,7 +11,6 @@
 
 	function saveOk(fileName: string) {
 		es.curFilePath = pathJoin(s.cwd, fileName);
-		es.curFileName = fileName;
 		save();
 	}
 
@@ -40,7 +39,7 @@
 			post({ kind: 'listdir', path: s.cwd });
 		} else {
 			if (!es.saved) {
-				if (es.curFileName === '') saveDialog.open();
+				if (es.curFilePath === '') saveDialog.open();
 				else save();
 				return;
 			}

@@ -119,24 +119,31 @@ function newFile(path: string, contents: string, overwrite: boolean): FileRespon
     return { kind: FileResponseKind.Ok, data: "" };
 }
 
+function doInitialSetupCheck() {
+    if (!py.FS.analyzePath("/data/projects").exists)
+        py.FS.mkdirTree("/data/projects");
+
+    // TODO: remove
+    if (!py.FS.analyzePath("/data/projects/default").exists)
+        py.FS.mkdirTree("/data/projects/default");
+}
+
 let py: any;
 async function loadBeancode() {
     if (!py) {
         // @ts-ignore
         const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs");
         py = await PyodideModule.loadPyodide({ args: [/*'-u'*/] });
-        py.setStdout(new XtermWriter());
-        py.setStderr(new XtermWriter());
-        py.setStdin(new XtermStdinHandler());
-        await py.loadPackage("micropip")
+
+        py.FS.mkdirTree("/data");
+        py.FS.mount(py.FS.filesystems.IDBFS, { autoPersist: true }, "/data");
+        await py.FS.syncfs(true);
+
+        await py.loadPackage("micropip");
 
         const BEANCODE_VERSION = "0.7.0a1";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
-        const SCRIPT = `import micropip
-await micropip.install(\"${PATH}\")
-from beancode.runner import *
-from beancode import __version__
-print(f"loaded beancode {__version__}")`
+        const SCRIPT = `import micropip;await micropip.install(\"${PATH}\");from beancode.runner import *;from beancode import __version__`
         try {
             await py.runPythonAsync(SCRIPT)
         } catch (e) {
@@ -144,6 +151,12 @@ print(f"loaded beancode {__version__}")`
             pyOK = false; 
             return;
         }
+
+        doInitialSetupCheck();
+
+        py.setStdout(new XtermWriter());
+        py.setStderr(new XtermWriter());
+        py.setStdin(new XtermStdinHandler());
 
         const version = py.globals.get("__version__")
         post({ kind: 'ready', version: version });

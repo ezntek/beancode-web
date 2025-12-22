@@ -69,7 +69,6 @@
 				case 'readfile-response':
 					es.src = response.data;
 					tick().then(() => {
-						es.curFileName = pathName(path);
 						es.curFilePath = path;
 						es.saved = true;
 					});
@@ -77,7 +76,6 @@
 					break;
 				case 'newfile-response':
 					tick().then(() => {
-						es.curFileName = pathName(path);
 						es.curFilePath = path;
 						es.saved = true;
 					});
@@ -176,7 +174,7 @@
 	}
 
 	function openSaveDialog() {
-		if (es.curFileName === '') {
+		if (es.curFilePath === '') {
 			saveDialog.open();
 		} else {
 			saveFile(true);
@@ -197,14 +195,13 @@
 	}
 
 	function newFile() {
-		if (!es.saved && es.curFileName !== '') {
+		if (!es.saved && es.curFilePath !== '') {
 			saveFile(true);
 		}
 		// reset to untitled
 		es.curFilePath = '';
-		es.curFileName = '';
 		es.src = '';
-		es.saved = false;
+		es.saved = true;
 	}
 </script>
 

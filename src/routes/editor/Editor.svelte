@@ -6,6 +6,7 @@
 	import { EditorState } from '@codemirror/state';
 	import { catppuccinMacchiato } from '@catppuccin/codemirror';
 	import { es } from './editor_state.svelte';
+	import { pathName } from '$lib/fstypes';
 
 	let editor: HTMLDivElement;
 
@@ -68,8 +69,8 @@
 <div class="editor-wrapper">
 	<div class="toolbar">
 		<p class="label">
-			{#if es.curFileName !== ''}
-				{es.curFileName}
+			{#if es.curFilePath !== ''}
+				{pathName(es.curFilePath)}
 			{:else}
 				[Untitled]
 			{/if}
