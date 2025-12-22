@@ -54,10 +54,10 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'newfile-response':
             rkind = msg.data.kind;
+            s.curFileStatus = rkind;
             if (rkind === FileResponseKind.Ok) {
+                // gotta update the FS listing on the frontend!
                 post({ kind: 'listdir', path: s.cwd });
-            } else {
-                console.error(msg.data);
             }
             break;
     }

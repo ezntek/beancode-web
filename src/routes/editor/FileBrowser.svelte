@@ -1,24 +1,13 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { post } from '$lib/workers/pyodide_state.svelte';
 	import { pathJoin } from '$lib/fstypes';
 	import { es } from './editor_state.svelte';
 	import { s } from './state.svelte';
-	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 
-	let confirmDialog: ConfirmDialog;
 	let saveDialog: SaveDialog;
 	let lastClicked: string = '';
-
-	function confirmOk() {
-		save();
-	}
-
-	function confirmCancel() {
-		// just for good measure
-		es.saved = false;
-	}
 
 	function saveOk(fileName: string, fileType: string) {
 		let name = fileName;
@@ -34,7 +23,7 @@
 	}
 
 	function save() {
-		post({ kind: 'newfile', path: es.curFilePath, contents: es.editorSrc, overwrite: true });
+		post({ kind: 'newfile', path: es.curFilePath, contents: es.src, overwrite: true });
 		es.saved = true;
 		read(lastClicked);
 	}
@@ -56,7 +45,9 @@
 			post({ kind: 'listdir', path: s.cwd });
 		} else {
 			if (!es.saved) {
-				confirmDialog.open('File has not been saved. Should we save it for you?');
+				if (es.curFileName === '') saveDialog.open();
+				else save();
+				return;
 			}
 			read(name);
 		}
@@ -94,13 +85,6 @@
 		{/if}
 	{/each}
 </div>
-<ConfirmDialog
-	bind:this={confirmDialog}
-	ok={confirmOk}
-	cancel={confirmCancel}
-	okText="Yes"
-	cancelText="No"
-/>
 <SaveDialog bind:this={saveDialog} ok={saveOk} cancel={saveCancel} />
 
 <style>

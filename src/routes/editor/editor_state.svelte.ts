@@ -3,11 +3,11 @@ interface IEditorState {
     curFileName: string,
     curFilePath: string,
     saved: boolean,
-    editorSrc: string,
+    src: string,
 }
 export const es: IEditorState = $state({
     curFileName: "",
     curFilePath: "",
     saved: false,
-    editorSrc: "",
+    src: "",
 });

@@ -13,7 +13,7 @@
 		const updateListener = EditorView.updateListener.of((update) => {
 			if (update.docChanged) {
 				const newValue = update.state.doc.toString();
-				if (newValue !== es.editorSrc) es.editorSrc = newValue;
+				if (newValue !== es.src) es.src = newValue;
 				es.saved = false;
 			}
 		});
@@ -48,12 +48,12 @@
 		});
 
 		$effect(() => {
-			if (view && es.editorSrc !== view.state.doc.toString()) {
+			if (view && es.src !== view.state.doc.toString()) {
 				view.dispatch({
 					changes: {
 						from: 0,
 						to: view.state.doc.length,
-						insert: es.editorSrc
+						insert: es.src
 					}
 				});
 			}

@@ -3,10 +3,11 @@
 	import ErrorDialog from './ErrorDialog.svelte';
 
 	interface IProps {
-		ok: (fileName: string, fileType: string) => void;
+		ok: (fileName: string) => void;
 		cancel: Function;
+		title?: string;
 	}
-	let { ok, cancel }: IProps = $props();
+	let { ok, cancel, title = 'Save' }: IProps = $props();
 
 	function submitOk() {
 		// throw it on the event loop for good measure
@@ -16,7 +17,10 @@
 		}
 
 		setTimeout(() => {
-			ok(fileName.slice(), fileType.slice());
+			const n = fileName.slice();
+			const t = fileType.slice();
+			let name = n + (t !== '' ? '.' + t : '');
+			ok(name);
 			innerDialog.close();
 			fileName = '';
 		}, 0);
@@ -43,7 +47,9 @@
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = () => {
+	export const open = (t?: string) => {
+		if (t) title = t;
+
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
 	};
@@ -59,7 +65,7 @@
 			<button aria-label="close" class="exit-button" onclick={() => close()}>
 				<span class="fa-solid fa-x"></span>
 			</button>
-			<p class="title"><strong>Save</strong></p>
+			<p class="title"><strong>{title}</strong></p>
 		</div>
 		<div class="middle">
 			<div class="row">
@@ -72,6 +78,7 @@
 					<option value="bean" selected>Pseudocode (.bean)</option>
 					<option value="py">Python (.py)</option>
 					<option value="txt">Text (.txt)</option>
+					<option value="">No File Extension</option>
 				</select>
 			</div>
 		</div>

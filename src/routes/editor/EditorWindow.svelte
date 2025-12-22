@@ -50,7 +50,7 @@
 
 		function readFileCallback(path: string, data: string) {
 			path;
-			es.editorSrc = data;
+			es.src = data;
 			tick().then(() => {
 				es.saved = true;
 			});
@@ -65,7 +65,7 @@
 		}
 
 		s.running = true;
-		post({ kind: 'run', data: es.editorSrc });
+		post({ kind: 'run', data: es.src });
 	}
 
 	function stop() {
@@ -152,17 +152,26 @@
 		}
 	}
 
-	function saveOk(fileName: string, fileType: string) {
-		let name = fileName;
-		name += fileType !== '' ? '.' + fileType : '';
-		es.curFilePath = pathJoin(s.cwd, name);
-		es.curFileName = name;
+	function saveOk(fileName: string) {
+		es.curFilePath = pathJoin(s.cwd, fileName);
+		es.curFileName = fileName;
 		saveFile(false);
 	}
 
 	function saveFile(overwrite: boolean) {
-		post({ kind: 'newfile', path: es.curFilePath, contents: es.editorSrc, overwrite: overwrite });
+		post({ kind: 'newfile', path: es.curFilePath, contents: es.src, overwrite: overwrite });
 		es.saved = true;
+	}
+
+	function newFile() {
+		if (!es.saved) {
+			saveFile(true);
+		}
+		// reset to untitled
+		es.curFilePath = '';
+		es.curFileName = '';
+		es.src = '';
+		es.saved = false;
 	}
 </script>
 
@@ -191,6 +200,9 @@
 					onclick={openSaveDialog}
 				>
 					<span class="icon fa-solid fa-floppy-disk"></span> Save
+				</button>
+				<button aria-label="new" class="editor-toolbar-button editor-button-new" onclick={newFile}>
+					<span class="icon fa-solid fa-plus"></span> New File
 				</button>
 			</div>
 			<div class="middle">
@@ -340,6 +352,16 @@
 	.editor-button-save:hover {
 		background: var(--bw-base1);
 		color: var(--bw-cyan);
+	}
+
+	.editor-button-new {
+		background: var(--bw-magenta);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-new:hover {
+		background: var(--bw-base1);
+		color: var(--bw-magenta);
 	}
 
 	aside.terminal {
