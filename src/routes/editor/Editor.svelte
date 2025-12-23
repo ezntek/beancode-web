@@ -25,7 +25,7 @@
 
 		sz = 21;
 		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
-			sz = 18;
+			sz = 16;
 		}
 
 		const style = EditorView.theme({

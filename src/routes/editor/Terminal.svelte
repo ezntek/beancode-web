@@ -10,7 +10,7 @@
 	import { type ITheme } from '@xterm/xterm';
 	import { THEMES, type ThemeSpec } from '$lib/themes/themes';
 
-	let fontSize = 23;
+	let fontSize = 22;
 	let options: ITerminalOptions & ITerminalInitOnlyOptions;
 	onMount(() => {
 		const handleResize = () => {
@@ -19,7 +19,7 @@
 		window.addEventListener('resize', handleResize);
 
 		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
-			fontSize = 20;
+			fontSize = 18;
 		}
 
 		options = {
@@ -143,6 +143,16 @@
 		write('\x1b[2J\x1b[H');
 		ts.terminal!.clear();
 	}
+
+	function zoomIn() {
+		ts.terminal!.options.fontSize! += 1;
+		ts.termFitAddon!.fit();
+	}
+
+	function zoomOut() {
+		ts.terminal!.options.fontSize! -= 1;
+		ts.termFitAddon!.fit();
+	}
 </script>
 
 <div class="terminal-wrapper">
@@ -156,7 +166,13 @@
 				<strong>waiting for input</strong>
 			</button>
 		{/if}
-		<button class="toolbar-button" onclick={clear}>clear</button>
+		<button aria-label="zoom in" class="toolbar-button zoomout" onclick={() => zoomOut()}>
+			<span class="fa-solid fa-minus"></span>
+		</button>
+		<button aria-label="zoom in" class="toolbar-button zoomin" onclick={() => zoomIn()}>
+			<span class="fa-solid fa-plus"></span>
+		</button>
+		<button class="toolbar-button clear" onclick={clear}>clear</button>
 	</div>
 	<div class="terminal-container" bind:this={terminalContainer}>
 		<Xterm bind:terminal={ts.terminal!} {options} {onLoad} {onData} {onKey} />
@@ -189,7 +205,6 @@
 	.toolbar-button {
 		border: 0px solid black;
 		margin: 0.2em;
-		background-color: var(--bw-purple);
 		color: var(--bw-base1);
 		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
@@ -199,10 +214,32 @@
 			font-weight 130ms ease;
 	}
 
-	.toolbar-button:hover {
+	.clear {
+		background-color: var(--bw-purple);
+	}
+
+	.clear:hover {
 		background-color: var(--bw-surface1);
 		color: var(--bw-purple);
 		font-weight: bold;
+	}
+
+	.zoomout {
+		background-color: var(--bw-red);
+	}
+
+	.zoomout:hover {
+		background-color: var(--bw-surface1);
+		color: var(--bw-red);
+	}
+
+	.zoomin {
+		background-color: var(--bw-green);
+	}
+
+	.zoomin:hover {
+		background-color: var(--bw-surface1);
+		color: var(--bw-green);
 	}
 
 	#terminal-label {

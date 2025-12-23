@@ -103,21 +103,6 @@
 		setFileResponseCallback(fileResponseCallback as FileResponseCallback);
 	});
 
-	function runStop() {
-		if (s.running) {
-			stop();
-			return;
-		}
-
-		saveFile(true);
-		s.running = true;
-		if (pathExtension(es.curFilePath) === 'py') {
-			post({ kind: 'runpy', data: es.src, filePath: es.curFilePath });
-		} else {
-			post({ kind: 'run', data: es.src, filePath: es.curFilePath });
-		}
-	}
-
 	function stop() {
 		// SIGINT
 		ibuf[0] = 2;
@@ -183,6 +168,23 @@
 
 		e.target.addEventListener('pointermove', onMove);
 		e.target.addEventListener('pointerup', onUp);
+	}
+
+	function runStop() {
+		if (s.running) {
+			stop();
+			return;
+		}
+
+		if (es.curFilePath !== '') {
+			saveFile(true);
+		}
+		s.running = true;
+		if (pathExtension(es.curFilePath) === 'py') {
+			post({ kind: 'runpy', data: es.src, filePath: es.curFilePath });
+		} else {
+			post({ kind: 'run', data: es.src, filePath: es.curFilePath });
+		}
 	}
 
 	function buttonStyle(name: string): string {
