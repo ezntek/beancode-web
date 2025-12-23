@@ -33,7 +33,7 @@
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
-	let newAfterSave = $state(true);
+	let newAfterSave = $state(false);
 	let saveDialog: SaveDialog;
 	let errorDialog: ErrorDialog;
 	let messageDialog: MessageDialog;

@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { post } from '$lib/workers/pyodide_state.svelte';
-	import { pathExtension, pathJoin } from '$lib/fstypes';
+	import {
+		pathBasename,
+		pathBeginsWith,
+		pathCountParts,
+		pathExtension,
+		pathJoin
+	} from '$lib/fstypes';
 	import { es } from './editor_state.svelte';
 	import { s } from './state.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
@@ -80,27 +86,36 @@
 		post({ kind: 'delfile', path: path });
 	}
 
-	let cwd = $derived(pathJoin(s.cwd, '.'));
+	let cwd = $derived(pathJoin(s.cwd));
+	let inProjects = $derived(pathBeginsWith(s.cwd, '/data/projects') && pathCountParts(s.cwd) === 3);
 </script>
 
 <div class="file-browser">
-	{#each s.curdir.keys() as item}
-		{#if item !== '.'}
-			{#if item === '..'}
-				<FileBrowserItem cwdDisplay onClick={() => clickItem(item)}>
-					{#if s.cwd !== '/'}
-						<span class="fa-solid fa-arrow-left"></span>
-					{/if}
-					{cwd}
-				</FileBrowserItem>
-			{:else}
+	<FileBrowserItem cwdDisplay onClick={() => clickItem('..')}>
+		{#if !inProjects}
+			<span class="fa-solid fa-arrow-left"></span>
+		{:else}
+			<strong class="project-label">Current Project</strong>
+			<br />
+		{/if}
+		{#if inProjects}
+			{pathBasename(cwd)}
+		{:else}
+			{cwd}
+		{/if}
+	</FileBrowserItem>
+	{#if s.curdir.size >= 3}
+		{#each s.curdir.keys() as item}
+			{#if item !== '.' && item !== '..'}
 				<FileBrowserItem onClick={() => clickItem(item)} onDelete={() => deleteItem(item)}>
 					<span class={determineIcon(item)}></span>
 					{item}
 				</FileBrowserItem>
 			{/if}
-		{/if}
-	{/each}
+		{/each}
+	{:else}
+		<center class="empty">empty...</center>
+	{/if}
 </div>
 <SaveDialog bind:this={saveDialog} ok={saveOk} cancel={saveCancel} />
 <ConfirmDialog
@@ -114,6 +129,12 @@
 />
 
 <style>
+	.empty {
+		font-family: 'IBM Plex Mono', monospace;
+		color: var(--bw-subtext1);
+		margin-top: 0.6em;
+	}
+
 	.file-browser {
 		display: flex;
 		flex: 1 0 auto;

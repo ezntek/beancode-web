@@ -72,14 +72,25 @@ export function pathJoin(...parts: string[]): string {
     return '/' + newParts.join('/');
 }
 
-export function pathName(path: string): string {
+export function pathBasename(path: string): string {
     const parts = path.split('/');
     return parts[parts.length - 1];
 }
 
 export function pathExtension(path: string): string {
-    const parts = path.split('.');
+    const parts = pathBasename(path).split('.');
     return parts.length !== 1 ? parts[parts.length - 1] : '';
+}
+
+export function pathBeginsWith(path: string, subpath: string): boolean {
+    return pathJoin(path).startsWith(pathJoin(subpath))
+}
+
+export function pathCountParts(path: string): number {
+    let p = path.trim();
+    if (p[0] === '/')
+        p = p.slice(1);
+    return p.split('/').length;
 }
 
 const ERRNO_MESSAGES: { [errno: number]: string } = {

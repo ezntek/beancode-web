@@ -19,7 +19,7 @@ export const s: IState = $state({
     themeName: "catppuccin_macchiato",
     versionText: "loading beancode",
     exitCode: 0,
-    cwd: "/",
+    cwd: "/data/projects/default",
     curdir: new Map(), 
     running: false,
 });

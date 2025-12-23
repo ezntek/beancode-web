@@ -74,7 +74,8 @@ function readFile(path: string): FileResponse {
             return { kind: FileResponseKind.Exception, data: exc };
         }
 
-        if (exc.errno === 2) {
+        // stupid pyodide returns 44 for ENOENT
+        if (exc.errno === 2 || exc.errno === 44) {
             return { kind: FileResponseKind.NotFound };
         } else if (exc.errno === 21) {
             return { kind: FileResponseKind.IsDir };

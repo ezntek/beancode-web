@@ -3,10 +3,10 @@
 	import { basicSetup } from 'codemirror';
 	import { EditorView, keymap } from '@codemirror/view';
 	import { indentWithTab } from '@codemirror/commands';
-	import { Compartment, EditorState, type Extension } from '@codemirror/state';
-	import { catppuccinMacchiato } from '@catppuccin/codemirror';
+	import { Compartment, EditorState } from '@codemirror/state';
 	import { es } from './editor_state.svelte';
-	import { pathName } from '$lib/fstypes';
+	import { pathBasename } from '$lib/fstypes';
+	import { catppuccinMacchiato } from '$lib/themes/catppuccin';
 
 	let editor: HTMLDivElement;
 	let view: EditorView;
@@ -42,11 +42,11 @@
 		const startState = EditorState.create({
 			doc: '',
 			extensions: [
+				catppuccinMacchiato,
 				basicSetup,
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),
-				catppuccinMacchiato,
 				keymap.of([indentWithTab])
 			]
 		});
@@ -97,7 +97,7 @@
 			{#if es.curFilePath === ''}
 				[New File]
 			{:else}
-				{pathName(es.curFilePath)}
+				{pathBasename(es.curFilePath)}
 			{/if}
 			{#if !es.saved}
 				<strong style="color: var(--bw-yellow)">*</strong>
