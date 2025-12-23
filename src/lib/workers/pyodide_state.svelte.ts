@@ -13,6 +13,7 @@ export type PyMessage =
     // path that file was read from
     | { kind: 'readfile-response', path: string, data: FileResponse }
     | { kind: 'newfile-response', path: string, data: FileResponse }
+    | { kind: 'delfile-response', path: string }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, filePath: string }
@@ -21,6 +22,7 @@ export type EditorMessage =
     | { kind: 'listdir', path: string }
     | { kind: 'readfile', path: string }
     | { kind: 'newfile', path: string, contents: string, overwrite: boolean }
+    | { kind: 'delfile', path: string }
 
  
 interface IPyState {

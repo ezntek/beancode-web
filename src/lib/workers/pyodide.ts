@@ -1,4 +1,4 @@
-import { FileResponseKind, strerror, type Dir } from "$lib/fstypes";
+import { FileResponseKind, pathJoin, strerror, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
 
@@ -23,6 +23,7 @@ class XtermWriter {
 
 let inputBuf: SharedArrayBuffer;
 let interruptBuf: SharedArrayBuffer;
+let FS: any;
 
 class XtermStdinHandler {
     isatty: boolean
@@ -52,14 +53,15 @@ class XtermStdinHandler {
 }
 
 function listDir(path: string): Dir {
-    let fs: Dir = new Map(); 
-    const listing = py.FS.readdir(path);
+    let dir: Dir = new Map(); 
+    const listing = FS.readdir(path);
+    console.log("listing: ", listing);
     for (const item of listing) {
-        const itemPath = path + '/' + item;
-        const stat = py.FS.stat(itemPath);
-        fs.set(item, py.FS.isDir(stat.mode));
+        const itemPath = pathJoin(path, item);
+        const stat = FS.stat(itemPath);
+        dir.set(item, FS.isDir(stat.mode));
     }
-    return fs;
+    return dir;
 }
 
 function readFile(path: string): FileResponse {
@@ -67,7 +69,7 @@ function readFile(path: string): FileResponse {
     let decoded: string;
 
     try { 
-        data = py.FS.readFile(path);
+        data = FS.readFile(path);
     } catch (exc: any) {
         if (typeof exc.errno !== 'number') {
             return { kind: FileResponseKind.Exception, data: exc };
@@ -94,13 +96,13 @@ function readFile(path: string): FileResponse {
 }
 
 function newFile(path: string, contents: string, overwrite: boolean): FileResponse {
-    if (py.FS.analyzePath(path).exists && !overwrite) {
+    if (FS.analyzePath(path).exists && !overwrite) {
         return { kind: FileResponseKind.AlreadyExists };
     }
 
     let stream: any;
     try {
-        stream = py.FS.writeFile(path, contents);
+        stream = FS.writeFile(path, contents);
     } catch (exc: any) {
         if (typeof exc.errno !== 'number') {
             return { kind: FileResponseKind.Exception, data: exc };
@@ -118,13 +120,29 @@ function newFile(path: string, contents: string, overwrite: boolean): FileRespon
     return { kind: FileResponseKind.Ok, data: "" };
 }
 
+function delPath(path: string) {
+    if (!FS.analyzePath(path).exists)
+        return;
+
+    try {
+        if (FS.isDir(path)) {
+            // we have python anyway :shrug:
+            py.runPython(`import shutil;shutil.rmtree(${path})`);    
+        } else {
+            FS.unlink(path);
+        }
+    } catch (e) {
+        // silently fail
+    }
+}
+
 async function doInitialSetupCheck() {
-    if (!py.FS.analyzePath("/data/projects").exists)
-        py.FS.mkdirTree("/data/projects");
+    if (!FS.analyzePath("/data/projects").exists)
+        FS.mkdirTree("/data/projects");
 
     // TODO: remove
-    if (!py.FS.analyzePath("/data/projects/default").exists)
-        py.FS.mkdirTree("/data/projects/default");
+    if (!FS.analyzePath("/data/projects/default").exists)
+        FS.mkdirTree("/data/projects/default");
 
     const PYFN = `def exec_user_py(s,n):
 \tug={"__name__":"__main__","__file__":n};ul=ug
@@ -163,10 +181,11 @@ async function loadBeancode() {
         // @ts-ignore
         const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs");
         py = await PyodideModule.loadPyodide({ args: [/*'-u'*/] });
+        FS = py.FS;
 
-        py.FS.mkdirTree("/data");
-        py.FS.mount(py.FS.filesystems.IDBFS, { autoPersist: true }, "/data");
-        await py.FS.syncfs(true);
+        FS.mkdirTree("/data");
+        FS.mount(FS.filesystems.IDBFS, { autoPersist: true }, "/data");
+        await FS.syncfs(true);
 
         await py.loadPackage("micropip");
 
@@ -272,6 +291,10 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'newfile':
                 post({ kind: 'newfile-response', path: msg.path, data: newFile(msg.path, msg.contents, msg.overwrite) });
+                break;
+            case 'delfile':
+                delPath(msg.path);
+                post({ kind: 'delfile-response', path: msg.path});
                 break;
         }
     } catch (exc: any) {

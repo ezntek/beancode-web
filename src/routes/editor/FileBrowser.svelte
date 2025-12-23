@@ -6,8 +6,11 @@
 	import { s } from './state.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import FileBrowserItem from '$lib/components/FileBrowserItem.svelte';
+	import MessageDialog from '$lib/components/MessageDialog.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 
 	let saveDialog: SaveDialog;
+	let confirmDialog: MessageDialog;
 	let lastClicked: string = '';
 
 	function saveOk(fileName: string) {
@@ -67,7 +70,15 @@
 		}
 	}
 
-	function infoItem(name: string) {}
+	function deleteItem(name: string) {
+		lastClicked = name;
+		confirmDialog.open(`Are you sure you want to delete ${name}?`);
+	}
+
+	function deleteItemForReal() {
+		const path = pathJoin(s.cwd, lastClicked);
+		post({ kind: 'delfile', path: path });
+	}
 
 	let cwd = $derived(pathJoin(s.cwd, '.'));
 </script>
@@ -83,7 +94,7 @@
 					{cwd}
 				</FileBrowserItem>
 			{:else}
-				<FileBrowserItem onClick={() => clickItem(item)} onInfo={() => infoItem(item)}>
+				<FileBrowserItem onClick={() => clickItem(item)} onDelete={() => deleteItem(item)}>
 					<span class={determineIcon(item)}></span>
 					{item}
 				</FileBrowserItem>
@@ -92,6 +103,15 @@
 	{/each}
 </div>
 <SaveDialog bind:this={saveDialog} ok={saveOk} cancel={saveCancel} />
+<ConfirmDialog
+	bind:this={confirmDialog}
+	ok={deleteItemForReal}
+	cancel={() => {
+		confirmDialog.close();
+	}}
+	okText="Yes"
+	cancelText="No"
+/>
 
 <style>
 	.file-browser {

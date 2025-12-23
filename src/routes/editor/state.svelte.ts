@@ -1,4 +1,4 @@
-import { FileResponseKind, type FileResponse, type Dir } from '$lib/fstypes';
+import { type FileResponse, type Dir } from '$lib/fstypes';
 
 const INPUT_MAX = 1024;
 export const inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
@@ -12,7 +12,6 @@ interface IState {
     cwd: string,
     curdir: Dir,
     running: boolean,
-    curFileStatus: FileResponseKind,
 };
 
 export const s: IState = $state({
@@ -23,7 +22,6 @@ export const s: IState = $state({
     cwd: "/",
     curdir: new Map(), 
     running: false,
-    curFileStatus: FileResponseKind.Ok,
 });
 
 // AFTER finished reading files

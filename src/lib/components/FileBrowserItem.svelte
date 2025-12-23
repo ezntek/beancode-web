@@ -1,11 +1,11 @@
 <script lang="ts">
 	interface IProps {
 		onClick: Function;
-		onInfo?: Function;
+		onDelete?: Function;
 		cwdDisplay?: boolean;
 		children: any;
 	}
-	let { onClick, onInfo = () => {}, cwdDisplay = false, children }: IProps = $props();
+	let { onClick, onDelete: onInfo = () => {}, cwdDisplay = false, children }: IProps = $props();
 	const bgcol = (() => cwdDisplay)() ? '--bw-surface1' : '--bw-base3';
 	const bgstyle = `background-color: var(${bgcol});`;
 </script>
@@ -16,7 +16,7 @@
 	</button>
 	{#if !cwdDisplay}
 		<button aria-label="info" class="info" style={bgstyle} onclick={() => onInfo()}>
-			<span class="fa-solid fa-circle-info"></span>
+			<span class="fa-solid fa-trash" style="color: var(--bw-red)"></span>
 		</button>
 	{/if}
 </div>

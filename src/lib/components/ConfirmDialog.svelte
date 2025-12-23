@@ -3,13 +3,13 @@
 
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
-	let message = $state('');
+	let messages: string[] = $state([]);
 
 	interface IProps {
 		ok: Function;
 		cancel: Function;
-		okText: string;
-		cancelText: string;
+		okText?: string;
+		cancelText?: string;
 	}
 	let { ok, cancel, okText = 'Ok', cancelText = 'Cancel' }: IProps = $props();
 
@@ -18,8 +18,9 @@
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = (msg: string) => {
-		message = msg;
+	export const open = (...msgs: string[]) => {
+		messages = [];
+		msgs.forEach((itm) => messages.push(itm));
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
 	};
@@ -48,7 +49,12 @@
 			<p class="title"><strong>Confirmation</strong></p>
 		</div>
 		<div class="middle">
-			<p class="label">{message}</p>
+			{#each messages as msg, i}
+				<p class="label">{msg}</p>
+				{#if i !== messages.length}
+					<br />
+				{/if}
+			{/each}
 		</div>
 		<div class="bottom">
 			<button class="ok" bind:this={submitButton} onclick={() => submitOk()}>

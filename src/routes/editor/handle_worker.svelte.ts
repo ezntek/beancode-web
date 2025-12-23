@@ -47,17 +47,18 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'readfile-response':
             rkind = msg.data.kind;
-            s.curFileStatus = rkind;
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
         case 'newfile-response':
             rkind = msg.data.kind;
-            s.curFileStatus = rkind;
             if (rkind === FileResponseKind.Ok) {
                 // gotta update the FS listing on the frontend!
                 post({ kind: 'listdir', path: s.cwd });
             }
             fileResponseCallback!(msg.kind, msg.path, msg.data);
+            break;
+        case 'delfile-response':
+            post({ kind: 'listdir', path: s.cwd });
             break;
     }
 }
