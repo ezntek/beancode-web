@@ -59,6 +59,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'delfile-response':
             post({ kind: 'listdir', path: s.cwd });
+            fileResponseCallback!(msg.kind, msg.path);
             break;
     }
 }

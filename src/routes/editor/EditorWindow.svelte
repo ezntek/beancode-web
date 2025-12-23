@@ -25,15 +25,15 @@
 		FileResponseKind,
 		pathExtension,
 		pathJoin,
-		pathName,
 		type FileResponse
 	} from '$lib/fstypes';
-	import { es } from './editor_state.svelte';
+	import { editorNewFile, es } from './editor_state.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
+	let newAfterSave = $state(true);
 	let saveDialog: SaveDialog;
 	let errorDialog: ErrorDialog;
 	let messageDialog: MessageDialog;
@@ -57,7 +57,14 @@
 			fileBrowserWidth = window.innerWidth * 0.1;
 		}
 
-		function fileResponseCallback(msgKind: string, path: string, response: FileResponse) {
+		function fileResponseCallback(msgKind: string, path: string, response?: FileResponse) {
+			if (!response) {
+				if (msgKind === 'delfile-response') {
+					if (path === es.curFilePath) editorNewFile();
+				}
+				return;
+			}
+
 			if (response.kind != FileResponseKind.Ok) {
 				errorDialog.open(
 					'An error occurred while interacting with the file system:',
@@ -80,6 +87,14 @@
 						es.curFilePath = path;
 						es.saved = true;
 					});
+					if (newAfterSave) {
+						newAfterSave = false;
+						editorNewFile();
+						setTimeout(() => {
+							es.saved = true;
+							// XXX: hacky AF but ig it works?!?!?
+						}, 50);
+					}
 					break;
 				default:
 					break;
@@ -206,13 +221,18 @@
 	}
 
 	function newFile() {
-		if (!es.saved && es.curFilePath !== '') {
-			saveFile(true);
+		if (!es.saved) {
+			if (es.curFilePath !== '') {
+				saveFile(true);
+			} else {
+				newAfterSave = true;
+				saveDialog.open('Save current file');
+				return;
+			}
 		}
+
 		// reset to untitled
-		es.curFilePath = '';
-		es.src = '';
-		es.saved = true;
+		editorNewFile();
 	}
 </script>
 

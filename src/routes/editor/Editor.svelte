@@ -69,10 +69,10 @@
 <div class="editor-wrapper">
 	<div class="toolbar">
 		<p class="label">
-			{#if es.curFilePath !== ''}
-				{pathName(es.curFilePath)}
+			{#if es.curFilePath === ''}
+				[New File]
 			{:else}
-				[Untitled]
+				{pathName(es.curFilePath)}
 			{/if}
 			{#if !es.saved}
 				<strong style="color: var(--bw-yellow)">*</strong>
