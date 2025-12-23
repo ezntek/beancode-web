@@ -15,8 +15,8 @@ export type PyMessage =
     | { kind: 'newfile-response', path: string, data: FileResponse }
 
 export type EditorMessage = 
-    | { kind: 'run', data: string }
-    | { kind: 'runpy', data: string }
+    | { kind: 'run', data: string, filePath: string }
+    | { kind: 'runpy', data: string, filePath: string }
     | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
     | { kind: 'listdir', path: string }
     | { kind: 'readfile', path: string }

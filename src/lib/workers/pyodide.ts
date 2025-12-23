@@ -1,4 +1,3 @@
-import { type VarTable, gen_beancode_wrapper, gen_py_wrapper } from "$lib/run_wrapper";
 import { FileResponseKind, strerror, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
@@ -119,13 +118,43 @@ function newFile(path: string, contents: string, overwrite: boolean): FileRespon
     return { kind: FileResponseKind.Ok, data: "" };
 }
 
-function doInitialSetupCheck() {
+async function doInitialSetupCheck() {
     if (!py.FS.analyzePath("/data/projects").exists)
         py.FS.mkdirTree("/data/projects");
 
     // TODO: remove
     if (!py.FS.analyzePath("/data/projects/default").exists)
         py.FS.mkdirTree("/data/projects/default");
+
+    const PYFN = `def exec_user_py(s,n):
+\tug={"__name__":"__main__","__file__":n};ul=ug
+\ttry:
+\t\texec(s,ug,ul);return 0
+\texcept SystemExit as e:
+\t\treturn e.code
+\texcept Exception as e:
+\t\traise e`;
+
+    const BFN = `from beancode.lexer import Lexer;from beancode.parser import Parser;from beancode.interpreter import Interpreter;from beancode.error import *
+def exec_user_bean(s,n):
+\ttry:
+\t\ti = Interpreter(Parser(Lexer(s).tokenize()).program().stmts);i.toplevel = True;i.visit_block(None);c=0
+\texcept BCError as err:
+\t\terr.print(n,s);c=1
+\texcept SystemExit as e:
+\t\tc=e.code
+\texcept KeyboardInterrupt:
+\t\twarn("Caught keyboard interrupt");c=1
+\texcept EOFError:
+\t\twarn("Caught EOF");c=1 
+\texcept RecursionError as e:
+\t\twarn("Python recursion depth exceeded! Did you forget your base case?");c=1 
+\texcept Exception as e:
+\t\terror(f'Python exception caught ({type(e)}: "{e}")! Please report this to the developers.');raise e
+\treturn c`
+
+    await py.runPythonAsync(PYFN);
+    await py.runPythonAsync(BFN);
 }
 
 let py: any;
@@ -152,7 +181,7 @@ async function loadBeancode() {
             return;
         }
 
-        doInitialSetupCheck();
+        await doInitialSetupCheck();
 
         py.setStdout(new XtermWriter());
         py.setStderr(new XtermWriter());
@@ -169,26 +198,19 @@ async function loadBeancode() {
 let pyOK = false;
 let pyBeancodePromise = loadBeancode();
 
-async function handleRun(src: string) {
-    const t: VarTable = {
-        file_name: "___beanweb_file_name",
-        src: "___beanweb_src",
-        exit_code: "___beanweb_exit_code",
-    };
+async function handleRun(src: string, path: string) {
     try {
         post({ kind: 'status', data: 'Running Beancode', positive: true});
-        py.globals.set(t.file_name, "(beanweb)");
-        py.globals.set(t.src, src);
-        py.globals.set(t.exit_code, 0);
-        await py.runPythonAsync(gen_beancode_wrapper(t));
-        const exit_code = py.globals.get(t.exit_code);
+        py.globals.set("n", path || "beanweb");
+        py.globals.set("s", src);
+        py.globals.set("c", 0);
+        await py.runPythonAsync("c=exec_user_bean(s,n)");
+        const exit_code = py.globals.get("c");
         post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
             post({ kind: 'status', data: 'Ready', positive: true });
         }, 500);
-        for (const value of Object.values(t)) {
-            await py.runPythonAsync(`try:del ${value}\nexcept NameError:pass`);
-        }
+        await py.runPythonAsync("del(s,n,c)");
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
@@ -198,16 +220,14 @@ async function handleRun(src: string) {
     }
 }
 
-async function handleRunPy(src: string){
+async function handleRunPy(src: string, name: string){
     try {
         post({ kind: 'status', data: 'Running Python', positive: true});
-        const t: VarTable = {
-            file_name: "___beanweb_file_name",
-            src: src,
-            exit_code: "___beanweb_exit_code",
-        };
-        await py.runPythonAsync(gen_py_wrapper(t));
-        const exit_code = py.globals.get(t.exit_code);
+        await py.globals.set("s", src);
+        await py.globals.set("n", name);
+        await py.runPythonAsync("c=exec_user_py(s,n)");
+        const exit_code = py.globals.get("c");
+        await py.runPythonAsync("del(s,n,c)");
         post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
             post({ kind: 'status', data: 'Ready', positive: true});
@@ -232,12 +252,12 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             case 'run':
                 (new Uint8Array(interruptBuf))[0] = 0;
                 post({ kind: 'clear' });
-                await handleRun(msg.data);
+                await handleRun(msg.data, msg.filePath);
                 break;
             case 'runpy':
                 (new Uint8Array(interruptBuf))[0] = 0;
                 post({ kind: 'clear' });
-                await handleRunPy(msg.data);
+                await handleRunPy(msg.data, msg.filePath);
                 break;
             case 'setup':
                 inputBuf = msg.inputBuf;
