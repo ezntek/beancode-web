@@ -55,7 +55,6 @@ class XtermStdinHandler {
 function listDir(path: string): Dir {
     let dir: Dir = new Map(); 
     const listing = FS.readdir(path);
-    console.log("listing: ", listing);
     for (const item of listing) {
         const itemPath = pathJoin(path, item);
         const stat = FS.stat(itemPath);
