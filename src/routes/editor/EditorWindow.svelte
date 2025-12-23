@@ -94,6 +94,7 @@
 			return;
 		}
 
+		saveFile(true);
 		s.running = true;
 		if (pathExtension(es.curFilePath) === 'py') {
 			post({ kind: 'runpy', data: es.src });

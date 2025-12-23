@@ -13,7 +13,6 @@
 	import '@fontsource/ibm-plex-mono/700';
 
 	onMount(() => {
-		s.themeName = 'catppuccin_macchiato';
 		applyTheme(s.themeName);
 	});
 </script>

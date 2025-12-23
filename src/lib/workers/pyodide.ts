@@ -141,7 +141,7 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const BEANCODE_VERSION = "0.7.0a1";
+        const BEANCODE_VERSION = "0.7.0b1";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
         const SCRIPT = `import micropip;await micropip.install(\"${PATH}\");from beancode.runner import *;from beancode import __version__`
         try {
@@ -170,13 +170,13 @@ let pyOK = false;
 let pyBeancodePromise = loadBeancode();
 
 async function handleRun(src: string) {
+    const t: VarTable = {
+        file_name: "___beanweb_file_name",
+        src: "___beanweb_src",
+        exit_code: "___beanweb_exit_code",
+    };
     try {
         post({ kind: 'status', data: 'Running Beancode', positive: true});
-        const t: VarTable = {
-            file_name: "___beanweb_file_name",
-            src: "___beanweb_src",
-            exit_code: "___beanweb_exit_code",
-        };
         py.globals.set(t.file_name, "(beanweb)");
         py.globals.set(t.src, src);
         py.globals.set(t.exit_code, 0);
@@ -194,6 +194,7 @@ async function handleRun(src: string) {
         setTimeout(() => {
             post({ kind: 'status', data: 'An error occurred', positive: false });
         }, 500);
+        post({ kind: 'pyexit', code: 1 });
     }
 }
 
