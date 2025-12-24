@@ -4,6 +4,7 @@
 	import { EditorView, keymap } from '@codemirror/view';
 	import { indentWithTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
+	import { indentUnit } from '@codemirror/language';
 	import { es } from './editor_state.svelte';
 	import { pathBasename } from '$lib/fstypes';
 	import { catppuccinMacchiato } from '$lib/themes/catppuccin';
@@ -47,7 +48,9 @@
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),
-				keymap.of([indentWithTab])
+				keymap.of([indentWithTab]),
+				EditorState.tabSize.of(4),
+				indentUnit.of('    ')
 			]
 		});
 

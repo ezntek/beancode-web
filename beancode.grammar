@@ -1,0 +1,181 @@
+// XXX: PLEASE DO NOT TOUCH THIS FILE
+// NOBODY IN THIS UNIVERSE KNOWS HOW THIS WORKS...
+// This one is the lezer grammar
+
+@top Program { Block }
+
+@precedence {
+    statement,
+    member @left,
+    pow @right,
+    times @left,
+    plus @left,
+    compare @left,
+    equal @left,
+    and @left,
+    or @left
+}
+
+ArrayLiteral {
+    "{" Expr ("," Expr)* ","? "}"
+}
+MatrixLiteral {
+    "{" ArrayLiteral ("," ArrayLiteral)* "}"
+}
+Literal {
+    IntegerLit | RealLit | StringLit | CharLit |
+    BooleanLit | KNull | ArrayLiteral | MatrixLiteral
+}
+BooleanLit { KTrue | KFalse }
+PrimitiveType { KInteger | KBoolean | KReal | KString | KChar | KNull }
+ArrayRange { IntegerLit ":" IntegerLit } 
+ArrayType { KArray "[" ArrayRange ("," ArrayRange)? "]" KOf PrimitiveType }
+Type { ArrayType | PrimitiveType }
+
+// Exprs
+Negation { "-" Expr }
+Not { KNot Expr }
+Grouping { "(" Expr ")" }
+Typecast { PrimitiveType "(" Expr ")" }
+FunctionCall { Ident "(" ArgList? ")" }
+Unary { 
+    Ident | Literal | Typecast | Grouping
+    | Negation | Not | FunctionCall
+}
+ArrayIndex { Unary "[" Expr ("," Expr)? "]" }
+Pow { ArrayIndex "^" Pow | ArrayIndex }
+Factor { Factor !times ("*" | "/") Pow | Pow }
+Term { Term !plus ("+" | "-") Factor | Factor }
+Comparison { Comparison !compare (">" | "<" | "<=" | ">=") Term | Term }
+Equality { Equality !equal ("=" | "<>") Comparison | Comparison }
+LogicalComparison { LogicalComparison !and KAnd Equality | LogicalComparison !or KOr Equality | Equality }
+Expr { LogicalComparison }
+
+// Blocks, Statements
+Lvalue { Ident | ArrayIndex }
+CaseofBranch { Expr ":" Statement Newline }
+Parameter { Ident ":" Type }
+ParameterList { Parameter ("," Parameter)* }
+ArgList { Expr ("," Expr)* }
+FileIdent { Ident | StringLit | Grouping }
+FileMode { KRead | KWrite | KAppend }
+FileModeList { FileMode (KAnd FileMode)* }
+
+Block { (Statement (Newline)+)* }
+DeclareStatement { KExport? KDeclare Ident ("," Ident)* ":" Type }
+ConstantStatement { KExport? KConstant Ident "<-" Expr }
+OutputStatement { (KOutput | KPrint) Expr ("," Expr)* }
+InputStatement { KInput Lvalue }
+AssignStatement { Lvalue "<-" Expr }
+
+IfStatement { KIf Expr KThen Block (KElse Block)? KEndif }
+CaseofStatement { KCase KOf Expr Newline (CaseofBranch)* (KOtherwise Statement)? KEndcase }
+WhileStatement { KWhile Expr KDo Block KEndwhile }
+RepeatUntilStatement { KRepeat Block KUntil Expr }
+ForStatement { KFor Ident "<-" Expr KTo Expr (KStep Expr)? Block KNext Ident }
+ProcedureStatement { KExport? KProcedure Ident ("(" ParameterList ")")? Block KEndprocedure }
+FunctionStatement { KExport? KFunction Ident ("(" ParameterList ")")? KReturns Type Block KEndfunction }
+CallStatement { KCall Ident ("(" ArgList ")")? }
+ReturnStatement { KReturn Expr? }
+ScopeStatement { KScope Block KEndscope }
+IncludeStatement { KInclude StringLit }
+TraceStatement { KTrace ("(" Ident ("," Ident)* ")")? (KTo StringLit)? Block KEndtrace}
+OpenfileStatement { KOpenfile FileIdent KFor FileModeList }
+WritefileStatement { KWritefile FileIdent "," Expr }
+ReadfileStatement { KReadfile FileIdent "," Lvalue }
+ClosefileStatement { KClosefile FileIdent }
+
+Statement {
+    (
+        DeclareStatement | ConstantStatement | OutputStatement | InputStatement
+        | AssignStatement | IfStatement | CaseofStatement | WhileStatement
+        | RepeatUntilStatement | ForStatement | ProcedureStatement
+        | FunctionStatement | CallStatement | ReturnStatement | ScopeStatement
+        | IncludeStatement | TraceStatement | OpenfileStatement
+        | WritefileStatement | ReadfileStatement | ClosefileStatement | Expr
+    )
+}
+
+@skip {
+    space
+    LineComment
+    BlockComment
+}
+
+KTrue { @specialize<Ident, "true" | "TRUE"> }
+KFalse { @specialize<Ident, "false" | "FALSE"> }
+KDeclare { @specialize<Ident, "declare" | "DECLARE"> }
+KOutput { @specialize<Ident, "output" | "OUTPUT"> }
+KInput { @specialize<Ident, "input" | "INPUT"> }
+KAnd { @specialize<Ident, "and" | "AND"> }
+KOr { @specialize<Ident, "or" | "OR"> }
+KNot { @specialize<Ident, "not" | "NOT"> }
+KIf { @specialize<Ident, "if" | "IF"> }
+KThen { @specialize<Ident, "then" | "THEN"> }
+KElse { @specialize<Ident, "else" | "ELSE"> }
+KEndif { @specialize<Ident, "endif" | "ENDIF"> }
+KCase { @specialize<Ident, "case" | "CASE"> }
+KOf { @specialize<Ident, "of" | "OF"> }
+KOtherwise { @specialize<Ident, "otherwise" | "OTHERWISE"> }
+KEndcase { @specialize<Ident, "endcase" | "ENDCASE"> }
+KWhile { @specialize<Ident, "while" | "WHILE"> }
+KDo { @specialize<Ident, "do" | "DO"> }
+KEndwhile { @specialize<Ident, "endwhile" | "ENDWHILE"> }
+KRepeat { @specialize<Ident, "repeat" | "REPEAT"> }
+KUntil { @specialize<Ident, "until" | "UNTIL"> }
+KFor { @specialize<Ident, "for" | "FOR"> }
+KTo { @specialize<Ident, "to" | "TO"> }
+KStep { @specialize<Ident, "step" | "STEP"> }
+KNext { @specialize<Ident, "next" | "NEXT"> }
+KProcedure { @specialize<Ident, "procedure" | "PROCEDURE"> }
+KEndprocedure { @specialize<Ident, "endprocedure" | "ENDPROCEDURE"> }
+KCall { @specialize<Ident, "call" | "CALL"> }
+KFunction { @specialize<Ident, "function" | "FUNCTION"> }
+KReturns { @specialize<Ident, "returns" | "RETURNS"> }
+KReturn { @specialize<Ident, "return" | "RETURN"> }
+KEndfunction { @specialize<Ident, "endfunction" | "ENDFUNCTION"> }
+KInclude { @specialize<Ident, "include" | "INCLUDE"> }
+KExport { @specialize<Ident, "export" | "EXPORT"> }
+KScope { @specialize<Ident, "scope" | "SCOPE"> }
+KEndscope { @specialize<Ident, "endscope" | "ENDSCOPE"> }
+KPrint { @specialize<Ident, "print" | "PRINT"> }
+KConstant { @specialize<Ident, "constant" | "CONSTANT"> }
+KArray { @specialize<Ident, "array" | "ARRAY"> }
+KTrace { @specialize<Ident, "trace" | "TRACE"> }
+KEndtrace { @specialize<Ident, "endtrace" | "ENDTRACE"> }
+KOpenfile { @specialize<Ident, "openfile" | "OPENFILE"> }
+KReadfile { @specialize<Ident, "readfile" | "READFILE"> }
+KWritefile { @specialize<Ident, "writefile" | "WRITEFILE"> }
+KClosefile { @specialize<Ident, "closefile" | "CLOSEFILE"> }
+KRead { @specialize<Ident, "read" | "READ"> }
+KWrite { @specialize<Ident, "write" | "WRITE"> }
+KAppend { @specialize<Ident, "append" | "APPEND"> }
+KInteger { @specialize<Ident, "integer" | "INTEGER"> }
+KReal { @specialize<Ident, "real" | "REAL"> }
+KString { @specialize<Ident, "string" | "STRING"> }
+KChar { @specialize<Ident, "char" | "CHAR"> }
+KBoolean { @specialize<Ident, "boolean" | "BOOLEAN"> }
+KNull { @specialize<Ident, "null" | "NULL"> }
+
+@tokens {
+    BlockComment { "/*" (![\*] | "*" ![/])* "*/" }
+    LineComment[isolate] { "//" ![\n]* }
+    stringContentDouble { ![\\\n"]+ }
+    Escape { "\\" @asciiLetter } 
+    space { $[ \t]+ }
+    Newline { "\n" | "\r\n" }
+    @precedence { RealLit IntegerLit }
+    RealLit { $[0-9]+ "." $[0-9]+ }
+    IntegerLit { $[0-9]+ }
+    StringLit {
+        '"' (stringContentDouble | Escape)* '"'
+    }
+    CharLit {
+        "'" ( ![\\\n'] | Escape ) "'"
+    }
+    Ident { $[a-zA-Z_] $[a-zA-Z0-9_]* }
+
+    Operators { "<>" | "<-" | "+" | "-" | "*" | "/" | "<" | ">" | "=" | "^" | "←" }
+    Separators { "{" | "}" | "[" | "]" | "(" | ")" | ";" | ":" | "," }
+
+}
