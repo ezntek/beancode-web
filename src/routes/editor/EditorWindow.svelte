@@ -171,6 +171,8 @@
 	}
 
 	function runStop() {
+		if (!ps.ready) return;
+
 		if (s.running) {
 			stop();
 			return;
@@ -188,6 +190,8 @@
 	}
 
 	function buttonStyle(name: string): string {
+		if (!ps.ready) return 'editor-button-grayed';
+
 		switch (name) {
 			case 'runstop':
 				if (s.running) {
@@ -196,12 +200,18 @@
 					if (pathExtension(es.curFilePath) === 'py') return 'editor-button-runpy';
 					else return 'editor-button-run';
 				}
+			case 'save':
+				return 'editor-button-save';
+			case 'new':
+				return 'editor-button-new';
 			default:
 				return '';
 		}
 	}
 
 	function openSaveDialog() {
+		if (!ps.ready) return;
+
 		if (es.curFilePath === '') {
 			saveDialog.open();
 		} else {
@@ -223,6 +233,8 @@
 	}
 
 	function newFile() {
+		if (!ps.ready) return;
+
 		if (!es.saved) {
 			if (es.curFilePath !== '') {
 				saveFile(true);
@@ -263,12 +275,16 @@
 				</button>
 				<button
 					aria-label="save"
-					class="editor-toolbar-button editor-button-save"
+					class="editor-toolbar-button {buttonStyle('save')}"
 					onclick={openSaveDialog}
 				>
 					<span class="icon fa-solid fa-floppy-disk"></span> Save
 				</button>
-				<button aria-label="new" class="editor-toolbar-button editor-button-new" onclick={newFile}>
+				<button
+					aria-label="new"
+					class="editor-toolbar-button {buttonStyle('new')}"
+					onclick={newFile}
+				>
 					<span class="icon fa-solid fa-plus"></span> New File
 				</button>
 			</div>

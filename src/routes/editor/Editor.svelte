@@ -6,16 +6,20 @@
 	import { Compartment, EditorState } from '@codemirror/state';
 	import { indentUnit } from '@codemirror/language';
 	import { es } from './editor_state.svelte';
-	import { pathBasename } from '$lib/fstypes';
+	import { pathBasename, pathExtension } from '$lib/fstypes';
 	import { catppuccinMacchiato } from '$lib/themes/catppuccin';
+	import { python } from '@codemirror/lang-python';
 
 	let editor: HTMLDivElement;
 	let view: EditorView;
 	let sz = $state(21);
 	let fontTheme: Compartment;
+	let highlighter: Compartment;
 
 	onMount(() => {
 		fontTheme = new Compartment();
+		highlighter = new Compartment();
+
 		const updateListener = EditorView.updateListener.of((update) => {
 			if (update.docChanged) {
 				const newValue = update.state.doc.toString();
@@ -33,7 +37,8 @@
 			'&': { height: '100%' },
 			'.cm-scroller': { overflow: 'auto' },
 			'.cm-content': { fontFamily: 'IBM Plex Mono' },
-			'.cm-gutterElement': { display: 'flex', alignItems: 'center' }
+			'.cm-gutterElement': { display: 'flex', alignItems: 'center' },
+			'.cm-tooltip': { fontFamily: 'IBM Plex Mono', fontSize: '14px' }
 		});
 
 		const fontStyle = EditorView.theme({
@@ -43,12 +48,13 @@
 		const startState = EditorState.create({
 			doc: '',
 			extensions: [
-				catppuccinMacchiato,
 				basicSetup,
+				catppuccinMacchiato,
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),
 				keymap.of([indentWithTab]),
+				highlighter.of(python()),
 				EditorState.tabSize.of(4),
 				indentUnit.of('    ')
 			]
@@ -69,6 +75,14 @@
 						insert: es.src
 					}
 				});
+			}
+		});
+
+		$effect(() => {
+			if (pathExtension(es.curFilePath) !== 'py') {
+				view.dispatch({ effects: highlighter.reconfigure([]) });
+			} else {
+				view.dispatch({ effects: highlighter.reconfigure(python()) });
 			}
 		});
 

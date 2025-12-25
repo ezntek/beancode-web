@@ -11,7 +11,7 @@ export default defineConfig({
     optimizeDeps: {
         include: [
             '@xterm/xterm', '@xterm/addon-fit', '@xterm/addon-search',
-            'codemirror', '@codemirror/theme-one-dark',
+            'codemirror', '@codemirror/language',
         ],
     },
 });

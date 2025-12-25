@@ -6,6 +6,8 @@
 
 @precedence {
     statement,
+    assign,
+    traceParams @cut,
     member @left,
     pow @right,
     times @left,
@@ -17,72 +19,75 @@
 }
 
 ArrayLiteral {
-    "{" Expr ("," Expr)* ","? "}"
-}
-MatrixLiteral {
-    "{" ArrayLiteral ("," ArrayLiteral)* "}"
+    LCurly Expr (Comma Expr)* Comma? RCurly
 }
 Literal {
     IntegerLit | RealLit | StringLit | CharLit |
-    BooleanLit | KNull | ArrayLiteral | MatrixLiteral
+    BooleanLit | KNull | ArrayLiteral
 }
 BooleanLit { KTrue | KFalse }
-PrimitiveType { KInteger | KBoolean | KReal | KString | KChar | KNull }
-ArrayRange { IntegerLit ":" IntegerLit } 
-ArrayType { KArray "[" ArrayRange ("," ArrayRange)? "]" KOf PrimitiveType }
+PrimitiveType { KInteger | KBoolean | KReal | KString | KChar }
+ArrayRange { IntegerLit Colon IntegerLit } 
+ArrayType { KArray LBracket ArrayRange (Comma ArrayRange)? RBracket KOf PrimitiveType }
 Type { ArrayType | PrimitiveType }
 
 // Exprs
-Negation { "-" Expr }
+Negation { Sub Expr }
 Not { KNot Expr }
-Grouping { "(" Expr ")" }
-Typecast { PrimitiveType "(" Expr ")" }
-FunctionCall { Ident "(" ArgList? ")" }
+Grouping { LParen Expr RParen }
+Typecast { PrimitiveType LParen Expr RParen }
+FunctionCall { Ident LParen ArgList? RParen }
+ArrayIndex { (Ident | Grouping) LBracket Expr (Comma Expr)? RBracket }
 Unary { 
-    Ident | Literal | Typecast | Grouping
-    | Negation | Not | FunctionCall
+    Ident | Negation | Literal | Typecast | Grouping
+    | Not | FunctionCall
 }
-ArrayIndex { Unary "[" Expr ("," Expr)? "]" }
-Pow { ArrayIndex "^" Pow | ArrayIndex }
-Factor { Factor !times ("*" | "/") Pow | Pow }
-Term { Term !plus ("+" | "-") Factor | Factor }
-Comparison { Comparison !compare (">" | "<" | "<=" | ">=") Term | Term }
-Equality { Equality !equal ("=" | "<>") Comparison | Comparison }
-LogicalComparison { LogicalComparison !and KAnd Equality | LogicalComparison !or KOr Equality | Equality }
-Expr { LogicalComparison }
+Expr {
+    Unary |
+    ArrayIndex |
+    BinaryExpr
+}
+
+BinaryExpr {
+    Expr !or KOr Expr |
+    Expr !and KAnd Expr |
+    Expr !equal (Eq | Neq) Expr |
+    Expr !compare (Gt | Lt | Geq | Leq) Expr |
+    Expr !plus (Add | Sub) Expr |
+    Expr !times (Mul | Div) Expr |
+    Expr !pow Pow Expr
+}
 
 // Blocks, Statements
 Lvalue { Ident | ArrayIndex }
-CaseofBranch { Expr ":" Statement Newline }
-Parameter { Ident ":" Type }
-ParameterList { Parameter ("," Parameter)* }
-ArgList { Expr ("," Expr)* }
+CaseofBranch { Expr Colon Statement Newline }
+Parameter { Ident Colon Type }
+ParameterList { Parameter (Comma Parameter)* }
+ArgList { Expr (Comma Expr)* }
 FileIdent { Ident | StringLit | Grouping }
 FileMode { KRead | KWrite | KAppend }
 FileModeList { FileMode (KAnd FileMode)* }
 
-Block { (Statement (Newline)+)* }
-DeclareStatement { KExport? KDeclare Ident ("," Ident)* ":" Type }
-ConstantStatement { KExport? KConstant Ident "<-" Expr }
-OutputStatement { (KOutput | KPrint) Expr ("," Expr)* }
+DeclareStatement { KExport? KDeclare Ident (Comma Ident)* Colon Type }
+ConstantStatement { KExport? KConstant Ident Assign Expr }
+OutputStatement { (KOutput | KPrint) Expr (Comma Expr)* }
 InputStatement { KInput Lvalue }
-AssignStatement { Lvalue "<-" Expr }
-
+AssignStatement { Ident !assign Assign Expr }
 IfStatement { KIf Expr KThen Block (KElse Block)? KEndif }
 CaseofStatement { KCase KOf Expr Newline (CaseofBranch)* (KOtherwise Statement)? KEndcase }
 WhileStatement { KWhile Expr KDo Block KEndwhile }
 RepeatUntilStatement { KRepeat Block KUntil Expr }
-ForStatement { KFor Ident "<-" Expr KTo Expr (KStep Expr)? Block KNext Ident }
-ProcedureStatement { KExport? KProcedure Ident ("(" ParameterList ")")? Block KEndprocedure }
-FunctionStatement { KExport? KFunction Ident ("(" ParameterList ")")? KReturns Type Block KEndfunction }
-CallStatement { KCall Ident ("(" ArgList ")")? }
+ForStatement { KFor Ident Assign Expr KTo Expr (KStep Expr)? Newline Block KNext Ident }
+ProcedureStatement { KExport? KProcedure Ident (LParen ParameterList RParen)? Block KEndprocedure }
+FunctionStatement { KExport? KFunction Ident (LParen ParameterList RParen)? KReturns Type Block KEndfunction }
+CallStatement { KCall Ident (LParen ArgList RParen)? }
 ReturnStatement { KReturn Expr? }
 ScopeStatement { KScope Block KEndscope }
 IncludeStatement { KInclude StringLit }
-TraceStatement { KTrace ("(" Ident ("," Ident)* ")")? (KTo StringLit)? Block KEndtrace}
+TraceStatement { KTrace !traceParams (LParen Ident (Comma Ident)* RParen)? (KTo StringLit)? Block KEndtrace}
 OpenfileStatement { KOpenfile FileIdent KFor FileModeList }
-WritefileStatement { KWritefile FileIdent "," Expr }
-ReadfileStatement { KReadfile FileIdent "," Lvalue }
+WritefileStatement { KWritefile FileIdent Comma Expr }
+ReadfileStatement { KReadfile FileIdent Comma Lvalue }
 ClosefileStatement { KClosefile FileIdent }
 
 Statement {
@@ -93,14 +98,9 @@ Statement {
         | FunctionStatement | CallStatement | ReturnStatement | ScopeStatement
         | IncludeStatement | TraceStatement | OpenfileStatement
         | WritefileStatement | ReadfileStatement | ClosefileStatement | Expr
-    )
+    )? Newline
 }
-
-@skip {
-    space
-    LineComment
-    BlockComment
-}
+Block { Statement* }
 
 KTrue { @specialize<Ident, "true" | "TRUE"> }
 KFalse { @specialize<Ident, "false" | "FALSE"> }
@@ -157,13 +157,19 @@ KChar { @specialize<Ident, "char" | "CHAR"> }
 KBoolean { @specialize<Ident, "boolean" | "BOOLEAN"> }
 KNull { @specialize<Ident, "null" | "NULL"> }
 
+@skip {
+    space
+    LineComment
+    BlockComment
+}
+
 @tokens {
     BlockComment { "/*" (![\*] | "*" ![/])* "*/" }
     LineComment[isolate] { "//" ![\n]* }
     stringContentDouble { ![\\\n"]+ }
     Escape { "\\" @asciiLetter } 
     space { $[ \t]+ }
-    Newline { "\n" | "\r\n" }
+    Newline { "\n" | "\r\n" | Semicolon }
     @precedence { RealLit IntegerLit }
     RealLit { $[0-9]+ "." $[0-9]+ }
     IntegerLit { $[0-9]+ }
@@ -175,7 +181,26 @@ KNull { @specialize<Ident, "null" | "NULL"> }
     }
     Ident { $[a-zA-Z_] $[a-zA-Z0-9_]* }
 
-    Operators { "<>" | "<-" | "+" | "-" | "*" | "/" | "<" | ">" | "=" | "^" | "←" }
-    Separators { "{" | "}" | "[" | "]" | "(" | ")" | ";" | ":" | "," }
+    Neq { "<>" }
+    Assign { "<-" | "←" }
+    Leq { "<=" }
+    Geq { ">=" }
+    Add { "+" }
+    Sub { "-" }
+    Mul { "*" }
+    Div { "/" }
+    Lt { "<" }
+    Gt { ">" }
+    Eq { "=" }
+    Pow { "^" }
+    LCurly { "{" }
+    RCurly { "}" }
+    LParen { "(" }
+    RParen { ")" }
+    LBracket { "[" }
+    RBracket { "]" }
+    Semicolon { ";" }
+    Colon { ":" }
+    Comma { "," }
 
 }

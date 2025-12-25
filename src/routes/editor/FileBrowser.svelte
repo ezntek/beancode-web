@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { post } from '$lib/workers/pyodide_state.svelte';
+	import { post, pyState } from '$lib/workers/pyodide_state.svelte';
 	import {
 		pathBasename,
 		pathBeginsWith,
@@ -91,30 +91,34 @@
 </script>
 
 <div class="file-browser">
-	<FileBrowserItem cwdDisplay onClick={() => clickItem('..')}>
-		{#if !inProjects}
-			<span class="fa-solid fa-arrow-left"></span>
-		{:else}
-			<strong class="project-label">Current Project</strong>
-			<br />
-		{/if}
-		{#if inProjects}
-			{pathBasename(cwd)}
-		{:else}
-			{cwd}
-		{/if}
-	</FileBrowserItem>
-	{#if s.curdir.size >= 3}
-		{#each s.curdir.keys() as item}
-			{#if item !== '.' && item !== '..'}
-				<FileBrowserItem onClick={() => clickItem(item)} onDelete={() => deleteItem(item)}>
-					<span class={determineIcon(item)}></span>
-					{item}
-				</FileBrowserItem>
-			{/if}
-		{/each}
+	{#if !pyState.ready}
+		<center class="empty">still loading files...</center>
 	{:else}
-		<center class="empty">empty...</center>
+		<FileBrowserItem cwdDisplay onClick={() => clickItem('..')}>
+			{#if !inProjects}
+				<span class="fa-solid fa-arrow-left"></span>
+			{:else}
+				<strong class="project-label">Current Project</strong>
+				<br />
+			{/if}
+			{#if inProjects}
+				{pathBasename(cwd)}
+			{:else}
+				{cwd}
+			{/if}
+		</FileBrowserItem>
+		{#if s.curdir.size >= 3}
+			{#each s.curdir.keys() as item}
+				{#if item !== '.' && item !== '..'}
+					<FileBrowserItem onClick={() => clickItem(item)} onDelete={() => deleteItem(item)}>
+						<span class={determineIcon(item)}></span>
+						{item}
+					</FileBrowserItem>
+				{/if}
+			{/each}
+		{:else}
+			<center class="empty">empty...</center>
+		{/if}
 	{/if}
 </div>
 <SaveDialog bind:this={saveDialog} ok={saveOk} cancel={saveCancel} />
