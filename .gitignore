@@ -1,5 +1,7 @@
 node_modules
 
+parser*.js
+test.js
 lang.js
 lang.*.js
 
