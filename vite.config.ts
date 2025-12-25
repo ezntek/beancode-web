@@ -11,7 +11,8 @@ export default defineConfig({
     optimizeDeps: {
         include: [
             '@xterm/xterm', '@xterm/addon-fit', '@xterm/addon-search',
-            'codemirror', '@codemirror/language',
+            'codemirror', '@codemirror/language', '@lezer/highlight',
+            '@lezer/lr',
         ],
     },
 });

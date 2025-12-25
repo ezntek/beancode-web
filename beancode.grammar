@@ -158,14 +158,15 @@ KBoolean { @specialize<Ident, "boolean" | "BOOLEAN"> }
 KNull { @specialize<Ident, "null" | "NULL"> }
 
 @skip {
-    space
-    LineComment
+    space | 
+    LineComment |
     BlockComment
 }
 
 @tokens {
+    LineCommentBegin { "//" }
     BlockComment { "/*" (![\*] | "*" ![/])* "*/" }
-    LineComment[isolate] { "//" ![\n]* }
+    LineComment { LineCommentBegin ![\n]* }
     stringContentDouble { ![\\\n"]+ }
     Escape { "\\" @asciiLetter } 
     space { $[ \t]+ }
@@ -188,7 +189,7 @@ KNull { @specialize<Ident, "null" | "NULL"> }
     Add { "+" }
     Sub { "-" }
     Mul { "*" }
-    Div { "/" }
+    Div { "/" ![\n/] }
     Lt { "<" }
     Gt { ">" }
     Eq { "=" }

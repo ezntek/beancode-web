@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { basicSetup } from 'codemirror';
 	import { EditorView, keymap } from '@codemirror/view';
-	import { indentWithTab } from '@codemirror/commands';
+	import { history, indentWithTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
 	import { indentUnit } from '@codemirror/language';
 	import { es } from './editor_state.svelte';
@@ -11,7 +11,6 @@
 	import { python } from '@codemirror/lang-python';
 
 	let editor: HTMLDivElement;
-	let view: EditorView;
 	let sz = $state(21);
 	let fontTheme: Compartment;
 	let highlighter: Compartment;
@@ -52,26 +51,27 @@
 				catppuccinMacchiato,
 				updateListener,
 				style,
+				es.history.of(history()),
 				fontTheme.of(fontStyle),
 				keymap.of([indentWithTab]),
-				highlighter.of(python()),
 				EditorState.tabSize.of(4),
-				indentUnit.of('    ')
+				indentUnit.of('    '),
+				highlighter.of(python())
 			]
 		});
 
-		view = new EditorView({
+		es.view = new EditorView({
 			// @ts-ignore
 			parent: editor,
 			state: startState
 		});
 
 		$effect(() => {
-			if (view && es.src !== view.state.doc.toString()) {
-				view.dispatch({
+			if (es.view! && es.src !== es.view.state.doc.toString()) {
+				es.view!.dispatch({
 					changes: {
 						from: 0,
-						to: view.state.doc.length,
+						to: es.view!.state.doc.length,
 						insert: es.src
 					}
 				});
@@ -80,14 +80,14 @@
 
 		$effect(() => {
 			if (pathExtension(es.curFilePath) !== 'py') {
-				view.dispatch({ effects: highlighter.reconfigure([]) });
+				es.view!.dispatch({ effects: highlighter.reconfigure([]) });
 			} else {
-				view.dispatch({ effects: highlighter.reconfigure(python()) });
+				es.view!.dispatch({ effects: highlighter.reconfigure(python()) });
 			}
 		});
 
 		return () => {
-			view.destroy();
+			es.view!.destroy();
 		};
 	});
 
@@ -96,7 +96,7 @@
 		const newTheme = EditorView.theme({
 			'.cm-content': { fontSize: `${sz}px` }
 		});
-		view.dispatch({ effects: fontTheme.reconfigure(newTheme) });
+		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
 
 	function zoomOut() {
@@ -104,7 +104,7 @@
 		const newTheme = EditorView.theme({
 			'.cm-content': { fontSize: `${sz}px` }
 		});
-		view.dispatch({ effects: fontTheme.reconfigure(newTheme) });
+		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
 </script>
 

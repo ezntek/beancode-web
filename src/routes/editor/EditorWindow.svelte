@@ -27,7 +27,7 @@
 		pathJoin,
 		type FileResponse
 	} from '$lib/fstypes';
-	import { editorNewFile, es } from './editor_state.svelte';
+	import { changeFile, editorNewFile, es } from './editor_state.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	let ibuf: Uint8Array;
@@ -75,12 +75,7 @@
 
 			switch (msgKind) {
 				case 'readfile-response':
-					es.src = response.data;
-					tick().then(() => {
-						es.curFilePath = path;
-						es.saved = true;
-					});
-
+					changeFile(response.data, path);
 					break;
 				case 'newfile-response':
 					tick().then(() => {

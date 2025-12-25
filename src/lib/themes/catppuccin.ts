@@ -91,7 +91,7 @@ function createCatppuccinTheme(flavor: CatppuccinFlavor) {
     { dark: isDark }
   );
 
-  const highlightStyle = HighlightStyle.define([
+ const highlightStyle = HighlightStyle.define([
     { tag: t.keyword, color: colors.mauve.hex },
     {
       tag: [
