@@ -265,19 +265,17 @@
 	/* very gross hack*/
 	.terminal-container :global(> div) {
 		display: flex;
-		width: 100%;
 		height: 100%;
+		width: 100%;
 	}
 
 	.terminal-container :global(.xterm) {
 		display: flex;
-		width: 100%;
 		height: 100% !important;
 	}
 
 	.terminal-container :global(.xterm-screen) {
 		display: flex;
-		width: 100%;
 		height: 100% !important;
 	}
 </style>

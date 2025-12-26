@@ -9,6 +9,8 @@
 	import { pathBasename, pathExtension } from '$lib/fstypes';
 	import { catppuccinMacchiato } from '$lib/themes/catppuccin';
 	import { python } from '@codemirror/lang-python';
+	import { oneDark } from '@codemirror/theme-one-dark';
+	import { beancode } from '$lib/highlighting/beancode';
 
 	let editor: HTMLDivElement;
 	let sz = $state(21);
@@ -80,7 +82,7 @@
 
 		$effect(() => {
 			if (pathExtension(es.curFilePath) !== 'py') {
-				es.view!.dispatch({ effects: highlighter.reconfigure([]) });
+				es.view!.dispatch({ effects: highlighter.reconfigure(beancode()) });
 			} else {
 				es.view!.dispatch({ effects: highlighter.reconfigure(python()) });
 			}

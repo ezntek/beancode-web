@@ -10,9 +10,20 @@ export default defineConfig({
     },
     optimizeDeps: {
         include: [
-            '@xterm/xterm', '@xterm/addon-fit', '@xterm/addon-search',
-            'codemirror', '@codemirror/language', '@lezer/highlight',
+            '@xterm/xterm',
+            '@xterm/addon-fit',
+            '@xterm/addon-search',
+            'codemirror',
+            '@codemirror/commands',
+            '@codemirror/language',
+            '@codemirror/state',
+            '@codemirror/view',
+            '@codemirror/lang-python',
+            '@codemirror/theme-one-dark',
+            '@lezer/highlight',
             '@lezer/lr',
         ],
+        exclude: [
+        ]
     },
 });
