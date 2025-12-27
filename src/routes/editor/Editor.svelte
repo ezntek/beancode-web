@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { basicSetup } from 'codemirror';
 	import { EditorView, keymap } from '@codemirror/view';
 	import { history, indentWithTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
@@ -9,8 +8,36 @@
 	import { pathBasename, pathExtension } from '$lib/fstypes';
 	import { catppuccinMacchiato } from '$lib/themes/catppuccin';
 	import { python } from '@codemirror/lang-python';
-	import { oneDark } from '@codemirror/theme-one-dark';
 	import { beancode } from '$lib/highlighting/beancode';
+
+	// custom extension setup
+	import {
+		highlightSpecialChars,
+		drawSelection,
+		highlightActiveLine,
+		dropCursor,
+		rectangularSelection,
+		crosshairCursor,
+		lineNumbers,
+		highlightActiveLineGutter
+	} from '@codemirror/view';
+	import {
+		defaultHighlightStyle,
+		syntaxHighlighting,
+		indentOnInput,
+		bracketMatching,
+		foldGutter,
+		foldKeymap
+	} from '@codemirror/language';
+	import { defaultKeymap, historyKeymap } from '@codemirror/commands';
+	import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
+	import {
+		autocompletion,
+		completionKeymap,
+		closeBrackets,
+		closeBracketsKeymap
+	} from '@codemirror/autocomplete';
+	import { lintKeymap } from '@codemirror/lint';
 
 	let editor: HTMLDivElement;
 	let sz = $state(21);
@@ -29,9 +56,9 @@
 			}
 		});
 
-		sz = 21;
+		sz = 20;
 		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
-			sz = 16;
+			sz = 14;
 		}
 
 		const style = EditorView.theme({
@@ -43,21 +70,50 @@
 		});
 
 		const fontStyle = EditorView.theme({
-			'.cm-content': { fontSize: sz + 'px' }
+			'.cm-content': { fontSize: sz + 'pt' }
 		});
 
+		function exts() {
+			return [
+				lineNumbers(),
+				highlightActiveLineGutter(),
+				highlightSpecialChars(),
+				foldGutter(),
+				drawSelection(),
+				dropCursor(),
+				EditorState.allowMultipleSelections.of(true),
+				indentOnInput(),
+				syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+				bracketMatching(),
+				closeBrackets(),
+				autocompletion(),
+				rectangularSelection(),
+				crosshairCursor(),
+				highlightActiveLine(),
+				highlightSelectionMatches(),
+				keymap.of([
+					...closeBracketsKeymap,
+					...defaultKeymap,
+					...searchKeymap,
+					...historyKeymap,
+					...foldKeymap,
+					...completionKeymap,
+					...lintKeymap
+				])
+			];
+		}
+
+		es.history = new Compartment();
 		const startState = EditorState.create({
 			doc: '',
 			extensions: [
-				basicSetup,
+				exts(),
 				catppuccinMacchiato,
 				updateListener,
 				style,
-				es.history.of(history()),
 				fontTheme.of(fontStyle),
 				keymap.of([indentWithTab]),
-				EditorState.tabSize.of(4),
-				indentUnit.of('    '),
+				es.history.of(history()),
 				highlighter.of(python())
 			]
 		});

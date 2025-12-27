@@ -247,7 +247,7 @@
 
 <div class="editor-window">
 	<div class="outer-wrapper">
-		<aside style="display: flex; width: {fileBrowserWidth}px;">
+		<aside style="display: flex; width: {fileBrowserWidth}px; max-width: {fileBrowserWidth}px;">
 			<FileBrowser />
 		</aside>
 		<ResizeBar resize={startResizeFileBrowser} />

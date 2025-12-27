@@ -162,13 +162,13 @@ def exec_user_bean(s,n):
 \texcept SystemExit as e:
 \t\tc=e.code
 \texcept KeyboardInterrupt:
-\t\twarn("Caught keyboard interrupt");c=1
+\t\twarn("Exited abnormally");c=1
 \texcept EOFError:
 \t\twarn("Caught EOF");c=1 
 \texcept RecursionError as e:
-\t\twarn("Python recursion depth exceeded! Did you forget your base case?");c=1 
+\t\twarn("Recursion depth exceeded! Did you forget your base case?");c=1 
 \texcept Exception as e:
-\t\terror(f'Python exception caught ({type(e)}: "{e}")! Please report this to the developers.');raise e
+\t\terror(f'Python exception caught ({type(e)}: "{e}") while running beancode! Please report this to the developers.');raise e
 \treturn c`
 
     await py.runPythonAsync(PYFN);

@@ -33,11 +33,17 @@ export function editorNewFile() {
 
 export function changeFile(newSrc: string, newPath: string) {
     // clear history
-    es.view!.dispatch({ effects: es.history.reconfigure([]) }); 
     es.curFilePath = newPath;
-    es.src = newSrc;
-    es.view!.dispatch({ effects: es.history.reconfigure(history())});
+    es.view!.dispatch({
+        changes: {
+            from: 0,
+            to: es.view!.state.doc.length,
+            insert: newSrc
+        }
+    });
     tick().then(() => {
+        es.view!.dispatch({ effects: es.history.reconfigure([]) }); 
+        es.view!.dispatch({ effects: es.history.reconfigure(history())});
         es.saved = true;
     });
 }

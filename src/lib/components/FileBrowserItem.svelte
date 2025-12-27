@@ -38,6 +38,7 @@
 		margin-right: 0.5em;
 		margin-top: 0.5em;
 		border-radius: 0.15em;
+		overflow: hidden;
 	}
 	.delete {
 		display: none;
@@ -52,7 +53,8 @@
 		color: var(--bw-text);
 	}
 	.button {
-		flex: 1;
+		word-wrap: break-word;
+		margin-right: auto;
 		border-radius: 0.15em;
 		border-width: 0px;
 		padding: 0.3em;

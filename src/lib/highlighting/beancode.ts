@@ -1,6 +1,9 @@
-import { LanguageSupport, LRLanguage } from "@codemirror/language";
+import { LanguageSupport, LRLanguage, syntaxTree } from "@codemirror/language";
+import { EditorState, RangeSetBuilder } from "@codemirror/state";
 import { parser } from "./parser";
 import { styleTags, tags as t } from "@lezer/highlight";
+import { EditorView } from "codemirror";
+import { Decoration } from "@codemirror/view";
 
 const myLanguageHighlighting = styleTags({
     // comments
@@ -54,11 +57,11 @@ const myLanguageHighlighting = styleTags({
     // types
     KArray: t.keyword,
     KOf: t.keyword,
-    KInteger: t.keyword,
-    KBoolean: t.keyword,
-    KReal: t.keyword,
-    KString: t.keyword,
-    KChar: t.keyword,
+    KInteger: t.typeName,
+    KBoolean: t.typeName,
+    KReal: t.typeName,
+    KString: t.typeName,
+    KChar: t.typeName,
     
     // operators
     KOr: t.logicOperator,
@@ -114,6 +117,7 @@ const myLanguageHighlighting = styleTags({
     "FunctionCall/Ident": t.function(t.variableName),
     "CallStatement/Ident": t.function(t.variableName),
 });
+
 export const beancodeLanguage = LRLanguage.define({
     parser: parser.configure({
         props: [myLanguageHighlighting]
@@ -125,6 +129,7 @@ export const beancodeLanguage = LRLanguage.define({
         }
     }
 });
+
 export function beancode() {
     // @ts-ignore
     return new LanguageSupport(beancodeLanguage, []);

@@ -200,6 +200,8 @@
 		color: var(--bw-base1);
 		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
+		overflow: none;
+		white-space: nowrap;
 	}
 
 	.toolbar-button {

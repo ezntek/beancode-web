@@ -103,7 +103,7 @@
 		font-family: 'IBM Plex Mono', monospace !important;
 		display: flex;
 		flex-direction: column;
-		width: 20vw;
+		min-width: 20vw;
 	}
 
 	.top {
