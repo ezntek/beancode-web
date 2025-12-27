@@ -19,7 +19,7 @@
 		window.addEventListener('resize', handleResize);
 
 		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
-			fontSize = 18;
+			fontSize = 20;
 		}
 
 		options = {

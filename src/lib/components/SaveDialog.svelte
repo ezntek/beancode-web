@@ -20,7 +20,7 @@
 		setTimeout(() => {
 			const n = fileName.slice();
 			let name = n;
-			if (pathExtension(n) !== fileType) {
+			if (pathExtension(n) === '') {
 				const t = fileType.slice();
 				name += t !== '' ? '.' + t : '';
 			}

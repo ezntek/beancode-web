@@ -1,9 +1,6 @@
-import { LanguageSupport, LRLanguage, syntaxTree } from "@codemirror/language";
-import { EditorState, RangeSetBuilder } from "@codemirror/state";
+import { LanguageSupport, LRLanguage } from "@codemirror/language";
 import { parser } from "./parser";
 import { styleTags, tags as t } from "@lezer/highlight";
-import { EditorView } from "codemirror";
-import { Decoration } from "@codemirror/view";
 
 const myLanguageHighlighting = styleTags({
     // comments

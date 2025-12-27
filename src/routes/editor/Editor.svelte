@@ -56,7 +56,7 @@
 			}
 		});
 
-		sz = 18;
+		sz = 16;
 		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
 			sz = 14;
 		}
@@ -152,7 +152,7 @@
 	function zoomIn() {
 		sz += 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}px` }
+			'.cm-content': { fontSize: `${sz}pt` }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
@@ -160,7 +160,7 @@
 	function zoomOut() {
 		sz -= 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}px` }
+			'.cm-content': { fontSize: `${sz}pt` }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
