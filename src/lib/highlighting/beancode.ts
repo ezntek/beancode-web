@@ -89,11 +89,7 @@ const myLanguageHighlighting = styleTags({
     KTrue: t.bool,
     KFalse: t.bool,
     KNull: t.null,
-    
-    // Identifiers
-    Ident: t.variableName,
-    FileIdent: t.variableName,
-    
+
     // separators
     Comma: t.separator,
     Colon: t.punctuation,
@@ -104,18 +100,43 @@ const myLanguageHighlighting = styleTags({
     LCurly: t.brace,
     RCurly: t.brace,
     
-    // Higher-level constructs (usually don't need styling, but can be useful)
     Type: t.typeName,
     PrimitiveType: t.typeName,
     ArrayType: t.typeName,
+
+    // Identifiers
+    Ident: t.variableName,
+    FileIdent: t.variableName,
+    // Individual library routines get the same tag
+    LUcase: t.number,
+    LLcase: t.number,
+    LDiv: t.number,
+    LMod: t.number,
+    LSubstring: t.number,
+    LRound: t.number,
+    LSqrt: t.number,
+    LLength: t.number,
+    LGetchar: t.number,
+    LRandom: t.number,
+    LPutchar: t.number,
+    LExit: t.number,
+    LSleep: t.number,
+    LFlush: t.number,
+    LSin: t.number,
+    LCos: t.number,
+    LTan: t.number,
+    LInitarray: t.number,
+
+    "FunctionStatement/Ident!": t.function(t.definition(t.variableName)),
+    "ProcedureStatement/Ident!": t.function(t.definition(t.variableName)),
+
+    "FunctionCall/TIdent!": t.function(t.variableName),
+    "CallStatement/TIdent!": t.function(t.variableName),
     
-    // Function/procedure names in their definition context
-    "FunctionStatement/Ident": t.function(t.definition(t.variableName)),
-    "ProcedureStatement/Ident": t.function(t.definition(t.variableName)),
+    // Library routines standalone
+    LibroutineIdent: t.number,
     
-    // Function calls
-    "FunctionCall/Ident": t.function(t.variableName),
-    "CallStatement/Ident": t.function(t.variableName),
+    // Identifiers
 });
 
 export const beancodeLanguage = LRLanguage.define({

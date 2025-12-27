@@ -36,7 +36,7 @@ Negation { Sub Expr }
 Not { KNot Expr }
 Grouping { LParen Expr RParen }
 Typecast { PrimitiveType LParen Expr RParen }
-FunctionCall { Ident LParen ArgList? RParen }
+FunctionCall { (TIdent | LibroutineIdent) LParen ArgList? RParen }
 ArrayIndex { (Ident | Grouping) LBracket Expr (Comma Expr)? RBracket }
 Unary { 
     Ident | Negation | Literal | Typecast | Grouping
@@ -80,7 +80,7 @@ RepeatUntilStatement { KRepeat Block KUntil Expr }
 ForStatement { KFor Ident Assign Expr KTo Expr (KStep Expr)? Newline Block KNext Ident }
 ProcedureStatement { KExport? KProcedure Ident (LParen ParameterList RParen)? Block KEndprocedure }
 FunctionStatement { KExport? KFunction Ident (LParen ParameterList RParen)? KReturns Type Block KEndfunction }
-CallStatement { KCall Ident (LParen ArgList RParen)? }
+CallStatement { KCall (TIdent | LibroutineIdent) (LParen ArgList RParen)? }
 ReturnStatement { KReturn Expr? }
 ScopeStatement { KScope Block KEndscope }
 IncludeStatement { KInclude StringLit }
@@ -102,60 +102,86 @@ Statement {
 }
 Block { Statement* }
 
-KTrue { @specialize<Ident, "true" | "TRUE"> }
-KFalse { @specialize<Ident, "false" | "FALSE"> }
-KDeclare { @specialize<Ident, "declare" | "DECLARE"> }
-KOutput { @specialize<Ident, "output" | "OUTPUT"> }
-KInput { @specialize<Ident, "input" | "INPUT"> }
-KAnd { @specialize<Ident, "and" | "AND"> }
-KOr { @specialize<Ident, "or" | "OR"> }
-KNot { @specialize<Ident, "not" | "NOT"> }
-KIf { @specialize<Ident, "if" | "IF"> }
-KThen { @specialize<Ident, "then" | "THEN"> }
-KElse { @specialize<Ident, "else" | "ELSE"> }
-KEndif { @specialize<Ident, "endif" | "ENDIF"> }
-KCase { @specialize<Ident, "case" | "CASE"> }
-KOf { @specialize<Ident, "of" | "OF"> }
-KOtherwise { @specialize<Ident, "otherwise" | "OTHERWISE"> }
-KEndcase { @specialize<Ident, "endcase" | "ENDCASE"> }
-KWhile { @specialize<Ident, "while" | "WHILE"> }
-KDo { @specialize<Ident, "do" | "DO"> }
-KEndwhile { @specialize<Ident, "endwhile" | "ENDWHILE"> }
-KRepeat { @specialize<Ident, "repeat" | "REPEAT"> }
-KUntil { @specialize<Ident, "until" | "UNTIL"> }
-KFor { @specialize<Ident, "for" | "FOR"> }
-KTo { @specialize<Ident, "to" | "TO"> }
-KStep { @specialize<Ident, "step" | "STEP"> }
-KNext { @specialize<Ident, "next" | "NEXT"> }
-KProcedure { @specialize<Ident, "procedure" | "PROCEDURE"> }
-KEndprocedure { @specialize<Ident, "endprocedure" | "ENDPROCEDURE"> }
-KCall { @specialize<Ident, "call" | "CALL"> }
-KFunction { @specialize<Ident, "function" | "FUNCTION"> }
-KReturns { @specialize<Ident, "returns" | "RETURNS"> }
-KReturn { @specialize<Ident, "return" | "RETURN"> }
-KEndfunction { @specialize<Ident, "endfunction" | "ENDFUNCTION"> }
-KInclude { @specialize<Ident, "include" | "INCLUDE"> }
-KExport { @specialize<Ident, "export" | "EXPORT"> }
-KScope { @specialize<Ident, "scope" | "SCOPE"> }
-KEndscope { @specialize<Ident, "endscope" | "ENDSCOPE"> }
-KPrint { @specialize<Ident, "print" | "PRINT"> }
-KConstant { @specialize<Ident, "constant" | "CONSTANT"> }
-KArray { @specialize<Ident, "array" | "ARRAY"> }
-KTrace { @specialize<Ident, "trace" | "TRACE"> }
-KEndtrace { @specialize<Ident, "endtrace" | "ENDTRACE"> }
-KOpenfile { @specialize<Ident, "openfile" | "OPENFILE"> }
-KReadfile { @specialize<Ident, "readfile" | "READFILE"> }
-KWritefile { @specialize<Ident, "writefile" | "WRITEFILE"> }
-KClosefile { @specialize<Ident, "closefile" | "CLOSEFILE"> }
-KRead { @specialize<Ident, "read" | "READ"> }
-KWrite { @specialize<Ident, "write" | "WRITE"> }
-KAppend { @specialize<Ident, "append" | "APPEND"> }
-KInteger { @specialize<Ident, "integer" | "INTEGER"> }
-KReal { @specialize<Ident, "real" | "REAL"> }
-KString { @specialize<Ident, "string" | "STRING"> }
-KChar { @specialize<Ident, "char" | "CHAR"> }
-KBoolean { @specialize<Ident, "boolean" | "BOOLEAN"> }
-KNull { @specialize<Ident, "null" | "NULL"> }
+KTrue { @specialize<TIdent, "true" | "TRUE"> }
+KFalse { @specialize<TIdent, "false" | "FALSE"> }
+KDeclare { @specialize<TIdent, "declare" | "DECLARE"> }
+KOutput { @specialize<TIdent, "output" | "OUTPUT"> }
+KInput { @specialize<TIdent, "input" | "INPUT"> }
+KAnd { @specialize<TIdent, "and" | "AND"> }
+KOr { @specialize<TIdent, "or" | "OR"> }
+KNot { @specialize<TIdent, "not" | "NOT"> }
+KIf { @specialize<TIdent, "if" | "IF"> }
+KThen { @specialize<TIdent, "then" | "THEN"> }
+KElse { @specialize<TIdent, "else" | "ELSE"> }
+KEndif { @specialize<TIdent, "endif" | "ENDIF"> }
+KCase { @specialize<TIdent, "case" | "CASE"> }
+KOf { @specialize<TIdent, "of" | "OF"> }
+KOtherwise { @specialize<TIdent, "otherwise" | "OTHERWISE"> }
+KEndcase { @specialize<TIdent, "endcase" | "ENDCASE"> }
+KWhile { @specialize<TIdent, "while" | "WHILE"> }
+KDo { @specialize<TIdent, "do" | "DO"> }
+KEndwhile { @specialize<TIdent, "endwhile" | "ENDWHILE"> }
+KRepeat { @specialize<TIdent, "repeat" | "REPEAT"> }
+KUntil { @specialize<TIdent, "until" | "UNTIL"> }
+KFor { @specialize<TIdent, "for" | "FOR"> }
+KTo { @specialize<TIdent, "to" | "TO"> }
+KStep { @specialize<TIdent, "step" | "STEP"> }
+KNext { @specialize<TIdent, "next" | "NEXT"> }
+KProcedure { @specialize<TIdent, "procedure" | "PROCEDURE"> }
+KEndprocedure { @specialize<TIdent, "endprocedure" | "ENDPROCEDURE"> }
+KCall { @specialize<TIdent, "call" | "CALL"> }
+KFunction { @specialize<TIdent, "function" | "FUNCTION"> }
+KReturns { @specialize<TIdent, "returns" | "RETURNS"> }
+KReturn { @specialize<TIdent, "return" | "RETURN"> }
+KEndfunction { @specialize<TIdent, "endfunction" | "ENDFUNCTION"> }
+KInclude { @specialize<TIdent, "include" | "INCLUDE"> }
+KExport { @specialize<TIdent, "export" | "EXPORT"> }
+KScope { @specialize<TIdent, "scope" | "SCOPE"> }
+KEndscope { @specialize<TIdent, "endscope" | "ENDSCOPE"> }
+KPrint { @specialize<TIdent, "print" | "PRINT"> }
+KConstant { @specialize<TIdent, "constant" | "CONSTANT"> }
+KArray { @specialize<TIdent, "array" | "ARRAY"> }
+KTrace { @specialize<TIdent, "trace" | "TRACE"> }
+KEndtrace { @specialize<TIdent, "endtrace" | "ENDTRACE"> }
+KOpenfile { @specialize<TIdent, "openfile" | "OPENFILE"> }
+KReadfile { @specialize<TIdent, "readfile" | "READFILE"> }
+KWritefile { @specialize<TIdent, "writefile" | "WRITEFILE"> }
+KClosefile { @specialize<TIdent, "closefile" | "CLOSEFILE"> }
+KRead { @specialize<TIdent, "read" | "READ"> }
+KWrite { @specialize<TIdent, "write" | "WRITE"> }
+KAppend { @specialize<TIdent, "append" | "APPEND"> }
+KInteger { @specialize<TIdent, "integer" | "INTEGER"> }
+KReal { @specialize<TIdent, "real" | "REAL"> }
+KString { @specialize<TIdent, "string" | "STRING"> }
+KChar { @specialize<TIdent, "char" | "CHAR"> }
+KBoolean { @specialize<TIdent, "boolean" | "BOOLEAN"> }
+KNull { @specialize<TIdent, "null" | "NULL"> }
+
+LibroutineIdent {
+    LUcase | LLcase | LDiv | LMod | LSubstring | LRound | LSqrt
+    | LLength | LGetchar | LRandom | LPutchar | LExit | LSleep
+    | LFlush | LSin | LCos | LTan | LInitarray
+}
+LUcase { @specialize<TIdent, "ucase" | "UCASE"> }
+LLcase { @specialize<TIdent, "lcase" | "LCASE"> }
+LDiv { @specialize<TIdent, "div" | "DIV"> }
+LMod { @specialize<TIdent, "mod" | "MOD"> }
+LSubstring { @specialize<TIdent, "substring" | "SUBSTRING"> }
+LRound { @specialize<TIdent, "round" | "ROUND"> }
+LSqrt { @specialize<TIdent, "sqrt" | "SQRT"> }
+LLength { @specialize<TIdent, "length" | "LENGTH"> }
+LGetchar { @specialize<TIdent, "getchar" | "GETCHAR"> }
+LRandom { @specialize<TIdent, "random" | "RANDOM"> }
+LPutchar { @specialize<TIdent, "putchar" | "PUTCHAR"> }
+LExit { @specialize<TIdent, "exit" | "EXIT"> }
+LSleep { @specialize<TIdent, "sleep" | "SLEEP"> }
+LFlush { @specialize<TIdent, "flush" | "FLUSH"> }
+LSin { @specialize<TIdent, "sin" | "SIN"> }
+LCos { @specialize<TIdent, "cos" | "COS"> }
+LTan { @specialize<TIdent, "tan" | "TAN"> }
+LInitarray { @specialize<TIdent, "initarray" | "INITARRAY"> }
+
+Ident { LibroutineIdent | TIdent }
 
 @skip {
     space | 
@@ -180,7 +206,7 @@ KNull { @specialize<Ident, "null" | "NULL"> }
     CharLit {
         "'" ( ![\\\n'] | Escape ) "'"
     }
-    Ident { $[a-zA-Z_] $[a-zA-Z0-9_]* }
+    TIdent { $[a-zA-Z_] $[a-zA-Z0-9_]* }
 
     Neq { "<>" }
     Assign { "<-" | "←" }

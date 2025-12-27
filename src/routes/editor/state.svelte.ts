@@ -1,6 +1,6 @@
 import { type FileResponse, type Dir } from '$lib/fstypes';
 
-const INPUT_MAX = 1024;
+const INPUT_MAX = 2048;
 export const inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
 export const interruptBuf = new SharedArrayBuffer(1);
 

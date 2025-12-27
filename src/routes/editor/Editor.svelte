@@ -56,7 +56,7 @@
 			}
 		});
 
-		sz = 20;
+		sz = 18;
 		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
 			sz = 14;
 		}
