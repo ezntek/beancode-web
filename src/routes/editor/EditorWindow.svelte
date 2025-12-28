@@ -105,6 +105,12 @@
 						}, 50);
 					}
 					break;
+				case 'renamefile-response':
+					tick().then(() => {
+						es.curFilePath = path;
+						es.saved = true;
+					});
+					break;
 				default:
 					break;
 			}

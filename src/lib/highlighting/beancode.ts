@@ -61,9 +61,9 @@ const myLanguageHighlighting = styleTags({
     KChar: t.typeName,
     
     // operators
-    KOr: t.logicOperator,
-    KAnd: t.logicOperator,
-    KNot: t.logicOperator,
+    KOr: t.keyword,
+    KAnd: t.keyword,
+    KNot: t.keyword,
     Add: t.arithmeticOperator,
     Sub: t.arithmeticOperator,
     Mul: t.arithmeticOperator,

@@ -1,4 +1,4 @@
-import { FileResponseKind, pathJoin, strerror, type Dir } from "$lib/fstypes";
+import { FileResponseKind, pathDirName, pathJoin, strerror, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
 
@@ -66,6 +66,20 @@ function listDir(path: string): Dir {
     return dir;
 }
 
+function getFileResponseFromException(exc: any): FileResponse {
+    if (typeof exc.errno !== 'number') {
+        return { kind: FileResponseKind.Exception, data: exc };
+    }
+
+    if (exc.errno === 2) {
+        return { kind: FileResponseKind.NotFound };
+    } else if (exc.errno === 21) {
+        return { kind: FileResponseKind.IsDir };
+    } else {
+        return { kind: FileResponseKind.Errno, errno: exc.errno, msg: strerror(exc.errno) };
+    }
+}
+
 function readFile(path: string): FileResponse {
     let data: Uint8Array;
     let decoded: string;
@@ -73,18 +87,7 @@ function readFile(path: string): FileResponse {
     try { 
         data = FS.readFile(path);
     } catch (exc: any) {
-        if (typeof exc.errno !== 'number') {
-            return { kind: FileResponseKind.Exception, data: exc };
-        }
-
-        // stupid pyodide returns 44 for ENOENT
-        if (exc.errno === 2 || exc.errno === 44) {
-            return { kind: FileResponseKind.NotFound };
-        } else if (exc.errno === 21) {
-            return { kind: FileResponseKind.IsDir };
-        } else {
-            return { kind: FileResponseKind.Errno, errno: exc.errno, msg: strerror(exc.errno) };
-        }
+        return getFileResponseFromException(exc);
     }
 
     const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -107,17 +110,7 @@ function newFile(path: string, contents: string, overwrite: boolean): FileRespon
     try {
         stream = FS.writeFile(path, contents);
     } catch (exc: any) {
-        if (typeof exc.errno !== 'number') {
-            return { kind: FileResponseKind.Exception, data: exc };
-        }
-
-        if (exc.errno === 2) {
-            return { kind: FileResponseKind.NotFound };
-        } else if (exc.errno === 21) {
-            return { kind: FileResponseKind.IsDir };
-        } else {
-            return { kind: FileResponseKind.Errno, errno: exc.errno, msg: strerror(exc.errno) };
-        }
+        return getFileResponseFromException(exc);
     }
 
     return { kind: FileResponseKind.Ok, data: "" };
@@ -135,8 +128,17 @@ function delPath(path: string) {
             FS.unlink(path);
         }
     } catch (e) {
-        // silently fail
+        return getFileResponseFromException(e);
     }
+}
+
+function renamePath(oldpath: string, newpath: string): FileResponse {
+    try {
+        FS.rename(oldpath, newpath);
+    } catch (e) {
+        return getFileResponseFromException(e);    
+    } 
+    return { kind: FileResponseKind.Ok, data: "" };
 }
 
 async function doInitialSetupCheck() {
@@ -267,12 +269,13 @@ async function handleRunPy(src: string, name: string){
 }
 
 onmessage = async (event: MessageEvent<EditorMessage>) => { 
-    await pyBeancodePromise;
-
-    if (!pyOK)
-        return;
-    
     try {
+        await pyBeancodePromise;
+
+        if (!pyOK)
+            return;
+    
+        FS.syncfs();
         const msg = event.data;
         switch (msg.kind) {
             case 'run':
@@ -292,7 +295,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'listdir':
                 post({ kind: 'listdir-response', data: listDir(msg.path) });
-                break
+                break;
             case 'readfile':
                 post({ kind: 'readfile-response', path: msg.path, data: readFile(msg.path) });
                 break;
@@ -302,6 +305,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             case 'delfile':
                 delPath(msg.path);
                 post({ kind: 'delfile-response', path: msg.path});
+                break;
+            case 'renamefile':
+                post({ kind: 'renamefile-response', path: msg.newpath, data: renamePath(msg.oldpath, msg.newpath) });
                 break;
         }
     } catch (exc: any) {

@@ -51,8 +51,25 @@
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = (t?: string) => {
+	export const open = (t?: string, defaultContents?: string) => {
 		if (t) title = t;
+		if (defaultContents) {
+			const parts = defaultContents!.split('.');
+			fileName = parts[0];
+			const ext = parts[parts.length - 1];
+			if (ext) {
+				switch (ext) {
+					case 'bean':
+					case 'py':
+					case 'txt':
+						fileType = ext;
+						break;
+					default:
+						fileName = defaultContents;
+						fileType = '';
+				}
+			}
+		}
 
 		innerDialog.open();
 		setTimeout(() => focus(), 0);

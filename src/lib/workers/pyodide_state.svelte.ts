@@ -14,6 +14,7 @@ export type PyMessage =
     | { kind: 'readfile-response', path: string, data: FileResponse }
     | { kind: 'newfile-response', path: string, data: FileResponse }
     | { kind: 'delfile-response', path: string }
+    | { kind: 'renamefile-response', path: string, data: FileResponse }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, filePath: string }
@@ -23,6 +24,7 @@ export type EditorMessage =
     | { kind: 'readfile', path: string }
     | { kind: 'newfile', path: string, contents: string, overwrite: boolean }
     | { kind: 'delfile', path: string }
+    | { kind: 'renamefile', oldpath: string, newpath: string }
 
  
 interface IPyState {

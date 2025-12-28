@@ -93,6 +93,12 @@ export function pathCountParts(path: string): number {
     return p.split('/').length;
 }
 
+export function pathDirName(path: string) : string {
+    // XXX: this will crash when you dont have enough parts
+    const parts = path.split('/');
+    return pathJoin(...(parts.slice(0, parts.length - 1)));
+}
+
 const ERRNO_MESSAGES: { [errno: number]: string } = {
     1: "Operation not permitted",
     2: "No such file or directory",

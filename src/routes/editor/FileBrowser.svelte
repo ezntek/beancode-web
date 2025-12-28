@@ -16,6 +16,7 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 
 	let saveDialog: SaveDialog;
+	let renameDialog: RenameDialog;
 	let confirmDialog: MessageDialog;
 	let lastClicked: string = '';
 
@@ -86,6 +87,15 @@
 		post({ kind: 'delfile', path: path });
 	}
 
+	function renameItem(name: string) {
+		lastClicked = name;
+		renameDialog.open('Rename', name);
+	}
+
+	function renameOk(name: string) {
+		post({ kind: 'renamefile', oldpath: lastClicked, newpath: pathJoin(s.cwd, name) });
+	}
+
 	let cwd = $derived(pathJoin(s.cwd));
 	let inProjects = $derived(pathBeginsWith(s.cwd, '/data/projects') && pathCountParts(s.cwd) === 3);
 </script>
@@ -110,7 +120,11 @@
 		{#if s.curdir.size >= 3}
 			{#each s.curdir.keys() as item}
 				{#if item !== '.' && item !== '..'}
-					<FileBrowserItem onClick={() => clickItem(item)} onDelete={() => deleteItem(item)}>
+					<FileBrowserItem
+						onClick={() => clickItem(item)}
+						onRename={() => renameItem(item)}
+						onDelete={() => deleteItem(item)}
+					>
 						<span class={determineIcon(item)}></span>
 						{item}
 					</FileBrowserItem>
@@ -122,6 +136,7 @@
 	{/if}
 </div>
 <SaveDialog bind:this={saveDialog} ok={saveOk} cancel={saveCancel} />
+<SaveDialog bind:this={renameDialog} ok={renameOk} cancel={() => {}} />
 <ConfirmDialog
 	bind:this={confirmDialog}
 	ok={deleteItemForReal}

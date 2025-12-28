@@ -43,7 +43,10 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.exitCode = msg.code;
             break;
         case 'listdir-response':
-            s.curdir = msg.data;
+            const newmap = new Map([...msg.data.entries()].sort(([keyA], [keyB]) =>
+              keyA.localeCompare(keyB)
+            ));
+            s.curdir = newmap;
             break;
         case 'readfile-response':
             rkind = msg.data.kind;
@@ -58,6 +61,10 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
         case 'delfile-response':
+            post({ kind: 'listdir', path: s.cwd });
+            fileResponseCallback!(msg.kind, msg.path);
+            break;
+        case 'renamefile-response':
             post({ kind: 'listdir', path: s.cwd });
             fileResponseCallback!(msg.kind, msg.path);
             break;
