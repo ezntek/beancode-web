@@ -19,46 +19,35 @@
 
 <div class="item" style={bgstyle}>
 	<button class="button" style={bgstyle} onclick={() => onClick()}>
-		{@render children()}
+		<span>{@render children()}</span>
 	</button>
 	{#if !cwdDisplay}
-		<button aria-label="rename" class="rename" onclick={() => onRename()}>
-			<span class="fa-solid fa-pencil"> </span>
-		</button>
-		<button aria-label="delete" class="delete" onclick={() => onDelete()}>
-			<span class="fa-solid fa-trash" style="color: var(--bw-red)"></span>
-		</button>
+		<div class="actions">
+			<button aria-label="rename" class="rename" onclick={() => onRename()}>
+				<span class="fa-solid fa-pencil"> </span>
+			</button>
+			<button aria-label="delete" class="delete" onclick={() => onDelete()}>
+				<span class="fa-solid fa-trash" style="color: var(--bw-red)"></span>
+			</button>
+		</div>
 	{/if}
 </div>
 
 <style>
 	.item {
 		display: flex;
+		position: relative;
+		margin: 0.4em;
 		margin-left: 0.5em;
 		margin-right: 0.5em;
-		margin-top: 0.5em;
 		border-radius: 0.15em;
 		overflow: hidden;
 	}
-	.delete {
-		display: none;
-		border-width: 0px;
-		background-color: var(--bw-base3);
-		color: var(--bw-text);
-	}
-	.rename {
-		display: none;
-		border-width: 0px;
-		background-color: var(--bw-base3);
-		color: var(--bw-text);
-	}
 	.button {
-		word-wrap: break-word;
-		margin-right: auto;
-		border-radius: 0.15em;
-		border-width: 0px;
-		padding: 0.3em;
-		padding-left: 0.5em;
+		flex: 1;
+		min-width: 0;
+		border: 0;
+		padding: 0.3em 0.3em 0.3em 0.5em;
 		text-align: left;
 		font-family: 'IBM Plex Mono', monospace;
 		font-size: 1em;
@@ -66,20 +55,51 @@
 		color: var(--bw-text);
 		overflow: hidden;
 	}
+
+	.button > span {
+		display: block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.actions {
+		position: absolute;
+		top: 0;
+		right: 0;
+		height: 100%;
+		width: 3.2em;
+		display: flex;
+		align-items: center;
+		justify-content: space-evenly;
+		background-color: var(--bw-base3);
+		pointer-events: none;
+		opacity: 0;
+	}
+	.actions > button {
+		opacity: 0;
+	}
+	.item:hover .actions {
+		background-color: var(--bw-surface1);
+		opacity: 1;
+		pointer-events: auto;
+	}
+	.item:hover .actions > button {
+		opacity: 1;
+	}
+	.rename,
+	.delete {
+		border: 0;
+		background: none;
+		color: var(--bw-text);
+		cursor: pointer;
+		padding: 0;
+	}
+
 	.item:hover {
 		background-color: var(--bw-surface1) !important;
 	}
+
 	.item:hover > :global(button) {
 		background-color: var(--bw-surface1) !important;
-	}
-	.item:hover > .delete {
-		display: block;
-		border-top-right-radius: 0.15em;
-		border-bottom-right-radius: 0.15em;
-	}
-	.item:hover > .rename {
-		display: block;
-		border-top-right-radius: 0.15em;
-		border-bottom-right-radius: 0.15em;
 	}
 </style>

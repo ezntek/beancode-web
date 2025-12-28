@@ -156,7 +156,7 @@
 		const container = e.currentTarget.parentElement;
 		const rect = container.getBoundingClientRect();
 		const min = rect.width * 0.05;
-		const max = rect.width * 0.2;
+		const max = rect.width * 0.35;
 
 		e.preventDefault();
 		const startX = e.clientX;
