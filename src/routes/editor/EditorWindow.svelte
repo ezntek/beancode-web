@@ -38,6 +38,16 @@
 	let errorDialog: ErrorDialog;
 	let messageDialog: MessageDialog;
 
+	function isTracerOutput(src: string): boolean {
+		return src.startsWith('<!DOCTYPE html>\n<!-- Generated HTML by beancode');
+	}
+
+	function handleTracerOutput(src: string) {
+		const blob = new Blob([src], { type: 'text/html' });
+		const url = URL.createObjectURL(blob);
+		window.open(url, '_blank', 'noopener');
+	}
+
 	onMount(async () => {
 		await setupWorker();
 		s.status = 'Waiting to launch';
@@ -75,6 +85,10 @@
 
 			switch (msgKind) {
 				case 'readfile-response':
+					if (isTracerOutput(response.data)) {
+						handleTracerOutput(response.data);
+						return;
+					}
 					changeFile(response.data, path);
 					break;
 				case 'newfile-response':

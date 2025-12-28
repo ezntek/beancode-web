@@ -137,10 +137,17 @@
 		});
 
 		$effect(() => {
-			if (pathExtension(es.curFilePath) !== 'py') {
-				es.view!.dispatch({ effects: highlighter.reconfigure(beancode()) });
-			} else {
-				es.view!.dispatch({ effects: highlighter.reconfigure(python()) });
+			const ext = pathExtension(es.curFilePath);
+			switch (ext) {
+				case 'bean':
+					es.view!.dispatch({ effects: highlighter.reconfigure(beancode()) });
+					break;
+				case 'py':
+					es.view!.dispatch({ effects: highlighter.reconfigure(python()) });
+					break;
+				default:
+					es.view!.dispatch({ effects: highlighter.reconfigure([]) });
+					break;
 			}
 		});
 

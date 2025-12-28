@@ -60,6 +60,9 @@ function listDir(path: string): Dir {
         const stat = FS.stat(itemPath);
         dir.set(item, FS.isDir(stat.mode));
     }
+    cwd = pathJoin(path);
+    py.globals.set("newcwd", cwd);
+    py.runPython("os.chdir(newcwd);del newcwd");
     return dir;
 }
 
@@ -191,7 +194,7 @@ async function loadBeancode() {
 
         const BEANCODE_VERSION = "0.7.0b1";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
-        const SCRIPT = `import micropip;await micropip.install(\"${PATH}\");from beancode.runner import *;from beancode import __version__`
+        const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\");from beancode.runner import *;from beancode import __version__`
         try {
             await py.runPythonAsync(SCRIPT)
         } catch (e) {
@@ -216,6 +219,7 @@ async function loadBeancode() {
 
 let pyOK = false;
 let pyBeancodePromise = loadBeancode();
+let cwd = "/home/pyodide";
 
 async function handleRun(src: string, path: string) {
     try {
@@ -237,6 +241,7 @@ async function handleRun(src: string, path: string) {
         }, 500);
         post({ kind: 'pyexit', code: 1 });
     }
+    post({ kind: 'listdir-response', data: listDir(cwd) });
 }
 
 async function handleRunPy(src: string, name: string){
@@ -256,7 +261,9 @@ async function handleRunPy(src: string, name: string){
         setTimeout(() => {
             post({ kind: 'status', data: 'An error occurred', positive: false});
         }, 500);
+        post({ kind: 'pyexit', code: 1 });
     }
+    post({ kind: 'listdir-response', data: listDir(cwd) });
 }
 
 onmessage = async (event: MessageEvent<EditorMessage>) => { 
