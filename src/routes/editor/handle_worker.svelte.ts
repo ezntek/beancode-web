@@ -66,7 +66,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'renamefile-response':
             post({ kind: 'listdir', path: s.cwd });
-            fileResponseCallback!(msg.kind, msg.path);
+            fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
     }
 }

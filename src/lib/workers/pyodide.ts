@@ -138,7 +138,7 @@ function renamePath(oldpath: string, newpath: string): FileResponse {
     } catch (e) {
         return getFileResponseFromException(e);    
     } 
-    return { kind: FileResponseKind.Ok, data: "" };
+    return { kind: FileResponseKind.Ok, data: newpath };
 }
 
 async function doInitialSetupCheck() {
@@ -275,7 +275,6 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
         if (!pyOK)
             return;
     
-        FS.syncfs();
         const msg = event.data;
         switch (msg.kind) {
             case 'run':
@@ -307,7 +306,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 post({ kind: 'delfile-response', path: msg.path});
                 break;
             case 'renamefile':
-                post({ kind: 'renamefile-response', path: msg.newpath, data: renamePath(msg.oldpath, msg.newpath) });
+                post({ kind: 'renamefile-response', path: msg.oldpath, data: renamePath(msg.oldpath, msg.newpath) });
                 break;
         }
     } catch (exc: any) {

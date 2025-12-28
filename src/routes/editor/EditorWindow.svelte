@@ -106,11 +106,8 @@
 					}
 					break;
 				case 'renamefile-response':
-					tick().then(() => {
-						es.curFilePath = path;
-						es.saved = true;
-					});
-					break;
+					const newPath = response.data;
+					if (es.curFilePath == path) changeFile(es.src, newPath);
 				default:
 					break;
 			}

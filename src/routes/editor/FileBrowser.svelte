@@ -16,7 +16,7 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 
 	let saveDialog: SaveDialog;
-	let renameDialog: RenameDialog;
+	let renameDialog: SaveDialog;
 	let confirmDialog: MessageDialog;
 	let lastClicked: string = '';
 
@@ -93,7 +93,11 @@
 	}
 
 	function renameOk(name: string) {
-		post({ kind: 'renamefile', oldpath: lastClicked, newpath: pathJoin(s.cwd, name) });
+		post({
+			kind: 'renamefile',
+			oldpath: pathJoin(s.cwd, lastClicked),
+			newpath: pathJoin(s.cwd, name)
+		});
 	}
 
 	let cwd = $derived(pathJoin(s.cwd));
