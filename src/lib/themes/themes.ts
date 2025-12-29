@@ -27,16 +27,43 @@ export interface ThemeSpec {
 	purple: string
 }
 
-import { CATPPUCCIN_MACCHIATO } from './catppuccin_macchiato';
-import { CATPPUCCIN_LATTE } from './catppuccin_latte';
-import { DEFAULT_DARK } from './default_dark';
-import { DEFAULT_LIGHT } from './default_light';
+function makeCatppuccinTheme(flavor: CatppuccinFlavor): ThemeSpec {
+    const C = flavor.colors;
+    return {
+        base1: C.crust.hex,
+        base2: C.mantle.hex,
+        base3: C.base.hex,
+        surface1: C.surface0.hex,
+        surface2: C.surface1.hex,
+        surface3: C.surface2.hex,
+        overlay1: C.overlay0.hex,
+        overlay2: C.overlay1.hex,
+        overlay3: C.overlay2.hex,
+        subtext1: C.subtext0.hex,
+        subtext2: C.subtext1.hex,
+        text: C.text.hex,
+        red: C.red.hex,
+        green: C.green.hex,
+        yellow: C.yellow.hex,
+        blue: C.blue.hex,
+        magenta: C.mauve.hex,
+        cyan: C.teal.hex,
+        brightRed: C.red.hex,
+        brightGreen: C.green.hex,
+        brightYellow: C.yellow.hex,
+        brightBlue: C.blue.hex,
+        brightMagenta: C.teal.hex,
+        brightCyan: C.mauve.hex,
+        orange: C.peach.hex,
+        purple: C.lavender.hex,
+    };
+}
+
+import { flavors, type CatppuccinFlavor } from '@catppuccin/palette'
 
 export const THEMES = {
-    'catppuccin_latte': CATPPUCCIN_LATTE,
-    'catppuccin_macchiato': CATPPUCCIN_MACCHIATO,
-    'default_dark': DEFAULT_DARK,
-    'default_light': DEFAULT_LIGHT,
+    'catppuccin_latte': makeCatppuccinTheme(flavors.latte),
+    'catppuccin_macchiato': makeCatppuccinTheme(flavors.macchiato),
 }
 
 export function applyTheme(themeName: string) { 

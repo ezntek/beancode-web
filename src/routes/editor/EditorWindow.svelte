@@ -20,15 +20,10 @@
 	import ResizeBar from '$lib/components/ResizeBar.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
-	import {
-		displayFileResponse,
-		FileResponseKind,
-		pathExtension,
-		pathJoin,
-		type FileResponse
-	} from '$lib/fstypes';
+	import { displayFileResponse, FileResponseKind, pathJoin, type FileResponse } from '$lib/fstypes';
 	import { changeFile, curExtension, editorNewFile, es } from './editor_state.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import TraceDialog from '$lib/components/trace/TraceDialog.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
@@ -37,6 +32,7 @@
 	let saveDialog: SaveDialog;
 	let errorDialog: ErrorDialog;
 	let messageDialog: MessageDialog;
+	let traceDialog: TraceDialog;
 
 	function isTracerOutput(src: string): boolean {
 		return src.startsWith('<!DOCTYPE html>\n<!-- Generated HTML by beancode');
@@ -244,6 +240,9 @@
 			case 'format':
 				if (curExtension() === 'bean') return 'editor-button-format';
 				else return 'editor-button-grayed';
+			case 'trace':
+				if (curExtension() === 'bean') return 'editor-button-trace';
+				else return 'editor-button-grayed';
 			default:
 				return '';
 		}
@@ -300,6 +299,13 @@
 		if (curExtension() !== 'bean') return;
 		post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
 	}
+
+	function traceFile() {
+		if (curExtension() !== 'bean') return;
+		traceDialog.open(es.src);
+	}
+
+	function traceOk() {}
 </script>
 
 <div class="editor-window">
@@ -328,6 +334,7 @@
 					aria-label="save"
 					class="editor-toolbar-button {buttonStyle('save')}"
 					onclick={openSaveDialog}
+					title="Save the current file"
 				>
 					<span class="icon fa-solid fa-floppy-disk"></span> Save
 				</button>
@@ -335,6 +342,7 @@
 					aria-label="new"
 					class="editor-toolbar-button {buttonStyle('new')}"
 					onclick={newFile}
+					title="Create a new file"
 				>
 					<span class="icon fa-solid fa-plus"></span> New File
 				</button>
@@ -345,6 +353,14 @@
 					onclick={formatFile}
 				>
 					<span class="icon fa-solid fa-wand-magic-sparkles"></span> Format
+				</button>
+				<button
+					aria-label="trace"
+					class="editor-toolbar-button {buttonStyle('trace')}"
+					title="Generate a trace table for the current file"
+					onclick={traceFile}
+				>
+					<span class="icon fa-solid fa-magnifying-glass"></span> Trace
 				</button>
 			</div>
 			<div class="middle">
@@ -366,15 +382,16 @@
 			<p>loading</p>
 		{/if}
 	</div>
-	<SaveDialog
-		bind:this={saveDialog}
-		cancel={() => saveDialog.close()}
-		ok={saveOk}
-		title="Save Current File"
-	/>
-	<MessageDialog bind:this={messageDialog} />
-	<ErrorDialog bind:this={errorDialog} />
 </div>
+<SaveDialog
+	bind:this={saveDialog}
+	cancel={() => saveDialog.close()}
+	ok={saveOk}
+	title="Save Current File"
+/>
+<MessageDialog bind:this={messageDialog} />
+<ErrorDialog bind:this={errorDialog} />
+<TraceDialog bind:this={traceDialog} ok={traceOk} cancel={() => traceDialog.close()} />
 
 <style>
 	.icon {
@@ -538,6 +555,17 @@
 	.editor-button-format:hover {
 		background: var(--bw-base1);
 		color: var(--bw-yellow);
+		font-weight: bold;
+	}
+
+	.editor-button-trace {
+		background: var(--bw-orange);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-trace:hover {
+		color: var(--bw-orange);
+		background: var(--bw-base1);
 		font-weight: bold;
 	}
 

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { EditorView, keymap } from '@codemirror/view';
-	import { history, indentWithTab, insertTab } from '@codemirror/commands';
+	import { history, insertTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
 	import { indentUnit } from '@codemirror/language';
 	import { es } from './editor_state.svelte';
 	import { pathBasename, pathExtension } from '$lib/fstypes';
-	import { catppuccinMacchiato } from '$lib/themes/catppuccin';
+	import { catppuccinMacchiato } from '$lib/highlighting/catppuccin';
 	import { python } from '@codemirror/lang-python';
 	import { beancode } from '$lib/highlighting/beancode';
 
@@ -40,7 +40,7 @@
 	import { lintKeymap } from '@codemirror/lint';
 
 	let editor: HTMLDivElement;
-	let sz = $state(21);
+	let sz = $state(16);
 	let fontTheme: Compartment;
 	let highlighter: Compartment;
 

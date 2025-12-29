@@ -168,7 +168,7 @@ async function loadBeancode() {
         FS = py.FS;
 
         FS.mkdirTree("/data");
-        FS.mount(FS.filesystems.IDBFS, { autoPersist: true }, "/data");
+        FS.mount(FS.filesystems.IDBFS, {}, "/data");
         await FS.syncfs(true);
 
         await py.loadPackage("micropip");
@@ -196,6 +196,7 @@ async function loadBeancode() {
         post({ kind: 'status', data: 'Ready', positive: true });
     }
     pyOK = true;
+    FS.syncfs(false);
 }
 
 let pyOK = false;
@@ -306,6 +307,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
 
         post({ kind: 'error', data: data });
     }
+    FS.syncfs(false);
 }
 
 export {};
