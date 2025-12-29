@@ -107,7 +107,10 @@
 					break;
 				case 'renamefile-response':
 					const newPath = response.data;
-					if (es.curFilePath == path) changeFile(es.src, newPath);
+					if (es.curFilePath == path) {
+						changeFile(es.src, newPath);
+						saveFile(true);
+					}
 				default:
 					break;
 			}
@@ -195,27 +198,30 @@
 		}
 		s.running = true;
 		if (pathExtension(es.curFilePath) === 'py') {
-			post({ kind: 'runpy', data: es.src, filePath: es.curFilePath });
+			post({ kind: 'runpy', data: es.src, path: es.curFilePath });
 		} else {
-			post({ kind: 'run', data: es.src, filePath: es.curFilePath });
+			post({ kind: 'run', data: es.src, path: es.curFilePath });
 		}
 	}
 
 	function buttonStyle(name: string): string {
 		if (!ps.ready) return 'editor-button-grayed';
-
+		const ext = pathExtension(es.curFilePath);
 		switch (name) {
 			case 'runstop':
 				if (s.running) {
 					return 'editor-button-stop';
 				} else {
-					if (pathExtension(es.curFilePath) === 'py') return 'editor-button-runpy';
+					if (ext === 'py') return 'editor-button-runpy';
 					else return 'editor-button-run';
 				}
 			case 'save':
 				return 'editor-button-save';
 			case 'new':
 				return 'editor-button-new';
+			case 'format':
+				if (ext === 'bean') return 'editor-button-format';
+				else return 'editor-button-grayed';
 			default:
 				return '';
 		}
@@ -260,6 +266,11 @@
 		// reset to untitled
 		editorNewFile();
 	}
+
+	function formatFile() {
+		if (pathExtension(es.curFilePath) !== 'bean') return;
+		post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
+	}
 </script>
 
 <div class="editor-window">
@@ -298,6 +309,13 @@
 					onclick={newFile}
 				>
 					<span class="icon fa-solid fa-plus"></span> New File
+				</button>
+				<button
+					aria-label="format"
+					class="editor-toolbar-button {buttonStyle('format')}"
+					onclick={formatFile}
+				>
+					<span class="icon fa-solid fa-wand-magic-sparkles"></span> Format
 				</button>
 			</div>
 			<div class="middle">
@@ -464,6 +482,7 @@
 	.editor-button-save:hover {
 		background: var(--bw-base1);
 		color: var(--bw-cyan);
+		font-weight: bold;
 	}
 
 	.editor-button-new {
@@ -474,6 +493,18 @@
 	.editor-button-new:hover {
 		background: var(--bw-base1);
 		color: var(--bw-magenta);
+		font-weight: bold;
+	}
+
+	.editor-button-format {
+		background: var(--bw-yellow);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-format:hover {
+		background: var(--bw-base1);
+		color: var(--bw-yellow);
+		font-weight: bold;
 	}
 
 	aside.terminal {

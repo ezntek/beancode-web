@@ -1,4 +1,4 @@
-import { FileResponseKind, pathDirName, pathJoin, strerror, type Dir } from "$lib/fstypes";
+import { FileResponseKind, pathBasename, pathJoin, strerror, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
 
@@ -149,43 +149,22 @@ async function doInitialSetupCheck() {
     if (!FS.analyzePath("/data/projects/default").exists)
         FS.mkdirTree("/data/projects/default");
 
-    const PYFN = `def exec_user_py(s,n):
-\tug={"__name__":"__main__","__file__":n};ul=ug
-\ttry:
-\t\texec(s,ug,ul);return 0
-\texcept SystemExit as e:
-\t\treturn e.code
-\texcept Exception as e:
-\t\traise e`;
+    const res = await fetch("/bcdata/utils.py?url");
+    if (!res.ok) {
+        throw new Error(`could not fetch beancode utilities: ${res.status}`);
+    }
+    const FNS = await res.text();
 
-    const BFN = `from beancode.lexer import Lexer;from beancode.parser import Parser;from beancode.interpreter import Interpreter;from beancode.error import *
-def exec_user_bean(s,n):
-\ttry:
-\t\ti = Interpreter(Parser(Lexer(s).tokenize()).program().stmts);i.toplevel = True;i.visit_block(None);c=0
-\texcept BCError as err:
-\t\terr.print(n,s);c=1
-\texcept SystemExit as e:
-\t\tc=e.code
-\texcept KeyboardInterrupt:
-\t\twarn("Exited abnormally");c=1
-\texcept EOFError:
-\t\twarn("Caught EOF");c=1 
-\texcept RecursionError as e:
-\t\twarn("Recursion depth exceeded! Did you forget your base case?");c=1 
-\texcept Exception as e:
-\t\terror(f'Python exception caught ({type(e)}: "{e}") while running beancode! Please report this to the developers.');raise e
-\treturn c`
-
-    await py.runPythonAsync(PYFN);
-    await py.runPythonAsync(BFN);
+    await py.runPythonAsync(FNS);
 }
 
 let py: any;
 async function loadBeancode() {
     if (!py) {
         // @ts-ignore
-        const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs");
-        py = await PyodideModule.loadPyodide({ args: [/*'-u'*/] });
+        const PyodideModule = await import("/pyodide/pyodide.mjs?url");
+        // @ts-ignore
+        py = await PyodideModule.loadPyodide({});
         FS = py.FS;
 
         FS.mkdirTree("/data");
@@ -221,12 +200,12 @@ async function loadBeancode() {
 
 let pyOK = false;
 let pyBeancodePromise = loadBeancode();
-let cwd = "/home/pyodide";
+let cwd = "/data/projects";
 
 async function handleRun(src: string, path: string) {
     try {
         post({ kind: 'status', data: 'Running Beancode', positive: true});
-        py.globals.set("n", path || "beanweb");
+        py.globals.set("n", pathBasename(path) || "(beanweb)");
         py.globals.set("s", src);
         py.globals.set("c", 0);
         await py.runPythonAsync("c=exec_user_bean(s,n)");
@@ -243,29 +222,36 @@ async function handleRun(src: string, path: string) {
         }, 500);
         post({ kind: 'pyexit', code: 1 });
     }
-    post({ kind: 'listdir-response', data: listDir(cwd) });
 }
 
 async function handleRunPy(src: string, name: string){
     try {
         post({ kind: 'status', data: 'Running Python', positive: true});
-        await py.globals.set("s", src);
-        await py.globals.set("n", name);
+        py.globals.set("s", src);
+        py.globals.set("n", name);
         await py.runPythonAsync("c=exec_user_py(s,n)");
         const exit_code = py.globals.get("c");
         await py.runPythonAsync("del(s,n,c)");
         post({ kind: 'pyexit', code: exit_code });
-        setTimeout(() => {
-            post({ kind: 'status', data: 'Ready', positive: true});
-        }, 500);
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
-        setTimeout(() => {
-            post({ kind: 'status', data: 'An error occurred', positive: false});
-        }, 500);
         post({ kind: 'pyexit', code: 1 });
     }
-    post({ kind: 'listdir-response', data: listDir(cwd) });
+}
+
+async function formatBean(src: string, path: string): Promise<string | null> {
+    try {
+        py.globals.set("s", src);
+        py.globals.set("n", pathBasename(path));
+        await py.runPythonAsync("r=format_bean(s,n)");
+        const res = py.globals.get("r");
+        await py.runPythonAsync("del(s,n,r)");
+        // @ts-ignore
+        return res;
+    } catch (e: any) {
+        post({ kind: 'error', data: String(e) });
+    }
+    return null;
 }
 
 onmessage = async (event: MessageEvent<EditorMessage>) => { 
@@ -280,12 +266,12 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             case 'run':
                 (new Uint8Array(interruptBuf))[0] = 0;
                 post({ kind: 'clear' });
-                await handleRun(msg.data, msg.filePath);
+                await handleRun(msg.data, msg.path);
                 break;
             case 'runpy':
                 (new Uint8Array(interruptBuf))[0] = 0;
                 post({ kind: 'clear' });
-                await handleRunPy(msg.data, msg.filePath);
+                await handleRunPy(msg.data, msg.path);
                 break;
             case 'setup':
                 inputBuf = msg.inputBuf;
@@ -308,6 +294,8 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             case 'renamefile':
                 post({ kind: 'renamefile-response', path: msg.oldpath, data: renamePath(msg.oldpath, msg.newpath) });
                 break;
+            case 'format':
+                post({ kind: 'format-response', data: await formatBean(msg.data, msg.path) });
         }
     } catch (exc: any) {
         console.error("worker error: ", exc);

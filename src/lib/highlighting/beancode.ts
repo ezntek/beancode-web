@@ -144,7 +144,8 @@ export const beancodeLanguage = LRLanguage.define({
         commentTokens: {
             line: "//",
             block: { open: "/*", close: "*/" },
-        }
+        },
+        indentUnit: "    ",
     }
 });
 

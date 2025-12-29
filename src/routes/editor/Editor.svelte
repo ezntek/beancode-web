@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { EditorView, keymap } from '@codemirror/view';
-	import { history, indentWithTab } from '@codemirror/commands';
+	import { history, indentWithTab, insertTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
 	import { indentUnit } from '@codemirror/language';
 	import { es } from './editor_state.svelte';
@@ -75,6 +75,7 @@
 
 		function exts() {
 			return [
+                indentUnit.of("    "),
 				lineNumbers(),
 				highlightActiveLineGutter(),
 				highlightSpecialChars(),
@@ -107,12 +108,12 @@
 		const startState = EditorState.create({
 			doc: '',
 			extensions: [
-				exts(),
+				...exts(),
 				catppuccinMacchiato,
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),
-				keymap.of([indentWithTab]),
+				keymap.of([ ...defaultKeymap, { key: "Tab", run: insertTab }]),
 				es.history.of(history()),
 				highlighter.of(python())
 			]

@@ -1,0 +1,58 @@
+# type: ignore
+
+from beancode.lexer import Lexer
+from beancode.parser import Parser
+from beancode.interpreter import Interpreter
+from beancode.error import *
+from beancode.formatter import Formatter
+
+
+def exec_user_py(src, name):
+    user_globals = {"__name__": "__main__", "__file__": name}
+    user_locals = user_globals
+    try:
+        exec(src, user_globals, user_locals)
+        return 0
+    except SystemExit as e:
+        return e.code
+    except Exception as e:
+        raise e
+
+
+def exec_user_bean(src, name):
+    try:
+        i = Interpreter(Parser(Lexer(src).tokenize()).program().stmts)
+        i.toplevel = True
+        i.visit_block(None)
+        c = 0
+    except BCError as err:
+        err.print(name, src)
+        c = 1
+    except SystemExit as e:
+        c = e.code
+    except KeyboardInterrupt:
+        # exit button should not produce an error message
+        c = 1
+    except EOFError:
+        warn("Caught EOF")
+        c = 1
+    except RecursionError as e:
+        warn("Recursion depth exceeded! Did you forget your base case?")
+        c = 1
+    except Exception as e:
+        error(
+            f'Python exception caught ({type(e)}: "{e}") while running beancode! Please report this to the developers.'
+        )
+        raise e
+    return c
+
+
+def format_bean(src, name):
+    try:
+        L = Lexer(src, preserve_comments=True)
+        toks = L.tokenize()
+        P = Parser(toks, preserve_trivia=True)
+        block = P.program().stmts
+        return "".join(Formatter(block).visit_block())
+    except BCError as err:
+        err.print(name, src)

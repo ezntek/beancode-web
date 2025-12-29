@@ -16,16 +16,18 @@ export type PyMessage =
     | { kind: 'delfile-response', path: string }
     // fileresponse ok data contains new path, path contains old path
     | { kind: 'renamefile-response', path: string, data: FileResponse }
+    | { kind: 'format-response', data: string | null }
 
 export type EditorMessage = 
-    | { kind: 'run', data: string, filePath: string }
-    | { kind: 'runpy', data: string, filePath: string }
+    | { kind: 'run', data: string, path: string }
+    | { kind: 'runpy', data: string, path: string }
     | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
     | { kind: 'listdir', path: string }
     | { kind: 'readfile', path: string }
     | { kind: 'newfile', path: string, contents: string, overwrite: boolean }
     | { kind: 'delfile', path: string }
     | { kind: 'renamefile', oldpath: string, newpath: string }
+    | { kind: 'format', data: string, path: string }
 
  
 interface IPyState {

@@ -5,6 +5,7 @@ import { termState as ts } from './terminal_state.svelte';
 
 import { s, inputBuf, interruptBuf, fileResponseCallback } from './state.svelte';
 import { FileResponseKind } from '$lib/fstypes';
+import { es } from './editor_state.svelte';
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     let ter = ts.terminal!;
@@ -41,6 +42,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             ts.canInput = false;
             s.exitCode = msg.code;
+            post({ kind: 'listdir', path: s.cwd });
             break;
         case 'listdir-response':
             const newmap = new Map([...msg.data.entries()].sort(([keyA], [keyB]) =>
@@ -68,6 +70,11 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             post({ kind: 'listdir', path: s.cwd });
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
+        case 'format-response':
+            if (msg.data !== null) {
+                es.src = msg.data;
+            }
+            break; 
     }
 }
 
