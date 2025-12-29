@@ -2,6 +2,7 @@ import { tick } from "svelte";
 import { Compartment } from '@codemirror/state';
 import { history } from '@codemirror/commands';
 import type { EditorView } from "codemirror";
+import { pathExtension } from "$lib/fstypes";
 
 interface IEditorState {
     curFilePath: string,
@@ -47,3 +48,5 @@ export function changeFile(newSrc: string, newPath: string) {
         es.saved = true;
     });
 }
+
+export function curExtension() { return pathExtension(es.curFilePath) };

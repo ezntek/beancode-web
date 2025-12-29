@@ -27,7 +27,7 @@
 		pathJoin,
 		type FileResponse
 	} from '$lib/fstypes';
-	import { changeFile, editorNewFile, es } from './editor_state.svelte';
+	import { changeFile, curExtension, editorNewFile, es } from './editor_state.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	let ibuf: Uint8Array;
@@ -185,6 +185,21 @@
 		e.target.addEventListener('pointerup', onUp);
 	}
 
+	function runStopTooltip() {
+		if (s.running) {
+			return 'Stop execution';
+		}
+
+		switch (curExtension()) {
+			case 'bean':
+				return 'Run your code';
+			case 'py':
+				return 'Run your Python code';
+			default:
+				return 'You cannot run this file type.';
+		}
+	}
+
 	function runStop() {
 		if (!ps.ready) return;
 
@@ -193,11 +208,13 @@
 			return;
 		}
 
+		if (curExtension() !== 'py' && curExtension() !== 'bean') return;
+
 		if (es.curFilePath !== '') {
 			saveFile(true);
 		}
 		s.running = true;
-		if (pathExtension(es.curFilePath) === 'py') {
+		if (curExtension() === 'py') {
 			post({ kind: 'runpy', data: es.src, path: es.curFilePath });
 		} else {
 			post({ kind: 'run', data: es.src, path: es.curFilePath });
@@ -206,21 +223,26 @@
 
 	function buttonStyle(name: string): string {
 		if (!ps.ready) return 'editor-button-grayed';
-		const ext = pathExtension(es.curFilePath);
 		switch (name) {
 			case 'runstop':
 				if (s.running) {
 					return 'editor-button-stop';
 				} else {
-					if (ext === 'py') return 'editor-button-runpy';
-					else return 'editor-button-run';
+					switch (curExtension()) {
+						case 'py':
+							return 'editor-button-runpy';
+						case 'bean':
+							return 'editor-button-run';
+						default:
+							return 'editor-button-grayed';
+					}
 				}
 			case 'save':
 				return 'editor-button-save';
 			case 'new':
 				return 'editor-button-new';
 			case 'format':
-				if (ext === 'bean') return 'editor-button-format';
+				if (curExtension() === 'bean') return 'editor-button-format';
 				else return 'editor-button-grayed';
 			default:
 				return '';
@@ -265,10 +287,17 @@
 
 		// reset to untitled
 		editorNewFile();
+		saveDialog.open('New File');
+	}
+
+	function formatTooltip() {
+		if (curExtension() !== 'bean')
+			return 'You can only format Beancode (Pseudocode) files right now.';
+		return 'Format (prettify) your current source code file.';
 	}
 
 	function formatFile() {
-		if (pathExtension(es.curFilePath) !== 'bean') return;
+		if (curExtension() !== 'bean') return;
 		post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
 	}
 </script>
@@ -284,13 +313,12 @@
 				<button
 					aria-label="run"
 					class="editor-toolbar-button {buttonStyle('runstop')}"
+					title={runStopTooltip()}
 					onclick={runStop}
 				>
 					{#if !s.running}
 						<span
-							class="icon {pathExtension(es.curFilePath) === 'py'
-								? 'fa-brands fa-python'
-								: 'fa-solid fa-play'}"
+							class="icon {curExtension() === 'py' ? 'fa-brands fa-python' : 'fa-solid fa-play'}"
 						></span> Run
 					{:else}
 						<span class="icon fa-solid fa-stop"></span> Stop
@@ -313,6 +341,7 @@
 				<button
 					aria-label="format"
 					class="editor-toolbar-button {buttonStyle('format')}"
+					title={formatTooltip()}
 					onclick={formatFile}
 				>
 					<span class="icon fa-solid fa-wand-magic-sparkles"></span> Format
@@ -430,6 +459,11 @@
 			background-color 130ms ease,
 			color 130ms ease,
 			font-weight 130ms ease;
+		transition-delay: 0ms;
+	}
+
+	.editor-toolbar-button:hover {
+		transition-delay: 15ms;
 	}
 
 	.editor-button-run {
