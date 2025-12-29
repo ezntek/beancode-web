@@ -48,11 +48,13 @@ def exec_user_bean(src, name, tracer=None):
     return c
 
 def format_bean(src, name):
+    lexer = Lexer(src, preserve_comments=True)
     try:
-        L = Lexer(src, preserve_comments=True)
-        toks = L.tokenize()
-        P = Parser(toks, preserve_trivia=True)
-        block = P.program().stmts
-        return "".join(Formatter(block).visit_block())
+        toks = lexer.tokenize()
+        parser = Parser(toks, preserve_trivia=True)
+        blk = parser.program().stmts
+        f = Formatter(blk)
+        res = "".join(f.visit_block())
+        return res
     except BCError as err:
         err.print(name, src)

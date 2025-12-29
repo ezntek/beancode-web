@@ -217,12 +217,12 @@
 	}
 
 	.clear {
-		background-color: var(--bw-purple);
+		background-color: var(--bw-magenta);
 	}
 
 	.clear:hover {
 		background-color: var(--bw-surface1);
-		color: var(--bw-purple);
+		color: var(--bw-magenta);
 		font-weight: bold;
 	}
 

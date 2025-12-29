@@ -97,7 +97,7 @@
 					() => {
 						if (msgKind === 'newfile-response') {
 							if (tracerOutput !== '') {
-								traceDoneDialog.open(undefined, 'tracer_output.html', true);
+								traceDoneDialog.open(undefined, pathBasename(path), true);
 								return;
 							} else {
 								saveDialog.open(undefined, pathBasename(path), true);

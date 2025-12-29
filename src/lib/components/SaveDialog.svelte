@@ -74,6 +74,7 @@
 		}
 
 		// we rely on JS's weird truthy stuff, don't fix
+		overwrite = false;
 		if (_overwrite) overwrite = true;
 
 		innerDialog.open();
