@@ -3,7 +3,7 @@ import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, inputBuf, interruptBuf, fileResponseCallback } from './state.svelte';
+import { s, inputBuf, interruptBuf, fileResponseCallback, doneTracingCallback } from './state.svelte';
 import { FileResponseKind } from '$lib/fstypes';
 import { es } from './editor_state.svelte';
 
@@ -75,6 +75,11 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 es.src = msg.data;
             }
             break; 
+        case 'trace-response':
+            if (msg.data !== null) {
+                doneTracingCallback!(msg.data);
+            }
+            break;
     }
 }
 

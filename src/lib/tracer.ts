@@ -16,6 +16,19 @@ export function defaultTracerConfig(): TracerConfig {
     };
 }
 
+export function tracerConfigToPython(c: TracerConfig): Object {
+    return {
+        trace_every_line: c.traceEveryLine,
+        hide_repeating_entries: c.hideRepeatingEntries,
+        condense_arrays: c.condenseArrays,
+        syntax_highlighting: c.syntaxHighlighting,
+        show_outputs: c.showOutputs,
+        prompt_on_inputs: c.promptOnInputs,
+        debug: false,
+        i_will_not_cheat: false,
+    }
+}
+
 export function getTraceableVars(src: string): string[] {
     const tree = parser.parse(src);
     const vars: Set<string> = new Set();

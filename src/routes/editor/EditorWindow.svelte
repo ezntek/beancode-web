@@ -9,27 +9,37 @@
 	import Terminal from './Terminal.svelte';
 	import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
 	import {
+		type FileResponseCallback,
 		inputBuf,
 		interruptBuf,
 		s,
 		setFileResponseCallback,
-		type FileResponseCallback
+		setDoneTracingCallback
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
 	import ResizeBar from '$lib/components/ResizeBar.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
-	import { displayFileResponse, FileResponseKind, pathJoin, type FileResponse } from '$lib/fstypes';
+	import {
+		displayFileResponse,
+		FileResponseKind,
+		pathBasename,
+		pathJoin,
+		type FileResponse
+	} from '$lib/fstypes';
 	import { changeFile, curExtension, editorNewFile, es } from './editor_state.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
-	import TraceDialog from '$lib/components/trace/TraceDialog.svelte';
+	import TraceDialog from '$lib/components/TraceDialog.svelte';
+	import type { TracerConfig } from '$lib/tracer';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
 	let newAfterSave = $state(false);
+	let tracerOutput = '';
 	let saveDialog: SaveDialog;
+	let traceDoneDialog: SaveDialog;
 	let errorDialog: ErrorDialog;
 	let messageDialog: MessageDialog;
 	let traceDialog: TraceDialog;
@@ -63,6 +73,13 @@
 			fileBrowserWidth = window.innerWidth * 0.1;
 		}
 
+		function doneTracingCallback(data: string) {
+			tracerOutput = data;
+			traceDoneDialog.open(undefined, 'tracer_output.html');
+		}
+
+		setDoneTracingCallback(doneTracingCallback);
+
 		function fileResponseCallback(msgKind: string, path: string, response?: FileResponse) {
 			if (!response) {
 				if (msgKind === 'delfile-response') {
@@ -73,8 +90,21 @@
 
 			if (response.kind != FileResponseKind.Ok) {
 				errorDialog.open(
-					'An error occurred while interacting with the file system:',
-					displayFileResponse(response)
+					[
+						'An error occurred while interacting with the file system:',
+						displayFileResponse(response)
+					],
+					() => {
+						if (msgKind === 'newfile-response') {
+							if (tracerOutput !== '') {
+								traceDoneDialog.open(undefined, 'tracer_output.html', true);
+								return;
+							} else {
+								saveDialog.open(undefined, pathBasename(path), true);
+								return;
+							}
+						}
+					}
 				);
 				return;
 			}
@@ -88,6 +118,11 @@
 					changeFile(response.data, path);
 					break;
 				case 'newfile-response':
+					if (tracerOutput !== '') {
+						tracerOutput = '';
+						return;
+					}
+
 					tick().then(() => {
 						es.curFilePath = path;
 						es.saved = true;
@@ -258,8 +293,8 @@
 		}
 	}
 
-	function saveOk(fileName: string) {
-		saveFile(false, pathJoin(s.cwd, fileName));
+	function saveOk(fileName: string, overwrite: boolean) {
+		saveFile(overwrite, pathJoin(s.cwd, fileName));
 	}
 
 	function saveFile(overwrite: boolean, path?: string) {
@@ -271,18 +306,21 @@
 		});
 	}
 
+	function trySave(): boolean {
+		if (es.curFilePath !== '') {
+			saveFile(true);
+			return false;
+		} else {
+			newAfterSave = true;
+			saveDialog.open('Save current file');
+			return true;
+		}
+	}
+
 	function newFile() {
 		if (!ps.ready) return;
 
-		if (!es.saved) {
-			if (es.curFilePath !== '') {
-				saveFile(true);
-			} else {
-				newAfterSave = true;
-				saveDialog.open('Save current file');
-				return;
-			}
-		}
+		if (!es.saved) if (trySave()) return;
 
 		// reset to untitled
 		editorNewFile();
@@ -305,7 +343,19 @@
 		traceDialog.open(es.src);
 	}
 
-	function traceOk() {}
+	function traceOk(vars: string[], config: TracerConfig) {
+		saveFile(true); // we can only call this function if the file is a saved beancode file anyway
+		post({ kind: 'trace', path: es.curFilePath, data: es.src, vars: vars, config: config });
+	}
+
+	function traceDoneOk(fileName: string, overwrite: boolean) {
+		post({
+			kind: 'newfile',
+			path: pathJoin(s.cwd, fileName),
+			contents: tracerOutput,
+			overwrite
+		});
+	}
 </script>
 
 <div class="editor-window">
@@ -388,6 +438,12 @@
 	cancel={() => saveDialog.close()}
 	ok={saveOk}
 	title="Save Current File"
+/>
+<SaveDialog
+	bind:this={traceDoneDialog}
+	ok={traceDoneOk}
+	cancel={() => saveDialog.close()}
+	title="Save tracer output"
 />
 <MessageDialog bind:this={messageDialog} />
 <ErrorDialog bind:this={errorDialog} />

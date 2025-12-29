@@ -1,6 +1,7 @@
 import { FileResponseKind, pathBasename, pathJoin, strerror, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
+import { tracerConfigToPython, type TracerConfig } from "$lib/tracer";
 
 function post(msg: PyMessage) {
     postMessage(msg satisfies PyMessage);
@@ -173,7 +174,7 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const BEANCODE_VERSION = "0.7.0b1";
+        const BEANCODE_VERSION = "0.7.0b2";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
         const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\");from beancode.runner import *;from beancode import __version__`
         try {
@@ -196,7 +197,6 @@ async function loadBeancode() {
         post({ kind: 'status', data: 'Ready', positive: true });
     }
     pyOK = true;
-    FS.syncfs(false);
 }
 
 let pyOK = false;
@@ -240,19 +240,31 @@ async function handleRunPy(src: string, name: string){
     }
 }
 
-async function formatBean(src: string, path: string): Promise<string | null> {
+function formatBean(src: string, path: string): string | null {
     try {
         py.globals.set("s", src);
         py.globals.set("n", pathBasename(path));
-        await py.runPythonAsync("r=format_bean(s,n)");
+        py.runPython("r=format_bean(s,n)");
         const res = py.globals.get("r");
-        await py.runPythonAsync("del(s,n,r)");
+        py.runPython("del(s,n,r)");
         // @ts-ignore
         return res;
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
     }
     return null;
+}
+
+function trace(src: string, path: string, vars: string[], config: TracerConfig): string | null {
+    py.globals.set("s", src);
+    py.globals.set("n", pathBasename(path));
+    py.globals.set("v", vars);
+    py.globals.set("cfg", tracerConfigToPython(config));
+    py.runPython("t=Tracer(v.to_py(),TracerConfig.from_dict(cfg.to_py()));c=exec_user_bean(s,n,tracer=t);print(c);res=(t.gen_html() if c==0 else None)");
+    const out = py.globals.get("res");
+    console.log(out);
+    py.runPython("del(s,n,v,cfg,t,c,res)"); 
+    return out;
 }
 
 onmessage = async (event: MessageEvent<EditorMessage>) => { 
@@ -296,7 +308,11 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 post({ kind: 'renamefile-response', path: msg.oldpath, data: renamePath(msg.oldpath, msg.newpath) });
                 break;
             case 'format':
-                post({ kind: 'format-response', data: await formatBean(msg.data, msg.path) });
+                post({ kind: 'format-response', data: formatBean(msg.data, msg.path) });
+                break;
+            case 'trace':
+                post({ kind: 'trace-response', data: trace(msg.data, msg.path, msg.vars, msg.config) });
+                break;
         }
     } catch (exc: any) {
         console.error("worker error: ", exc);

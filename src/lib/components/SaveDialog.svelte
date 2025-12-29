@@ -4,19 +4,19 @@
 	import ErrorDialog from './ErrorDialog.svelte';
 
 	interface IProps {
-		ok: (fileName: string) => void;
+		ok: (fileName: string, overwrite: boolean) => void;
 		cancel: Function;
 		title?: string;
 	}
 	let { ok, cancel, title = 'Save' }: IProps = $props();
 
 	function submitOk() {
-		// throw it on the event loop for good measure
 		if (fileName === '') {
-			errorDialog.open('Cannot save to empty file name!');
+			errorDialog.open(['Cannot save to empty file name!']);
 			return;
 		}
 
+		// throw it on the event loop for good measure
 		setTimeout(() => {
 			const n = fileName.slice();
 			let name = n;
@@ -24,7 +24,7 @@
 				const t = fileType.slice();
 				name += t !== '' ? '.' + t : '';
 			}
-			ok(name);
+			ok(name, overwrite);
 			innerDialog.close();
 			fileName = '';
 		}, 0);
@@ -41,9 +41,10 @@
 
 	let innerDialog: Dialog;
 	let errorDialog: ErrorDialog;
-	let submitButton: HTMLButtonElement;
+	let submitButton: HTMLButtonElement | undefined = $state();
 	let fileName = $state('');
 	let fileType = $state('bean');
+	let overwrite = $state(false);
 
 	// @ts-ignore
 	export const close = () => {
@@ -51,7 +52,7 @@
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = (t?: string, defaultContents?: string) => {
+	export const open = (t?: string, defaultContents?: string, _overwrite?: boolean) => {
 		if (t) title = t;
 		if (defaultContents) {
 			const parts = defaultContents!.split('.');
@@ -62,6 +63,7 @@
 					case 'bean':
 					case 'py':
 					case 'txt':
+					case 'html':
 						fileType = ext;
 						break;
 					default:
@@ -71,12 +73,15 @@
 			}
 		}
 
+		// we rely on JS's weird truthy stuff, don't fix
+		if (_overwrite) overwrite = true;
+
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
 	};
 
 	export function focus() {
-		submitButton.focus();
+		submitButton?.focus();
 	}
 </script>
 
@@ -98,15 +103,23 @@
 				<select class="picker" style="flex: 1;" bind:value={fileType}>
 					<option value="bean" selected>Pseudocode (.bean)</option>
 					<option value="py">Python (.py)</option>
+					<option value="html">HTML (.html)</option>
 					<option value="txt">Text (.txt)</option>
 					<option value="">No File Extension</option>
 				</select>
 			</div>
 		</div>
 		<div class="bottom">
-			<button class="ok" onclick={submitOk} bind:this={submitButton}>
-				<span class="fa-solid fa-check" style="margin-right: 0.4em;"></span>Ok
-			</button>
+			{#if overwrite}
+				<button class="overwrite" onclick={submitOk} bind:this={submitButton}>
+					<span class="fa-solid fa-triangle-exclamation" style="margin-right: 0.4em;"
+					></span>Overwrite
+				</button>
+			{:else}
+				<button class="ok" onclick={submitOk} bind:this={submitButton}>
+					<span class="fa-solid fa-check" style="margin-right: 0.4em;"></span>Ok
+				</button>
+			{/if}
 			<button class="cancel" onclick={submitCancel}>
 				<span class="fa-solid fa-x" style="margin-right: 0.4em;"></span>Cancel
 			</button>
@@ -170,6 +183,15 @@
 	.bottom .ok:hover {
 		background-color: var(--bw-base1);
 		color: var(--bw-green);
+	}
+
+	.bottom .overwrite {
+		background-color: var(--bw-yellow);
+	}
+
+	.bottom .overwrite:hover {
+		background-color: var(--bw-base1);
+		color: var(--bw-yellow);
 	}
 
 	.bottom .cancel {

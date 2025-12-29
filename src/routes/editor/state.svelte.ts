@@ -26,7 +26,12 @@ export const s: IState = $state({
 
 // AFTER finished reading files
 export type FileResponseCallback = (msgKind: string, path: string, response?: FileResponse) => void;
+export type DoneTracingCallback = (data: string) => void;
+export let doneTracingCallback: DoneTracingCallback | null = null;
 export let fileResponseCallback: FileResponseCallback | null = null;
+export function setDoneTracingCallback(cb: DoneTracingCallback) {
+    doneTracingCallback = cb;
+}
 export function setFileResponseCallback(cb: FileResponseCallback) {
     fileResponseCallback = cb;
 }

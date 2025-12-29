@@ -15,9 +15,8 @@
 	let availableVars: string[] = $state([]);
 	let usedVars: string[] = $state([]);
 
-	let vars: string[] = $state([]);
 	let config = $state(defaultTracerConfig());
-	type TView = 'vars' | 'settings';
+	type TView = 'vars' | 'options';
 	let view: TView = $state('vars');
 
 	function pickerChanged(e: any) {
@@ -73,7 +72,7 @@
 	}
 
 	function submit() {
-		ok(vars, config);
+		ok(usedVars.slice(), { ...config } satisfies TracerConfig);
 		innerDialog.close();
 		return;
 	}
@@ -105,11 +104,11 @@
 			</button>
 			<button
 				onclick={() => {
-					view = 'settings';
+					view = 'options';
 				}}
-				class={selectorStyle('settings')}
+				class={selectorStyle('options')}
 			>
-				SETTINGS
+				OPTIONS
 			</button>
 		</div>
 		<div class="middle">
@@ -147,20 +146,50 @@
 						</button>
 					</div>
 					{#each usedVars as varName}
-						<div class="var-row">
-							<p class="label">{varName}</p>
-							<button
-								aria-label="delete variable"
-								class="delete variable"
-								onclick={() => delItem(varName)}
-							>
-								<span class="fa-solid fa-trash" style="color: var(--bw-red)"></span>
-							</button>
-						</div>
+						<button
+							aria-label="delete variable"
+							title="delete variable"
+							class="var-row"
+							onclick={() => delItem(varName)}
+						>
+							<span style="margin-right: auto;">{varName}</span>
+							<span class="icon fa-solid fa-trash" style="color: var(--bw-red)"></span>
+						</button>
 					{/each}
 				</div>
-			{:else if view === 'settings'}
-				<p class="label">settings</p>
+			{:else if view === 'options'}
+				<p class="subtext">Adjust the tracer's options:</p>
+				<div class="options">
+					<label
+						><input type="checkbox" bind:checked={config.traceEveryLine} />
+						Trace every line of the script
+					</label>
+					<br />
+					<label
+						><input type="checkbox" bind:checked={config.hideRepeatingEntries} />
+						Hide repeating entries
+					</label>
+					<br />
+					<label
+						><input type="checkbox" bind:checked={config.syntaxHighlighting} />
+						Enable syntax highlighting
+					</label>
+					<br />
+					<label
+						><input type="checkbox" bind:checked={config.condenseArrays} />
+						Condense arrays into one column
+					</label>
+					<br />
+					<label
+						><input type="checkbox" bind:checked={config.showOutputs} />
+						Show outputs
+					</label>
+					<br />
+					<label
+						><input type="checkbox" bind:checked={config.promptOnInputs} />
+						Display an extra prompt for inputs
+					</label>
+				</div>
 			{/if}
 		</div>
 		<div class="bottom">
@@ -185,53 +214,50 @@
 		font-family: 'IBM Plex Mono', monospace !important;
 		display: flex;
 		flex-direction: column;
-		width: 23vw;
+		min-width: 23vw;
 		min-height: 28vw;
+	}
+
+	.options > label {
+		color: var(--bw-text);
+	}
+
+	.options > label > input {
+		accent-color: var(--bw-blue);
 	}
 
 	.var-row {
 		display: flex;
+		font-size: 1em;
 		flex-direction: row;
+		justify-content: center;
+		align-items: center;
 		margin-top: 0.5em;
 		background-color: var(--bw-base3);
+		color: var(--bw-text);
+		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
-		position: relative;
-		padding: 0em;
 		padding-left: 0.3em;
 		padding-right: 0.3em;
+		border: 0px;
+		margin: 0.1 0 0.1 0em;
+
 		transition:
 			background-color 130ms ease,
 			color 130ms ease;
 	}
 
-	.var-row > p {
-		flex: 1;
-		min-width: 0;
-		margin-right: auto;
-		font-weight: normal;
-		transition: font-weight 130ms ease;
-	}
-
-	.var-row > button {
-		border: 0px;
-		background-color: transparent;
-		pointer-events: 0;
+	.var-row .icon {
 		opacity: 0;
-		margin: 0.1 0 0.1 0em;
-		padding: 0px;
 	}
 
 	.var-row:hover {
 		background-color: var(--bw-surface1);
-	}
-
-	.var-row:hover > button {
-		opacity: 1;
-		pointer-events: auto;
-	}
-
-	.var-row:hover > p {
 		font-weight: bold;
+	}
+
+	.var-row:hover .icon {
+		opacity: 1;
 	}
 
 	.varlist {

@@ -5,6 +5,7 @@ from beancode.parser import Parser
 from beancode.interpreter import Interpreter
 from beancode.error import *
 from beancode.formatter import Formatter
+from beancode.tracer import *
 
 
 def exec_user_py(src, name):
@@ -19,9 +20,9 @@ def exec_user_py(src, name):
         raise e
 
 
-def exec_user_bean(src, name):
+def exec_user_bean(src, name, tracer=None):
     try:
-        i = Interpreter(Parser(Lexer(src).tokenize()).program().stmts)
+        i = Interpreter(Parser(Lexer(src).tokenize()).program().stmts, tracer=tracer)
         i.toplevel = True
         i.visit_block(None)
         c = 0
@@ -45,7 +46,6 @@ def exec_user_bean(src, name):
         )
         raise e
     return c
-
 
 def format_bean(src, name):
     try:

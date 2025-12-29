@@ -1,4 +1,5 @@
 import type { FileResponse, Dir } from '$lib/fstypes';
+import type { TracerConfig } from '$lib/tracer';
 
 export type PyMessage =
     | { kind: 'ready', version: string }
@@ -16,7 +17,9 @@ export type PyMessage =
     | { kind: 'delfile-response', path: string }
     // fileresponse ok data contains new path, path contains old path
     | { kind: 'renamefile-response', path: string, data: FileResponse }
+    // null: error
     | { kind: 'format-response', data: string | null }
+    | { kind: 'trace-response', data: string | null }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, path: string }
@@ -28,6 +31,7 @@ export type EditorMessage =
     | { kind: 'delfile', path: string }
     | { kind: 'renamefile', oldpath: string, newpath: string }
     | { kind: 'format', data: string, path: string }
+    | { kind: 'trace', data: string, path: string, vars: string[], config: TracerConfig }
 
  
 interface IPyState {

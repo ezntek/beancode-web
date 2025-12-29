@@ -3,15 +3,18 @@
 
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
+	let after: Function | undefined;
 	let messages: string[] = $state([]);
 
 	// @ts-ignore
 	export const close = () => {
 		innerDialog.close();
+		if (after) after();
 	};
 	// @ts-ignore
-	export const open = (...msgs: string[]) => {
+	export const open = (msgs: string[], aft?: Function) => {
 		messages = [];
+		after = aft;
 		msgs.forEach((itm) => messages.push(itm));
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
