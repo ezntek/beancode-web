@@ -246,7 +246,6 @@ function formatBean(src: string, path: string): string | null {
         py.globals.set("n", pathBasename(path));
         py.runPython("r=format_bean(s,n)");
         const res = py.globals.get("r");
-        console.log(res);
         py.runPython("del(s,n,r)");
         // @ts-ignore
         return res;
@@ -263,7 +262,6 @@ function trace(src: string, path: string, vars: string[], config: TracerConfig):
     py.globals.set("cfg", tracerConfigToPython(config));
     py.runPython("t=Tracer(v.to_py(),TracerConfig.from_dict(cfg.to_py()));c=exec_user_bean(s,n,tracer=t);res=(t.gen_html() if c==0 else None)");
     const out = py.globals.get("res");
-    console.log(out);
     py.runPython("del(s,n,v,cfg,t,c,res)"); 
     return out;
 }
@@ -309,7 +307,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 post({ kind: 'renamefile-response', path: msg.oldpath, data: renamePath(msg.oldpath, msg.newpath) });
                 break;
             case 'format':
-                post({ kind: 'format-response', data: formatBean(msg.data, msg.path) });
+                post({ kind: 'format-response', data: formatBean(msg.data, msg.path), path: msg.path });
                 break;
             case 'trace':
                 post({ kind: 'trace-response', data: trace(msg.data, msg.path, msg.vars, msg.config) });
@@ -324,6 +322,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
 
         post({ kind: 'error', data: data });
     }
+
     FS.syncfs(false);
 }
 

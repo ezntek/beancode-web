@@ -24,11 +24,15 @@ export const s: IState = $state({
     running: false,
 });
 
-// AFTER finished reading files
-export type FileResponseCallback = (msgKind: string, path: string, response?: FileResponse) => void;
+export type DoneFormattingCallback = (data: string, path: string) => void;
 export type DoneTracingCallback = (data: string) => void;
+export type FileResponseCallback = (msgKind: string, path: string, response?: FileResponse) => void;
+export let doneFormattingCallback: DoneFormattingCallback | null = null;
 export let doneTracingCallback: DoneTracingCallback | null = null;
 export let fileResponseCallback: FileResponseCallback | null = null;
+export function setDoneFormattingCallback(cb: DoneFormattingCallback) {
+    doneFormattingCallback = cb;
+}
 export function setDoneTracingCallback(cb: DoneTracingCallback) {
     doneTracingCallback = cb;
 }

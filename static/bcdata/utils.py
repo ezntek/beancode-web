@@ -58,3 +58,4 @@ def format_bean(src, name):
         return res
     except BCError as err:
         err.print(name, src)
+        return None

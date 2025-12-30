@@ -18,7 +18,7 @@ export type PyMessage =
     // fileresponse ok data contains new path, path contains old path
     | { kind: 'renamefile-response', path: string, data: FileResponse }
     // null: error
-    | { kind: 'format-response', data: string | null }
+    | { kind: 'format-response', data: string | null, path: string }
     | { kind: 'trace-response', data: string | null }
 
 export type EditorMessage = 

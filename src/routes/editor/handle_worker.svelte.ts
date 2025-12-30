@@ -3,9 +3,8 @@ import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, inputBuf, interruptBuf, fileResponseCallback, doneTracingCallback } from './state.svelte';
+import { s, inputBuf, interruptBuf, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
 import { FileResponseKind } from '$lib/fstypes';
-import { es } from './editor_state.svelte';
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     let ter = ts.terminal!;
@@ -71,8 +70,8 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
         case 'format-response':
-            if (msg.data !== null) {
-                es.src = msg.data;
+            if (msg.data !== null && msg.data !== '') {
+                doneFormattingCallback!(msg.data, msg.path);
             }
             break; 
         case 'trace-response':

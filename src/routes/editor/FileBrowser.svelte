@@ -163,9 +163,9 @@
 		flex: 1 0 auto;
 		flex-direction: column;
 		background-color: var(--bw-base2);
-		margin-left: 0.2em;
-		height: 100%;
 		width: 100%;
 		width: 18.5%;
+		gap: 0.4em;
+		padding: 0.3em;
 	}
 </style>

@@ -14,7 +14,8 @@
 		interruptBuf,
 		s,
 		setFileResponseCallback,
-		setDoneTracingCallback
+		setDoneTracingCallback,
+		setDoneFormattingCallback
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
@@ -54,109 +55,114 @@
 		window.open(url, '_blank', 'noopener');
 	}
 
-	onMount(async () => {
-		await setupWorker();
-		s.status = 'Waiting to launch';
-		ibuf = new Uint8Array(interruptBuf);
-
+	function setTermWidth() {
 		const twidth = localStorage.getItem('EditorTerminalWidth');
 		if (twidth !== null) {
 			terminalWidth = Number.parseInt(twidth);
 		} else {
 			terminalWidth = window.innerWidth * 0.3;
 		}
+	}
 
+	function setFileBrowserWidth() {
 		const fbwidth = localStorage.getItem('EditorFileBrowserWidth');
 		if (fbwidth !== null) {
 			fileBrowserWidth = Number.parseInt(fbwidth);
 		} else {
 			fileBrowserWidth = window.innerWidth * 0.1;
 		}
+	}
 
-		function doneTracingCallback(data: string) {
-			tracerOutput = data;
-			traceDoneDialog.open(undefined, 'tracer_output.html');
-		}
+	onMount(async () => {
+		await setupWorker();
+		ibuf = new Uint8Array(interruptBuf);
 
+		setTermWidth();
+		setFileBrowserWidth();
+
+		setDoneFormattingCallback(doneFormattingCallback);
 		setDoneTracingCallback(doneTracingCallback);
-
-		function fileResponseCallback(msgKind: string, path: string, response?: FileResponse) {
-			if (!response) {
-				if (msgKind === 'delfile-response') {
-					if (path === es.curFilePath) editorNewFile();
-				}
-				return;
-			}
-
-			if (response.kind != FileResponseKind.Ok) {
-				errorDialog.open(
-					[
-						'An error occurred while interacting with the file system:',
-						displayFileResponse(response)
-					],
-					() => {
-						if (msgKind === 'newfile-response') {
-							if (tracerOutput !== '') {
-								traceDoneDialog.open(undefined, pathBasename(path), true);
-								return;
-							} else {
-								saveDialog.open(undefined, pathBasename(path), true);
-								return;
-							}
-						}
-					}
-				);
-				return;
-			}
-
-			switch (msgKind) {
-				case 'readfile-response':
-					if (isTracerOutput(response.data)) {
-						handleTracerOutput(response.data);
-						return;
-					}
-					changeFile(response.data, path);
-					break;
-				case 'newfile-response':
-					if (tracerOutput !== '') {
-						tracerOutput = '';
-						return;
-					}
-
-					tick().then(() => {
-						es.curFilePath = path;
-						es.saved = true;
-					});
-					if (newAfterSave) {
-						newAfterSave = false;
-						editorNewFile();
-						setTimeout(() => {
-							es.saved = true;
-							// XXX: hacky AF but ig it works?!?!?
-						}, 50);
-					}
-					break;
-				case 'renamefile-response':
-					const newPath = response.data;
-					if (es.curFilePath == path) {
-						changeFile(es.src, newPath);
-						saveFile(true);
-					}
-				default:
-					break;
-			}
-		}
-		setFileResponseCallback(fileResponseCallback as FileResponseCallback);
+		setFileResponseCallback(fileResponseCallback);
 	});
 
-	function stop() {
-		// SIGINT
-		ibuf[0] = 2;
-		const flag = new Int32Array(inputBuf, 0, 1);
-		Atomics.store(flag, 0, 0);
-		Atomics.notify(flag, 0);
-		s.running = false;
-		ts.canInput = false;
+	function doneFormattingCallback(data: string, path: string) {
+		if (data && es.curFilePath === path) {
+			console.log('weee');
+			es.src = data;
+			saveFile(true, path);
+		}
+	}
+
+	function doneTracingCallback(data: string) {
+		tracerOutput = data;
+		traceDoneDialog.open(undefined, 'tracer_output.html');
+	}
+
+	function fileResponseCallback(msgKind: string, path: string, response?: FileResponse) {
+		if (!response) {
+			if (msgKind === 'delfile-response') {
+				if (path === es.curFilePath) editorNewFile();
+			}
+			return;
+		}
+
+		if (response.kind != FileResponseKind.Ok) {
+			errorDialog.open(
+				[
+					'An error occurred while interacting with the file system:',
+					displayFileResponse(response)
+				],
+				() => {
+					if (msgKind === 'newfile-response') {
+						if (tracerOutput !== '') {
+							traceDoneDialog.open(undefined, pathBasename(path), true);
+							return;
+						} else {
+							saveDialog.open(undefined, pathBasename(path), true);
+							return;
+						}
+					}
+				}
+			);
+			return;
+		}
+
+		switch (msgKind) {
+			case 'readfile-response':
+				if (isTracerOutput(response.data)) {
+					handleTracerOutput(response.data);
+					return;
+				}
+				changeFile(response.data, path);
+				break;
+			case 'newfile-response':
+				if (tracerOutput !== '') {
+					tracerOutput = '';
+					return;
+				}
+
+				tick().then(() => {
+					es.curFilePath = path;
+					es.saved = true;
+				});
+				if (newAfterSave) {
+					newAfterSave = false;
+					editorNewFile();
+					setTimeout(() => {
+						es.saved = true;
+						// XXX: hacky AF but ig it works?!?!?
+					}, 50);
+				}
+				break;
+			case 'renamefile-response':
+				const newPath = response.data;
+				if (es.curFilePath == path) {
+					changeFile(es.src, newPath);
+					saveFile(true);
+				}
+			default:
+				break;
+		}
 	}
 
 	function startResizeTerm(e: any) {
@@ -214,6 +220,17 @@
 
 		e.target.addEventListener('pointermove', onMove);
 		e.target.addEventListener('pointerup', onUp);
+	}
+
+	// actually useful UI bound functions
+	function stop() {
+		// SIGINT
+		ibuf[0] = 2;
+		const flag = new Int32Array(inputBuf, 0, 1);
+		Atomics.store(flag, 0, 0);
+		Atomics.notify(flag, 0);
+		s.running = false;
+		ts.canInput = false;
 	}
 
 	function runStopTooltip() {

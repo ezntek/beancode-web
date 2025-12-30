@@ -37,9 +37,6 @@
 	.item {
 		display: flex;
 		position: relative;
-		margin: 0.4em;
-		margin-left: 0.5em;
-		margin-right: 0.5em;
 		border-radius: 0.15em;
 		overflow: hidden;
 	}
