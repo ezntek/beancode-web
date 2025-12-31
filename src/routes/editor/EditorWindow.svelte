@@ -15,7 +15,8 @@
 		s,
 		setFileResponseCallback,
 		setDoneTracingCallback,
-		setDoneFormattingCallback
+		setDoneFormattingCallback,
+		setDownloadCallback
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
@@ -38,6 +39,7 @@
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
 	let newAfterSave = $state(false);
+	let downloadFile = $state(true);
 	let tracerOutput = '';
 	let saveDialog: SaveDialog;
 	let traceDoneDialog: SaveDialog;
@@ -83,6 +85,7 @@
 		setDoneFormattingCallback(doneFormattingCallback);
 		setDoneTracingCallback(doneTracingCallback);
 		setFileResponseCallback(fileResponseCallback);
+		setDownloadCallback(downloadCallback);
 	});
 
 	function doneFormattingCallback(data: string, path: string) {
@@ -129,6 +132,10 @@
 
 		switch (msgKind) {
 			case 'readfile-response':
+				if (downloadFile) {
+					downloadCallback(pathBasename(path), response.data);
+					return;
+				}
 				if (isTracerOutput(response.data)) {
 					handleTracerOutput(response.data);
 					return;
@@ -162,6 +169,22 @@
 				}
 			default:
 				break;
+		}
+	}
+
+	function downloadCallback(name: string, data?: string) {
+		if (data) {
+			const blob = new Blob([data], { type: 'text/plain' });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = name;
+			a.click();
+			URL.revokeObjectURL(a.href);
+			downloadFile = false;
+		} else {
+			const path = pathJoin(s.cwd, name);
+			downloadFile = true;
+			post({ kind: 'readfile', path: path });
 		}
 	}
 

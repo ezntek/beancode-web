@@ -27,15 +27,25 @@ export const s: IState = $state({
 export type DoneFormattingCallback = (data: string, path: string) => void;
 export type DoneTracingCallback = (data: string) => void;
 export type FileResponseCallback = (msgKind: string, path: string, response?: FileResponse) => void;
+export type DownloadCallback = (name: string) => void;
+
 export let doneFormattingCallback: DoneFormattingCallback | null = null;
 export let doneTracingCallback: DoneTracingCallback | null = null;
 export let fileResponseCallback: FileResponseCallback | null = null;
+export let downloadCallback : DownloadCallback | null = null;
+
 export function setDoneFormattingCallback(cb: DoneFormattingCallback) {
     doneFormattingCallback = cb;
 }
+
 export function setDoneTracingCallback(cb: DoneTracingCallback) {
     doneTracingCallback = cb;
 }
+
 export function setFileResponseCallback(cb: FileResponseCallback) {
     fileResponseCallback = cb;
+}
+
+export function setDownloadCallback(cb: DownloadCallback) {
+    downloadCallback = cb;
 }

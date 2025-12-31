@@ -1,18 +1,11 @@
 <script lang="ts">
 	interface IProps {
 		onClick: Function;
-		onRename?: Function;
-		onDelete?: Function;
+		onRename?: (e: MouseEvent) => void;
 		cwdDisplay?: boolean;
 		children: any;
 	}
-	let {
-		onClick,
-		onDelete = () => {},
-		onRename = () => {},
-		cwdDisplay = false,
-		children
-	}: IProps = $props();
+	let { onClick, onRename = () => {}, cwdDisplay = false, children }: IProps = $props();
 	const bgcol = (() => cwdDisplay)() ? '--bw-surface1' : '--bw-base3';
 	const bgstyle = `background-color: var(${bgcol});`;
 </script>
@@ -23,11 +16,8 @@
 	</button>
 	{#if !cwdDisplay}
 		<div class="actions">
-			<button aria-label="rename" class="rename" onclick={() => onRename()}>
-				<span class="fa-solid fa-pencil"> </span>
-			</button>
-			<button aria-label="delete" class="delete" onclick={() => onDelete()}>
-				<span class="fa-solid fa-trash" style="color: var(--bw-red)"></span>
+			<button aria-label="info" class="info" onclick={(e) => onRename(e)}>
+				<span class="fa-solid fa-circle-info"></span>
 			</button>
 		</div>
 	{/if}
@@ -50,7 +40,7 @@
 		font-size: 1em;
 		background-color: var(--bw-base3);
 		color: var(--bw-text);
-		overflow: hidden;
+		overflow: hiddee-info;
 	}
 
 	.button > span {
@@ -64,8 +54,8 @@
 		top: 0;
 		right: 0;
 		height: 100%;
-		width: 3.2em;
 		display: flex;
+		margin-right: 0.5em;
 		align-items: center;
 		justify-content: space-evenly;
 		background-color: var(--bw-base3);
@@ -83,8 +73,7 @@
 	.item:hover .actions > button {
 		opacity: 1;
 	}
-	.rename,
-	.delete {
+	.info {
 		border: 0;
 		background: none;
 		color: var(--bw-text);
