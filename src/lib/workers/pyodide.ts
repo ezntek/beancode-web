@@ -2,6 +2,7 @@ import { FileResponseKind, pathBasename, pathJoin, strerror, type Dir } from "$l
 import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
 import { tracerConfigToPython, type TracerConfig } from "$lib/tracer";
+import JSZip from "jszip";
 
 function post(msg: PyMessage) {
     postMessage(msg satisfies PyMessage);
@@ -42,7 +43,6 @@ class XtermStdinHandler {
             // KeyboardInterrupt
             flag.fill(0);
             buf.fill(0);
-            post({ kind: 'output', data: '' });
             return "";
         }
         const sliced = buf.slice(0, flag[0]);
@@ -67,7 +67,7 @@ function listDir(path: string): Dir {
     return dir;
 }
 
-function getFileResponseFromException(exc: any): FileResponse {
+function getFileResponseFromException(exc: any): FileResponse<any> {
     if (typeof exc.errno !== 'number') {
         return { kind: FileResponseKind.Exception, data: exc };
     }
@@ -81,11 +81,11 @@ function getFileResponseFromException(exc: any): FileResponse {
     }
 }
 
-function readFile(path: string): FileResponse {
+function readFile(path: string): FileResponse<string> {
     let data: Uint8Array;
     let decoded: string;
 
-    try { 
+    try {
         data = FS.readFile(path);
     } catch (exc: any) {
         return getFileResponseFromException(exc);
@@ -102,7 +102,7 @@ function readFile(path: string): FileResponse {
     return { kind: FileResponseKind.Ok, data: decoded };
 }
 
-function newFile(path: string, contents: string, overwrite: boolean): FileResponse {
+function newFile(path: string, contents: string, overwrite: boolean): FileResponse<string> {
     if (FS.analyzePath(path).exists && !overwrite) {
         return { kind: FileResponseKind.AlreadyExists };
     }
@@ -133,13 +133,51 @@ function delPath(path: string) {
     }
 }
 
-function renamePath(oldpath: string, newpath: string): FileResponse {
+function renamePath(oldpath: string, newpath: string): FileResponse<string> {
     try {
         FS.rename(oldpath, newpath);
     } catch (e) {
         return getFileResponseFromException(e);    
     } 
     return { kind: FileResponseKind.Ok, data: newpath };
+}
+
+async function compressDir(path: string): Promise<FileResponse<Blob>> {
+    const zip = new JSZip();
+
+    if (!FS.analyzePath(path).exists)
+        return {kind: FileResponseKind.NotFound};
+
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    let data: Uint8Array;
+    try {
+        const listing = FS.readdir(path);
+        for (const item of listing) {
+            if (item == '.' || item == '..')
+                continue;
+
+            const itemPath = pathJoin(path, item);
+            if (FS.isDir(itemPath))
+                continue;
+
+            console.log("item path: ", itemPath);
+            data = FS.readFile(itemPath);
+            try {
+                zip.file(item, decoder.decode(data));
+            } catch (e) {
+                zip.file(item, data);
+            }
+        }
+    } catch (e) {
+        return getFileResponseFromException(e);
+    }
+
+    const res = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 },
+    });
+    return { kind: FileResponseKind.Ok, data: res};
 }
 
 async function doInitialSetupCheck() {
@@ -311,6 +349,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'trace':
                 post({ kind: 'trace-response', data: trace(msg.data, msg.path, msg.vars, msg.config) });
+                break;
+            case 'compressdir':
+                post({ kind: 'compressdir-response', path: msg.path, data: await compressDir(msg.path) });
                 break;
         }
     } catch (exc: any) {

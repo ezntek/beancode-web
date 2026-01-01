@@ -9,7 +9,7 @@
 		pathJoin
 	} from '$lib/fstypes';
 	import { es } from './editor_state.svelte';
-	import { downloadCallback, s } from './state.svelte';
+	import { downloadCallback, downloadCwdCallback, s } from './state.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import FileBrowserItem from '$lib/components/FileBrowserItem.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
@@ -84,16 +84,6 @@
 		}
 	}
 
-	function handleDelete(name: string) {
-		lastClicked = name;
-		confirmDialog.open(`Are you sure you want to delete ${name}?`);
-	}
-
-	function deleteItemForReal() {
-		const path = pathJoin(s.cwd, lastClicked);
-		post({ kind: 'delfile', path: path });
-	}
-
 	let openDropdownItem = $state('');
 	function openInfo(name: string, e: MouseEvent) {
 		if (name === openDropdownItem) {
@@ -109,15 +99,32 @@
 		}
 	}
 
+	function handleDelete(name: string) {
+		if (name === '..') {
+			return;
+		}
+
+		lastClicked = name;
+		confirmDialog.open(`Are you sure you want to delete ${name}?`);
+	}
+
+	function deleteItemForReal() {
+		const path = pathJoin(s.cwd, lastClicked);
+		post({ kind: 'delfile', path: path });
+	}
+
 	function handleRename(name: string) {
+		if (name === '..') {
+			return;
+		}
+
 		lastClicked = name;
 		renameDialog.open('Rename', name);
 	}
 
 	function handleDownload(name: string) {
-		downloadCallback!(name);
-		/*
-		 */
+		if (name == '..') downloadCwdCallback!();
+		else downloadCallback!(name);
 	}
 
 	function renameOk(name: string) {
@@ -130,7 +137,7 @@
 </script>
 
 <div class="file-browser">
-	<FileBrowserItem cwdDisplay onClick={() => clickItem('..')}>
+	<FileBrowserItem cwdDisplay onClick={() => clickItem('..')} onInfo={(e) => openInfo('..', e)}>
 		{#if inProjects}
 			<strong class="project-label">Current Project</strong>
 			<br />
@@ -152,7 +159,7 @@
 			{#each s.curdir.keys() as item}
 				{#if item !== '.' && item !== '..'}
 					<div style="position: relative;">
-						<FileBrowserItem onClick={() => clickItem(item)} onRename={(e) => openInfo(item, e)}>
+						<FileBrowserItem onClick={() => clickItem(item)} onInfo={(e) => openInfo(item, e)}>
 							<span class={determineIcon(item)}></span>
 							{item}
 						</FileBrowserItem>
@@ -224,7 +231,22 @@
 		padding: 0.3em;
 		margin: 0;
 		margin-right: auto;
-		font-size: 0.9em;
+	}
+
+	.toolbar-button {
+		border: 0px solid black;
+		margin: 0.2em;
+		color: var(--bw-base1);
+		font-family: 'Inter', sans-serif;
+		border-radius: 0.2em;
+		transition:
+			background-color 130ms ease,
+			color 130ms ease,
+			font-weight 130ms ease;
+	}
+
+	.toolbar-newfile {
+		background-color: var(--bw-green);
 	}
 
 	.file-browser {

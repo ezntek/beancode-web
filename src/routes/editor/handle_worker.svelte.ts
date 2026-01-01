@@ -79,6 +79,9 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 doneTracingCallback!(msg.data);
             }
             break;
+        case 'compressdir-response':
+            fileResponseCallback!(msg.kind, msg.path, msg.data);
+            break;
     }
 }
 

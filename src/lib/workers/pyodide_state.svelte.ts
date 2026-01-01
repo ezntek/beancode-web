@@ -12,14 +12,15 @@ export type PyMessage =
     | { kind: 'pyexit', code: number }
     | { kind: 'listdir-response', data: Dir }
     // path that file was read from
-    | { kind: 'readfile-response', path: string, data: FileResponse }
-    | { kind: 'newfile-response', path: string, data: FileResponse }
+    | { kind: 'readfile-response', path: string, data: FileResponse<string> }
+    | { kind: 'newfile-response', path: string, data: FileResponse<string> }
     | { kind: 'delfile-response', path: string }
     // fileresponse ok data contains new path, path contains old path
-    | { kind: 'renamefile-response', path: string, data: FileResponse }
+    | { kind: 'renamefile-response', path: string, data: FileResponse<string> }
     // null: error
     | { kind: 'format-response', data: string | null, path: string }
     | { kind: 'trace-response', data: string | null }
+    | { kind: 'compressdir-response', path: string, data: FileResponse<Map<string, string | Uint8Array>> }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, path: string }
@@ -32,6 +33,7 @@ export type EditorMessage =
     | { kind: 'renamefile', oldpath: string, newpath: string }
     | { kind: 'format', data: string, path: string }
     | { kind: 'trace', data: string, path: string, vars: string[], config: TracerConfig }
+    | { kind: 'compressdir', path: string }
 
  
 interface IPyState {

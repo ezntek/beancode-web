@@ -30,8 +30,8 @@ export function displayFileResponseKind(k: FileResponseKind): string {
     }
 }
 
-export type FileResponse = 
-    | { kind: FileResponseKind.Ok, data: string }
+export type FileResponse<T> = 
+    | { kind: FileResponseKind.Ok, data: T }
     | { kind: FileResponseKind.NotFound }
     | { kind: FileResponseKind.IsDir }
     | { kind: FileResponseKind.NotText }
@@ -39,7 +39,7 @@ export type FileResponse =
     | { kind: FileResponseKind.Errno, errno: number, msg: string }
     | { kind: FileResponseKind.Exception, data: any }
 
-export function displayFileResponse(r: FileResponse): string {
+export function displayFileResponse(r: FileResponse<any>): string {
     let base = displayFileResponseKind(r.kind);
     switch (r.kind) {
         case FileResponseKind.Ok:

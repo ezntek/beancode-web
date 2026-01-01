@@ -9,14 +9,14 @@
 	import Terminal from './Terminal.svelte';
 	import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
 	import {
-		type FileResponseCallback,
 		inputBuf,
 		interruptBuf,
 		s,
 		setFileResponseCallback,
 		setDoneTracingCallback,
 		setDoneFormattingCallback,
-		setDownloadCallback
+		setDownloadCallback,
+		setDownloadCwdCallback
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
@@ -39,7 +39,7 @@
 	let terminalWidth = $state(0);
 	let fileBrowserWidth = $state(0);
 	let newAfterSave = $state(false);
-	let downloadFile = $state(true);
+	let downloadFile = $state(false);
 	let tracerOutput = '';
 	let saveDialog: SaveDialog;
 	let traceDoneDialog: SaveDialog;
@@ -86,6 +86,7 @@
 		setDoneTracingCallback(doneTracingCallback);
 		setFileResponseCallback(fileResponseCallback);
 		setDownloadCallback(downloadCallback);
+		setDownloadCwdCallback(downloadCwdCallback);
 	});
 
 	function doneFormattingCallback(data: string, path: string) {
@@ -101,7 +102,7 @@
 		traceDoneDialog.open(undefined, 'tracer_output.html');
 	}
 
-	function fileResponseCallback(msgKind: string, path: string, response?: FileResponse) {
+	function fileResponseCallback(msgKind: string, path: string, response?: FileResponse<any>) {
 		if (!response) {
 			if (msgKind === 'delfile-response') {
 				if (path === es.curFilePath) editorNewFile();
@@ -132,15 +133,17 @@
 
 		switch (msgKind) {
 			case 'readfile-response':
+				const dat: string = response.data;
 				if (downloadFile) {
-					downloadCallback(pathBasename(path), response.data);
+					downloadFile = false;
+					downloadCallback(pathBasename(path), dat);
 					return;
 				}
 				if (isTracerOutput(response.data)) {
-					handleTracerOutput(response.data);
+					handleTracerOutput(dat);
 					return;
 				}
-				changeFile(response.data, path);
+				changeFile(dat, path);
 				break;
 			case 'newfile-response':
 				if (tracerOutput !== '') {
@@ -162,11 +165,13 @@
 				}
 				break;
 			case 'renamefile-response':
-				const newPath = response.data;
+				const newPath: string = response.data;
 				if (es.curFilePath == path) {
 					changeFile(es.src, newPath);
 					saveFile(true);
 				}
+			case 'compressdir-response':
+				downloadCwdCallback(response.data);
 			default:
 				break;
 		}
@@ -180,12 +185,24 @@
 			a.download = name;
 			a.click();
 			URL.revokeObjectURL(a.href);
-			downloadFile = false;
 		} else {
 			const path = pathJoin(s.cwd, name);
 			downloadFile = true;
 			post({ kind: 'readfile', path: path });
 		}
+	}
+
+	function downloadCwdCallback(blob: Blob) {
+		if (!blob) {
+			post({ kind: 'compressdir', path: s.cwd });
+			return;
+		}
+
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = pathBasename(s.cwd);
+		a.click();
+		URL.revokeObjectURL(a.href);
 	}
 
 	function startResizeTerm(e: any) {
@@ -254,6 +271,7 @@
 		Atomics.notify(flag, 0);
 		s.running = false;
 		ts.canInput = false;
+		ts.terminal!.writeln('');
 	}
 
 	function runStopTooltip() {

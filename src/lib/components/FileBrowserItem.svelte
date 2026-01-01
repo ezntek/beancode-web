@@ -1,11 +1,11 @@
 <script lang="ts">
 	interface IProps {
 		onClick: Function;
-		onRename?: (e: MouseEvent) => void;
+		onInfo?: (e: MouseEvent) => void;
 		cwdDisplay?: boolean;
 		children: any;
 	}
-	let { onClick, onRename = () => {}, cwdDisplay = false, children }: IProps = $props();
+	let { onClick, onInfo = () => {}, cwdDisplay = false, children }: IProps = $props();
 	const bgcol = (() => cwdDisplay)() ? '--bw-surface1' : '--bw-base3';
 	const bgstyle = `background-color: var(${bgcol});`;
 </script>
@@ -14,13 +14,11 @@
 	<button class="button" style={bgstyle} onclick={() => onClick()}>
 		<span>{@render children()}</span>
 	</button>
-	{#if !cwdDisplay}
-		<div class="actions">
-			<button aria-label="info" class="info" onclick={(e) => onRename(e)}>
-				<span class="fa-solid fa-circle-info"></span>
-			</button>
-		</div>
-	{/if}
+	<div class="actions">
+		<button aria-label="info" class="info" onclick={(e) => onInfo(e)}>
+			<span class="fa-solid fa-circle-info"></span>
+		</button>
+	</div>
 </div>
 
 <style>
