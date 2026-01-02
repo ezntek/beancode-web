@@ -1,5 +1,5 @@
 import { FileResponseKind, pathBasename, pathJoin, strerror, type Dir } from "$lib/fstypes";
-import type { PyMessage, EditorMessage } from "./pyodide_state.svelte";
+import type { PyMessage, EditorMessage, BeanError } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";
 import { tracerConfigToPython, type TracerConfig } from "$lib/tracer";
 import JSZip from "jszip";
@@ -114,6 +114,7 @@ function newFile(path: string, contents: string, overwrite: boolean): FileRespon
         return getFileResponseFromException(exc);
     }
 
+    FS.syncfs(false);
     return { kind: FileResponseKind.Ok, data: "" };
 }
 
@@ -139,6 +140,8 @@ function renamePath(oldpath: string, newpath: string): FileResponse<string> {
     } catch (e) {
         return getFileResponseFromException(e);    
     } 
+
+    FS.syncfs(false);
     return { kind: FileResponseKind.Ok, data: newpath };
 }
 
@@ -241,19 +244,33 @@ let pyOK = false;
 let pyBeancodePromise = loadBeancode();
 let cwd = "/data/projects";
 
+function handleBeanErr(vname: string) {
+    const edicProxy = py.globals.get(vname);
+    if (edicProxy) {
+        let proxies: any[] = [];
+        const edic = edicProxy.toJs({proxies});
+        post({ kind: 'beanerror', data: { ...edic } satisfies BeanError});
+        for (let px of proxies) {
+            px.destroy();
+        }
+        edicProxy.destroy();
+    }
+}
+
 async function handleRun(src: string, path: string) {
     try {
         post({ kind: 'status', data: 'Running Beancode', positive: true});
         py.globals.set("n", pathBasename(path) || "(beanweb)");
         py.globals.set("s", src);
         py.globals.set("c", 0);
-        await py.runPythonAsync("c=exec_user_bean(s,n)");
+        await py.runPythonAsync("(c,edic)=exec_user_bean(s,n)");
         const exit_code = py.globals.get("c");
+        handleBeanErr("edic");
         post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
             post({ kind: 'status', data: 'Ready', positive: true });
         }, 500);
-        await py.runPythonAsync("del(s,n,c)");
+        await py.runPythonAsync("del(s,n,c,edic)");
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
@@ -282,9 +299,10 @@ function formatBean(src: string, path: string): string | null {
     try {
         py.globals.set("s", src);
         py.globals.set("n", pathBasename(path));
-        py.runPython("r=format_bean(s,n)");
+        py.runPython("(r,edic)=format_bean(s,n)");
+        handleBeanErr("edic");
         const res = py.globals.get("r");
-        py.runPython("del(s,n,r)");
+        py.runPython("del(s,n,r,edic)");
         // @ts-ignore
         return res;
     } catch (e: any) {
@@ -298,9 +316,10 @@ function trace(src: string, path: string, vars: string[], config: TracerConfig):
     py.globals.set("n", pathBasename(path));
     py.globals.set("v", vars);
     py.globals.set("cfg", tracerConfigToPython(config));
-    py.runPython("t=Tracer(v.to_py(),TracerConfig.from_dict(cfg.to_py()));c=exec_user_bean(s,n,tracer=t);res=(t.gen_html() if c==0 else None)");
+    py.runPython("(res,edic)=trace_bean(s,n,v)");
+    handleBeanErr("edic");
     const out = py.globals.get("res");
-    py.runPython("del(s,n,v,cfg,t,c,res)"); 
+    py.runPython("del(s,n,v,cfg,edic,res)"); 
     return out;
 }
 
@@ -363,8 +382,6 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
 
         post({ kind: 'error', data: data });
     }
-
-    FS.syncfs(false);
 }
 
 export {};

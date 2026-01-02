@@ -4,7 +4,7 @@
 	import { history, insertTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
 	import { indentUnit } from '@codemirror/language';
-	import { es } from './editor_state.svelte';
+	import { beanDiagnostics, errField, es } from './editor_state.svelte';
 	import { pathBasename, pathExtension } from '$lib/fstypes';
 	import { catppuccinMacchiato } from '$lib/highlighting/catppuccin';
 	import { python } from '@codemirror/lang-python';
@@ -38,6 +38,8 @@
 		closeBracketsKeymap
 	} from '@codemirror/autocomplete';
 	import { lintKeymap } from '@codemirror/lint';
+	import { pyState as ps } from '$lib/workers/pyodide_state.svelte';
+	import { setErrEffect } from './editor_state.svelte';
 
 	let editor: HTMLDivElement;
 	let sz = $state(16);
@@ -75,7 +77,7 @@
 
 		function exts() {
 			return [
-                indentUnit.of("    "),
+				indentUnit.of('    '),
 				lineNumbers(),
 				highlightActiveLineGutter(),
 				highlightSpecialChars(),
@@ -105,6 +107,13 @@
 		}
 
 		es.history = new Compartment();
+
+		$effect(() => {
+			es.view!.dispatch({
+				effects: setErrEffect.of(ps.curError)
+			});
+		});
+
 		const startState = EditorState.create({
 			doc: '',
 			extensions: [
@@ -113,9 +122,11 @@
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),
-				keymap.of([ ...defaultKeymap, { key: "Tab", run: insertTab }]),
+				keymap.of([...defaultKeymap, { key: 'Tab', run: insertTab }]),
 				es.history.of(history()),
-				highlighter.of(python())
+				highlighter.of(python()),
+				es.diag.of(beanDiagnostics),
+				errField
 			]
 		});
 

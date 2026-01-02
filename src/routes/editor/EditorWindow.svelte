@@ -92,7 +92,6 @@
 
 	function doneFormattingCallback(data: string, path: string) {
 		if (data && es.curFilePath === path) {
-			console.log('weee');
 			es.src = data;
 			saveFile(true, path);
 		}
@@ -295,6 +294,8 @@
 	function runStop() {
 		if (!ps.ready) return;
 
+		ps.curError = null;
+
 		if (s.running) {
 			stop();
 			return;
@@ -396,11 +397,13 @@
 
 	function formatFile() {
 		if (curExtension() !== 'bean') return;
+		ps.curError = null;
 		post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
 	}
 
 	function traceFile() {
 		if (curExtension() !== 'bean') return;
+		ps.curError = null;
 		traceDialog.open(es.src);
 	}
 

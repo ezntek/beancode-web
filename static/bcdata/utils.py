@@ -21,13 +21,15 @@ def exec_user_py(src, name):
 
 
 def exec_user_bean(src, name, tracer=None):
+    errdict = None
     try:
         i = Interpreter(Parser(Lexer(src).tokenize()).program().stmts, tracer=tracer)
         i.toplevel = True
         i.visit_block(None)
         c = 0
     except BCError as err:
-        err.print(name, src)
+        err.print(name, src, compact=True)
+        errdict = err.to_dict(src)
         c = 1
     except SystemExit as e:
         c = e.code
@@ -45,7 +47,8 @@ def exec_user_bean(src, name, tracer=None):
             f'Python exception caught ({type(e)}: "{e}") while running beancode! Please report this to the developers.'
         )
         raise e
-    return c
+    return (c, errdict)
+
 
 def format_bean(src, name):
     lexer = Lexer(src, preserve_comments=True)
@@ -55,7 +58,13 @@ def format_bean(src, name):
         blk = parser.program().stmts
         f = Formatter(blk)
         res = "".join(f.visit_block())
-        return res
+        return (res, None)
     except BCError as err:
-        err.print(name, src)
-        return None
+        err.print(name, src, compact=True)
+        return (None, err.to_dict())
+
+
+def trace_bean(s, n, v):
+    t = Tracer(v.to_py(), TracerConfig.from_dict(cfg.to_py()))
+    (c, edic) = exec_user_bean(s, n, tracer=t)
+    return (t.gen_html() if c == 0 else None, edic)

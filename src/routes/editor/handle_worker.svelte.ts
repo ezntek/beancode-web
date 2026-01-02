@@ -31,6 +31,9 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             ter.writeln('An error occurred whilst trying to interact with the Python backend:');
             ter.writeln(String(msg.data).replaceAll("\n", "\r\n"));
             break;
+        case 'beanerror':
+            ps.curError = msg.data;
+            break;
         case 'pyout':
             ter.write(msg.data);
             break;

@@ -7,6 +7,7 @@ export type PyMessage =
     | { kind: 'output', data: string }
     | { kind: 'status', data: string, positive: boolean }
     | { kind: 'error', data: string }
+    | { kind: 'beanerror', data: BeanError }
     | { kind: 'pyout', data: string }
     | { kind: 'pyin' }
     | { kind: 'pyexit', code: number }
@@ -36,14 +37,22 @@ export type EditorMessage =
     | { kind: 'compressdir', path: string }
 
  
+export interface BeanError {
+    msg: string,
+    from: number | null,
+    to: number | null,
+}
+
 interface IPyState {
     ready: boolean,
     worker: Worker | null,
+    curError: BeanError | null,
 }
 
 export const pyState: IPyState = $state({
     ready: false,
     worker: null,
+    curError: null,
 })
 
 export function post(msg: EditorMessage) {
