@@ -20,7 +20,7 @@ export type PyMessage =
     // null: error
     | { kind: 'format-response', data: string | null, path: string }
     | { kind: 'trace-response', data: string | null }
-    | { kind: 'compressdir-response', path: string, data: FileResponse<Map<string, string | Uint8Array>> }
+    | { kind: 'compressdir-response', path: string, data: FileResponse<Blob> }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, path: string }

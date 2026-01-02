@@ -68,7 +68,7 @@
 	}
 
 	function clickItem(name: string) {
-		if (name === '..' && atProjects) return;
+		//if (name === '..' && atProjects) return;
 
 		lastClicked = name;
 		if (s.curdir.get(name)) {
@@ -103,6 +103,9 @@
 		if (name === '..') {
 			return;
 		}
+
+		// is a dir
+		if (s.curdir.get(name)) return;
 
 		lastClicked = name;
 		confirmDialog.open(`Are you sure you want to delete ${name}?`);

@@ -25,9 +25,9 @@
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
 	import {
 		displayFileResponse,
-		FileResponseKind,
 		pathBasename,
 		pathJoin,
+		FileResponseKind,
 		type FileResponse
 	} from '$lib/fstypes';
 	import { changeFile, curExtension, editorNewFile, es } from './editor_state.svelte';
@@ -86,6 +86,7 @@
 		setDoneTracingCallback(doneTracingCallback);
 		setFileResponseCallback(fileResponseCallback);
 		setDownloadCallback(downloadCallback);
+		// @ts-ignore
 		setDownloadCwdCallback(downloadCwdCallback);
 	});
 
@@ -170,8 +171,10 @@
 					changeFile(es.src, newPath);
 					saveFile(true);
 				}
+				break;
 			case 'compressdir-response':
 				downloadCwdCallback(response.data);
+				break;
 			default:
 				break;
 		}
