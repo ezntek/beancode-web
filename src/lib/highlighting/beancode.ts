@@ -1,6 +1,8 @@
 import { LanguageSupport, LRLanguage } from "@codemirror/language";
 import { parser } from "./parser";
 import { styleTags, tags as t } from "@lezer/highlight";
+import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
+import { beancodeCompletions } from "./completions";
 
 const myLanguageHighlighting = styleTags({
     // comments
@@ -81,7 +83,7 @@ const myLanguageHighlighting = styleTags({
     IntegerLit: t.integer,
     RealLit: t.float,
     StringLit: t.string,
-    CharLit: t.character,
+    CharLit: t.string,
     BooleanLit: t.bool,
     KTrue: t.bool,
     KFalse: t.bool,
@@ -146,6 +148,7 @@ export const beancodeLanguage = LRLanguage.define({
             block: { open: "/*", close: "*/" },
         },
         indentUnit: "    ",
+        autocomplete: beancodeCompletions,
     }
 });
 
