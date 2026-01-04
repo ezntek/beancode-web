@@ -4,7 +4,8 @@
 	import '../app.css';
 	onMount(() => {
 		if ('serviceWorker' in navigator) {
-			// Register service worker
+			// https://dev.to/stefnotch/enabling-coop-coep-without-touching-the-server-2d3n
+			//
 			navigator.serviceWorker.register('/sw.js').then(
 				function (registration) {
 					console.log('COOP/COEP Service Worker registered', registration.scope);

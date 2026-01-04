@@ -1,4 +1,5 @@
-// sw.js
+// Courtesy of https://dev.to/stefnotch/enabling-coop-coep-without-touching-the-server-2d3n
+//
 self.addEventListener("install", function () {
     self.skipWaiting();
 });
