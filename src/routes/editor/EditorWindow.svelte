@@ -73,7 +73,7 @@
 
 	function setTermWidth() {
 		const twidth = localStorage.getItem('EditorTerminalWidth');
-		if (twidth !== null) {
+		if (twidth) {
 			terminalWidth = Number.parseInt(twidth);
 		} else {
 			terminalWidth = window.innerWidth * 0.3;
@@ -82,7 +82,7 @@
 
 	function setFileBrowserWidth() {
 		const fbwidth = localStorage.getItem('EditorFileBrowserWidth');
-		if (fbwidth !== null) {
+		if (fbwidth) {
 			fileBrowserWidth = Number.parseInt(fbwidth);
 		} else {
 			fileBrowserWidth = window.innerWidth * 0.1;

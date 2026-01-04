@@ -1,5 +1,4 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { readFileSync } from 'fs';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -22,10 +21,10 @@ export default defineConfig({
             "Cross-Origin-Embedder-Policy": "credentialless",
             "Cross-Origin-Opener-Policy": "same-origin"
         },
-        https: {
+        //https: {
           //key: readFileSync('./localhost+3-key.pem'),
           //cert: readFileSync('./localhost+3.pem')
-        }
+        //}
     },
     optimizeDeps: {
         include: [
