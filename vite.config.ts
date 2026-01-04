@@ -23,8 +23,8 @@ export default defineConfig({
             "Cross-Origin-Opener-Policy": "same-origin"
         },
         https: {
-          key: readFileSync('./localhost+3-key.pem'),
-          cert: readFileSync('./localhost+3.pem')
+          //key: readFileSync('./localhost+3-key.pem'),
+          //cert: readFileSync('./localhost+3.pem')
         }
     },
     optimizeDeps: {
