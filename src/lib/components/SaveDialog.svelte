@@ -3,9 +3,10 @@
 	import Dialog from './Dialog.svelte';
 	import ErrorDialog from './ErrorDialog.svelte';
 
+	type OkCallback = (fileName: string, overwrite: boolean) => void;
 	interface IProps {
-		ok: (fileName: string, overwrite: boolean) => void;
-		cancel: Function;
+		ok?: OkCallback;
+		cancel?: Function;
 		title?: string;
 	}
 	let { ok, cancel, title = 'Save' }: IProps = $props();
@@ -24,7 +25,7 @@
 				const t = fileType.slice();
 				name += t !== '' ? '.' + t : '';
 			}
-			ok(name, overwrite);
+			if (ok) ok(name, overwrite);
 			innerDialog.close();
 			fileName = '';
 		}, 0);
@@ -34,7 +35,7 @@
 		fileName = '';
 		fileType = 'bean';
 		setTimeout(() => {
-			cancel();
+			if (cancel) cancel();
 			innerDialog.close();
 		}, 0);
 	}
@@ -50,9 +51,16 @@
 	export const close = () => {
 		fileName = '';
 		innerDialog.close();
+		if (outerThen) outerThen();
 	};
+	let outerThen: Function | undefined;
 	// @ts-ignore
-	export const open = (t?: string, defaultContents?: string, _overwrite?: boolean) => {
+	export const open = (
+		t?: string,
+		defaultContents?: string,
+		_overwrite?: boolean,
+		then?: OkCallback
+	) => {
 		if (t) title = t;
 		if (defaultContents) {
 			const parts = defaultContents!.split('.');
@@ -79,6 +87,7 @@
 
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
+		if (then) ok = then;
 	};
 
 	export function focus() {

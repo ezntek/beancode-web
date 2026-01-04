@@ -49,12 +49,12 @@ interface IPyState {
     curError: BeanError | null,
 }
 
-export const pyState: IPyState = $state({
+export const ps: IPyState = $state({
     ready: false,
     worker: null,
     curError: null,
 })
 
 export function post(msg: EditorMessage) {
-    pyState.worker!.postMessage(msg);
+    ps.worker!.postMessage(msg);
 }

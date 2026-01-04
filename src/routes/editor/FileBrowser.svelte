@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { post, pyState } from '$lib/workers/pyodide_state.svelte';
+	import { post, ps } from '$lib/workers/pyodide_state.svelte';
 	import {
 		pathBasename,
 		pathBeginsWith,
@@ -8,27 +8,25 @@
 		pathExtension,
 		pathJoin
 	} from '$lib/fstypes';
-	import { es } from './editor_state.svelte';
+	import { editorNewFile, es } from './editor_state.svelte';
 	import { downloadCallback, downloadCwdCallback, s } from './state.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import FileBrowserItem from '$lib/components/FileBrowserItem.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	let saveDialog: SaveDialog;
 	let renameDialog: SaveDialog;
-	let confirmDialog: MessageDialog;
+	let confirmDialog: ConfirmDialog;
+	let uploadElem: HTMLInputElement;
+	let errorDialog: ErrorDialog;
 	let lastClicked = '';
 	let cwd = $derived(pathJoin(s.cwd));
 	let inProjects = $derived(pathBeginsWith(s.cwd, '/data/projects') && pathCountParts(s.cwd) === 3);
 	let atProjects = $derived(pathBeginsWith(s.cwd, '/data/projects') && pathCountParts(s.cwd) === 2);
 	let dropdownPosition = $state({ x: 0, y: 0 });
-
-	function saveOk(fileName: string) {
-		es.curFilePath = pathJoin(s.cwd, fileName);
-		save();
-	}
 
 	function saveCancel() {
 		// just for good measure
@@ -76,7 +74,12 @@
 			post({ kind: 'listdir', path: s.cwd });
 		} else {
 			if (!es.saved) {
-				if (es.curFilePath === '') saveDialog.open();
+				if (es.curFilePath === '')
+					saveDialog.open('Save', undefined, undefined, (fileName: string, overwrite: boolean) => {
+						overwrite;
+						es.curFilePath = pathJoin(s.cwd, fileName);
+						save();
+					});
 				else save();
 				return;
 			}
@@ -108,7 +111,15 @@
 		if (s.curdir.get(name)) return;
 
 		lastClicked = name;
-		confirmDialog.open(`Are you sure you want to delete ${name}?`);
+		confirmDialog.open(
+			[`Are you sure you want to delete ${name}?`],
+			// Ok
+			() => {
+				deleteItemForReal();
+			},
+			// Cancel
+			() => {}
+		);
 	}
 
 	function deleteItemForReal() {
@@ -137,6 +148,68 @@
 			newpath: pathJoin(s.cwd, name)
 		});
 	}
+
+	function newFile() {
+		saveDialog.open('New File', undefined, undefined, (fileName: string, overwrite: boolean) => {
+			overwrite;
+			editorNewFile();
+			post({ kind: 'newfile', path: pathJoin(s.cwd, fileName), contents: '', overwrite: false });
+		});
+	}
+
+	async function handleFileSelect(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.item(0);
+
+		if (!file) return;
+
+		const name = file.name;
+
+		let fileContent = '';
+		try {
+			fileContent = await file.text();
+		} catch (err) {
+			errorDialog.open([`Error reading file ${name}:`, String(err)], () => {});
+			return;
+		}
+
+		if (s.curdir.has(name)) {
+			confirmDialog.open(
+				[`File ${name} already exists, do you want to upload it with a different name?`],
+				() => {
+					const dotIdx = name.lastIndexOf('.');
+					const namePart = name.slice(0, dotIdx);
+					const extPart = name.slice(dotIdx + 1);
+					let addedNum: number;
+					let newName: string;
+					for (
+						addedNum = 1;
+						s.curdir.has((newName = `${namePart} (${addedNum}).${extPart}`));
+						addedNum++
+					)
+						continue;
+					saveDialog.open(
+						'Upload with different name',
+						newName,
+						true,
+						(fileName: string, overwrite: boolean) => {
+							overwrite;
+							upload(fileName, fileContent);
+						}
+					);
+				},
+				() => {
+					upload(name, fileContent);
+				}
+			);
+		} else {
+			upload(name, fileContent);
+		}
+	}
+
+	function upload(name: string, content: string) {
+		post({ kind: 'newfile', path: pathJoin(s.cwd, name), contents: content, overwrite: true });
+	}
 </script>
 
 <div class="file-browser">
@@ -154,9 +227,15 @@
 	</FileBrowserItem>
 	<div class="toolbar">
 		<p class="toolbar-label">FILES</p>
+		<button class="toolbar-button toolbar-newfile" onclick={() => newFile()}>
+			<span class="icon fa-solid fa-plus"></span> New
+		</button>
+		<button class="toolbar-button toolbar-newfile" onclick={() => uploadElem.click()}>
+			<span class="icon fa-solid fa-upload"></span> Upload
+		</button>
 	</div>
 	<div class="file-browser-content">
-		{#if !pyState.ready}
+		{#if !ps.ready}
 			<center class="empty">still loading files...</center>
 		{:else if s.curdir.size >= 3}
 			{#each s.curdir.keys() as item}
@@ -174,17 +253,17 @@
 		{/if}
 	</div>
 </div>
-<SaveDialog bind:this={saveDialog} ok={saveOk} cancel={saveCancel} />
-<SaveDialog bind:this={renameDialog} ok={renameOk} cancel={() => {}} />
-<ConfirmDialog
-	bind:this={confirmDialog}
-	ok={deleteItemForReal}
-	cancel={() => {
-		confirmDialog.close();
-	}}
-	okText="Yes"
-	cancelText="No"
+<input
+	bind:this={uploadElem}
+	type="file"
+	accept=".txt,.py,.html,.bean,text/*"
+	onchange={handleFileSelect}
+	hidden
 />
+<SaveDialog bind:this={saveDialog} cancel={saveCancel} />
+<SaveDialog bind:this={renameDialog} ok={renameOk} cancel={() => {}} />
+<ConfirmDialog bind:this={confirmDialog} okText="Yes" cancelText="No" />
+<ErrorDialog bind:this={errorDialog} />
 {#if openDropdownItem}
 	<Dropdown x={dropdownPosition.x} y={dropdownPosition.y} onClose={() => (openDropdownItem = '')}>
 		<button onclick={() => handleRename(openDropdownItem)}>
@@ -223,6 +302,7 @@
 		align-items: center;
 		flex-shrink: 0;
 		margin-top: 0.4em;
+		gap: 0.4em;
 	}
 
 	.toolbar-label {
@@ -237,10 +317,11 @@
 	}
 
 	.toolbar-button {
+		display: flex;
+		align-items: center;
 		border: 0px solid black;
-		margin: 0.2em;
 		color: var(--bw-base1);
-		font-family: 'Inter', sans-serif;
+		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
 		transition:
 			background-color 130ms ease,
@@ -249,7 +330,14 @@
 	}
 
 	.toolbar-newfile {
-		background-color: var(--bw-green);
+		background-color: var(--bw-surface1);
+		color: var(--bw-text);
+	}
+
+	.toolbar-newfile:hover {
+		background-color: var(--bw-surface1);
+		color: var(--bw-magenta);
+		font-weight: bold;
 	}
 
 	.file-browser {
@@ -265,5 +353,9 @@
 		background-color: var(--bw-base2);
 		gap: 0.4em;
 		padding: 0.3em;
+	}
+
+	.icon {
+		margin-right: 0.3em;
 	}
 </style>

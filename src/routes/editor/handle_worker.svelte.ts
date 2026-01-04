@@ -1,5 +1,5 @@
 import type { EditorMessage, PyMessage } from '$lib/workers/pyodide_state.svelte';
-import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
+import { post, ps as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 

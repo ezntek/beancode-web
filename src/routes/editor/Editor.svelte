@@ -38,7 +38,7 @@
 		closeBracketsKeymap
 	} from '@codemirror/autocomplete';
 	import { lintKeymap } from '@codemirror/lint';
-	import { pyState as ps } from '$lib/workers/pyodide_state.svelte';
+	import { ps as ps } from '$lib/workers/pyodide_state.svelte';
 	import { setErrEffect } from './editor_state.svelte';
 
 	let editor: HTMLDivElement;

@@ -1,4 +1,6 @@
 import { type FileResponse, type Dir } from '$lib/fstypes';
+import { post } from '$lib/workers/pyodide_state.svelte';
+import { es } from './editor_state.svelte';
 
 const INPUT_MAX = 2048;
 export const inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
@@ -23,6 +25,15 @@ export const s: IState = $state({
     curdir: new Map(), 
     running: false,
 });
+
+export function saveFile(overwrite: boolean, path?: string) {
+    post({
+        kind: 'newfile',
+        path: path ?? es.curFilePath,
+        contents: es.src,
+        overwrite: overwrite
+    });
+}
 
 export type DoneFormattingCallback = (data: string, path: string) => void;
 export type DoneTracingCallback = (data: string) => void;

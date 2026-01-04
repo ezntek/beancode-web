@@ -6,8 +6,8 @@
 	let messages: string[] = $state([]);
 
 	interface IProps {
-		ok: Function;
-		cancel: Function;
+		ok?: Function;
+		cancel?: Function;
 		okText?: string;
 		cancelText?: string;
 	}
@@ -18,11 +18,13 @@
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = (...msgs: string[]) => {
+	export const open = (msgs: string[], _ok?: Function, _cancel?: Function) => {
 		messages = [];
 		msgs.forEach((itm) => messages.push(itm));
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
+		if (_ok) ok = _ok;
+		if (_cancel) cancel = _cancel;
 	};
 
 	export function focus() {
@@ -30,12 +32,12 @@
 	}
 
 	function submitOk() {
-		ok();
+		if (ok) ok();
 		close();
 	}
 
 	function submitCancel() {
-		cancel();
+		if (cancel) cancel();
 		close();
 	}
 </script>

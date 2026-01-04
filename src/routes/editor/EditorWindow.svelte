@@ -7,7 +7,7 @@
 
 	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';
-	import { post, pyState as ps } from '$lib/workers/pyodide_state.svelte';
+	import { post, ps } from '$lib/workers/pyodide_state.svelte';
 	import {
 		inputBuf,
 		interruptBuf,
@@ -16,7 +16,8 @@
 		setDoneTracingCallback,
 		setDoneFormattingCallback,
 		setDownloadCallback,
-		setDownloadCwdCallback
+		setDownloadCwdCallback,
+		saveFile
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
@@ -156,7 +157,6 @@
 					es.saved = true;
 				});
 				if (newAfterSave) {
-					newAfterSave = false;
 					editorNewFile();
 					setTimeout(() => {
 						es.saved = true;
@@ -359,36 +359,6 @@
 		saveFile(overwrite, pathJoin(s.cwd, fileName));
 	}
 
-	function saveFile(overwrite: boolean, path?: string) {
-		post({
-			kind: 'newfile',
-			path: path ?? es.curFilePath,
-			contents: es.src,
-			overwrite: overwrite
-		});
-	}
-
-	function trySave(): boolean {
-		if (es.curFilePath !== '') {
-			saveFile(true);
-			return false;
-		} else {
-			newAfterSave = true;
-			saveDialog.open('Save current file');
-			return true;
-		}
-	}
-
-	function newFile() {
-		if (!ps.ready) return;
-
-		if (!es.saved) if (trySave()) return;
-
-		// reset to untitled
-		editorNewFile();
-		saveDialog.open('New File');
-	}
-
 	function formatTooltip() {
 		if (curExtension() !== 'bean')
 			return 'You can only format Beancode (Pseudocode) files right now.';
@@ -451,14 +421,6 @@
 					title="Save the current file"
 				>
 					<span class="icon fa-solid fa-floppy-disk"></span> Save
-				</button>
-				<button
-					aria-label="new"
-					class="editor-toolbar-button {buttonStyle('new')}"
-					onclick={newFile}
-					title="Create a new file"
-				>
-					<span class="icon fa-solid fa-plus"></span> New File
 				</button>
 				<button
 					aria-label="format"

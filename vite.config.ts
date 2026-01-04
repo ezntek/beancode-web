@@ -20,8 +20,8 @@ export default defineConfig({
             '@codemirror/view',
             '@codemirror/lang-python',
             '@codemirror/theme-one-dark',
-            '@lezer/highlight',
-            '@lezer/lr',
+            //'@lezer/highlight',
+            //'@lezer/lr',
         ],
         exclude: [
         ]

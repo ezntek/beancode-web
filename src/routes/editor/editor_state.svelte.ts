@@ -4,7 +4,7 @@ import { history } from '@codemirror/commands';
 import type { EditorView } from "codemirror";
 import { pathExtension } from "$lib/fstypes";
 import {linter, type Diagnostic} from '@codemirror/lint';
-import { pyState as ps, type BeanError } from "$lib/workers/pyodide_state.svelte";
+import { ps as ps, type BeanError } from "$lib/workers/pyodide_state.svelte";
 
 interface IEditorState {
     curFilePath: string,
@@ -47,8 +47,10 @@ export function changeFile(newSrc: string, newPath: string) {
         }
     });
     tick().then(() => {
+        ps.curError = null;
         es.view!.dispatch({ effects: es.history.reconfigure([]) }); 
         es.view!.dispatch({ effects: es.history.reconfigure(history())});
+        es.view!.dispatch({})
         es.saved = true;
     });
 }
