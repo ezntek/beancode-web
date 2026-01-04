@@ -45,6 +45,8 @@
 		"@lezer/generator": "^1.8.0",
 		"@lezer/highlight": "1.1.6",
 		"@lezer/lr": "^1.4.5",
+		"@sveltejs/adapter-cloudflare": "^7.2.4",
+		"@sveltejs/adapter-static": "^3.0.10",
 		"@xterm/xterm": "^6.0.0",
 		"codemirror": "6",
 		"jszip": "^3.10.1",
