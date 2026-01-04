@@ -93,10 +93,7 @@
 			}
 			return false;
 		});
-
-		setTimeout(() => {
-			ts.termFitAddon!.fit();
-		}, 0);
+		ts.termFitAddon!.fit();
 	}
 
 	function onData(data: string) {
@@ -266,18 +263,21 @@
 
 	/* very gross hack*/
 	.terminal-container :global(> div) {
-		display: flex;
 		height: 100%;
 		width: 100%;
 	}
 
+	.terminal-container :global(.xterm-viewport) {
+		background-color: var(--bw-base3);
+	}
+
 	.terminal-container :global(.xterm) {
-		display: flex;
-		height: 100% !important;
+		height: 100%;
+		width: 100%;
 	}
 
 	.terminal-container :global(.xterm-screen) {
-		display: flex;
-		height: 100% !important;
+		height: 100%;
+		width: 100%;
 	}
 </style>
