@@ -1,3 +1,13 @@
+/*
+ * Beancode Web
+ * 
+ * Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * license, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import type { EditorMessage, PyMessage } from '$lib/workers/pyodide_state.svelte';
 import { post, ps as ps } from '$lib/workers/pyodide_state.svelte';
 
@@ -15,7 +25,8 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             ps.ready = true;
             s.running = false;
             ts.canInput = false;
-            s.versionText = "beancode v" + msg.version;
+            s.versionText = msg.version;
+            s.pyVersion = msg.pyversion;
             ter.write('\x1b[2J\x1b[H')
             break;
         case 'clear':

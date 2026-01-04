@@ -1,8 +1,17 @@
+/*
+ * Beancode Web
+ * 
+ * Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * license, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import { continuedIndent, foldInside, foldNodeProp, indentNodeProp, LanguageSupport, LRLanguage } from "@codemirror/language";
 import { parser } from "./parser";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { beancodeCompletions } from "./completions";
-import { CaseofStatement } from "./parser.terms";
 
 const myLanguageHighlighting = styleTags({
     // comments

@@ -2,7 +2,7 @@ import type { FileResponse, Dir } from '$lib/fstypes';
 import type { TracerConfig } from '$lib/tracer';
 
 export type PyMessage =
-    | { kind: 'ready', version: string }
+    | { kind: 'ready', version: string, pyversion: string }
     | { kind: 'clear' }
     | { kind: 'output', data: string }
     | { kind: 'status', data: string, positive: boolean }

@@ -1,3 +1,13 @@
+<!--
+ Beancode Web
+
+ Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
+
+ This Source Code Form is subject to the terms of the Mozilla Public
+ license, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+-->
+
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 
@@ -32,6 +42,7 @@
 		type FileResponse
 	} from '$lib/fstypes';
 	import { changeFile, curExtension, editorNewFile, es } from './editor_state.svelte';
+	import AboutDialog from '$lib/components/AboutDialog.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 	import TraceDialog from '$lib/components/TraceDialog.svelte';
 	import type { TracerConfig } from '$lib/tracer';
@@ -44,6 +55,7 @@
 	let terminalShown = $state(true);
 	let fileBrowserShown = $state(true);
 	let tracerOutput = '';
+	let aboutDialog: AboutDialog;
 	let saveDialog: SaveDialog;
 	let traceDoneDialog: SaveDialog;
 	let errorDialog: ErrorDialog;
@@ -455,10 +467,15 @@
 				>
 					<span class="fa-solid fa-terminal"></span>
 				</button>
-				<button aria-label="Go to project GitHub" class="toolbar-aux-button">
+				<button
+					aria-label="Go to project GitHub"
+					class="toolbar-aux-button"
+					onclick={() =>
+						window.open('https://github.com/ezntek/beancode-web', '_blank', 'noopener,noreferrer')}
+				>
 					<span class="fa-brands fa-github"></span>
 				</button>
-				<button aria-label="info" class="toolbar-aux-button">
+				<button aria-label="info" class="toolbar-aux-button" onclick={() => aboutDialog.open()}>
 					<span class="fa-solid fa-circle-info"></span>
 				</button>
 			</div>
@@ -478,12 +495,13 @@
 	<div class="bottom">
 		<p>Beancode Web version {BEANCODE_WEB_VERSION}</p>
 		{#if ps.ready}
-			<p>loaded <strong>{s.versionText}</strong></p>
+			<p>loaded beancode <strong>v{s.versionText}</strong></p>
 		{:else}
-			<p>loading</p>
+			<p>loading beancode</p>
 		{/if}
 	</div>
 </div>
+<AboutDialog bind:this={aboutDialog} />
 <SaveDialog
 	bind:this={saveDialog}
 	cancel={() => saveDialog.close()}

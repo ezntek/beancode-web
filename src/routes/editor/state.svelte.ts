@@ -1,3 +1,13 @@
+/*
+ * Beancode Web
+ * 
+ * Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * license, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import { type FileResponse, type Dir } from '$lib/fstypes';
 import { post } from '$lib/workers/pyodide_state.svelte';
 import { es } from './editor_state.svelte';
@@ -11,6 +21,7 @@ interface IState {
     themeName: string,
     exitCode: number,
     versionText: string,
+    pyVersion: string,
     cwd: string,
     curdir: Dir,
     running: boolean,
@@ -19,7 +30,8 @@ interface IState {
 export const s: IState = $state({
     status: "",
     themeName: "catppuccin_macchiato",
-    versionText: "loading beancode",
+    versionText: "",
+    pyVersion: "",
     exitCode: 0,
     cwd: "/data/projects/default",
     curdir: new Map(), 

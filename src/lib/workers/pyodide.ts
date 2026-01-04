@@ -195,9 +195,9 @@ async function doInitialSetupCheck() {
     if (!res.ok) {
         throw new Error(`could not fetch beancode utilities: ${res.status}`);
     }
-    const FNS = await res.text();
+    const UTIL_SCRIPT = await res.text();
 
-    await py.runPythonAsync(FNS);
+    await py.runPythonAsync(UTIL_SCRIPT);
 }
 
 let py: any;
@@ -217,7 +217,7 @@ async function loadBeancode() {
 
         const BEANCODE_VERSION = "0.7.0b2";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
-        const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\");from beancode.runner import *;from beancode import __version__`
+        const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\")`
         try {
             await py.runPythonAsync(SCRIPT)
         } catch (e) {
@@ -233,7 +233,8 @@ async function loadBeancode() {
         py.setStdin(new XtermStdinHandler());
 
         const version = py.globals.get("__version__")
-        post({ kind: 'ready', version: version });
+        const pyversion = py.globals.get("__py_version__")
+        post({ kind: 'ready', version: version, pyversion: pyversion });
         post({ kind: 'output', data: 'Ready' });
         post({ kind: 'status', data: 'Ready', positive: true });
     }

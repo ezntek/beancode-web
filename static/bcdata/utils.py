@@ -1,3 +1,12 @@
+# Beancode Web
+# 
+# Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
+# 
+# This Source Code Form is subject to the terms of the Mozilla Public
+# license, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+
 # type: ignore
 
 from beancode.lexer import Lexer
@@ -6,6 +15,10 @@ from beancode.interpreter import Interpreter
 from beancode.error import *
 from beancode.formatter import Formatter
 from beancode.tracer import *
+from beancode.runner import *
+from beancode import __version__
+import sys
+__py_version__ = sys.version.split(" ")[0]
 
 
 def exec_user_py(src, name):
