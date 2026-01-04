@@ -16,7 +16,7 @@
 	</button>
 	<div class="actions">
 		<button aria-label="info" class="info" onclick={(e) => onInfo(e)}>
-			<span class="fa-solid fa-circle-info"></span>
+			<span class="fa-solid fa-ellipsis-vertical"></span>
 		</button>
 	</div>
 </div>

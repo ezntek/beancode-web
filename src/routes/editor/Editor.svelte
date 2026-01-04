@@ -67,6 +67,7 @@
 			'&': { height: '100%' },
 			'.cm-scroller': { overflow: 'auto' },
 			'.cm-content': { fontFamily: 'IBM Plex Mono' },
+			'.cm-gutter': { fontFamily: 'IBM Plex Mono', fontSize: '0.75em' },
 			'.cm-gutterElement': { display: 'flex', alignItems: 'center' },
 			'.cm-tooltip': { fontFamily: 'IBM Plex Mono', fontSize: '14px' }
 		});

@@ -12,7 +12,6 @@
 	import { downloadCallback, downloadCwdCallback, s } from './state.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import FileBrowserItem from '$lib/components/FileBrowserItem.svelte';
-	import MessageDialog from '$lib/components/MessageDialog.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
@@ -66,7 +65,7 @@
 	}
 
 	function clickItem(name: string) {
-		//if (name === '..' && atProjects) return;
+		if (name === '..' && atProjects) return;
 
 		lastClicked = name;
 		if (s.curdir.get(name)) {
@@ -230,7 +229,7 @@
 		<button class="toolbar-button toolbar-newfile" onclick={() => newFile()}>
 			<span class="icon fa-solid fa-plus"></span> New
 		</button>
-		<button class="toolbar-button toolbar-newfile" onclick={() => uploadElem.click()}>
+		<button class="toolbar-button toolbar-upload" onclick={() => uploadElem.click()}>
 			<span class="icon fa-solid fa-upload"></span> Upload
 		</button>
 	</div>
@@ -266,22 +265,36 @@
 <ErrorDialog bind:this={errorDialog} />
 {#if openDropdownItem}
 	<Dropdown x={dropdownPosition.x} y={dropdownPosition.y} onClose={() => (openDropdownItem = '')}>
-		<button onclick={() => handleRename(openDropdownItem)}>
-			<span class="fa-solid fa-pen"></span>
-			Rename
-		</button>
-		<button onclick={() => handleDownload(openDropdownItem)}>
-			<span class="fa-solid fa-download"></span>
-			Download
-		</button>
-		<button onclick={() => handleDelete(openDropdownItem)} style="color: var(--bw-red);">
-			<span class="fa-solid fa-trash"></span>
-			Delete
-		</button>
+		{#if !atProjects}
+			{#if openDropdownItem != '..'}
+				<button onclick={() => handleRename(openDropdownItem)}>
+					<span class="fa-solid fa-pen"></span>
+					Rename
+				</button>
+			{/if}
+			<button onclick={() => handleDownload(openDropdownItem)}>
+				<span class="fa-solid fa-download"></span>
+				Download
+			</button>
+			{#if openDropdownItem != '..'}
+				<button onclick={() => handleDelete(openDropdownItem)} style="color: var(--bw-red);">
+					<span class="fa-solid fa-trash"></span>
+					Delete
+				</button>
+			{/if}
+		{:else}
+			<p class="label">No actions available.</p>
+		{/if}
 	</Dropdown>
 {/if}
 
 <style>
+	.label {
+		color: var(--bw-text);
+		font-family: 'Inter', sans-serif;
+		margin: 0.3em;
+		padding: 0px;
+	}
 	.empty {
 		font-family: 'IBM Plex Mono', monospace;
 		color: var(--bw-subtext1);
@@ -323,21 +336,25 @@
 		color: var(--bw-base1);
 		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
+		background-color: var(--bw-surface1);
+		color: var(--bw-text);
 		transition:
 			background-color 130ms ease,
 			color 130ms ease,
 			font-weight 130ms ease;
 	}
 
-	.toolbar-newfile {
+	.toolbar-button:hover {
 		background-color: var(--bw-surface1);
-		color: var(--bw-text);
+		font-weight: bold;
 	}
 
 	.toolbar-newfile:hover {
-		background-color: var(--bw-surface1);
-		color: var(--bw-magenta);
-		font-weight: bold;
+		color: var(--bw-green);
+	}
+
+	.toolbar-upload:hover {
+		color: var(--bw-cyan);
 	}
 
 	.file-browser {

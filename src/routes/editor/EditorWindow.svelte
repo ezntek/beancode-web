@@ -41,6 +41,8 @@
 	let fileBrowserWidth = $state(0);
 	let newAfterSave = $state(false);
 	let downloadFile = $state(false);
+	let terminalShown = $state(true);
+	let fileBrowserShown = $state(true);
 	let tracerOutput = '';
 	let saveDialog: SaveDialog;
 	let traceDoneDialog: SaveDialog;
@@ -392,15 +394,17 @@
 
 <div class="editor-window">
 	<div class="outer-wrapper">
-		<aside style="display: flex; width: {fileBrowserWidth}px; max-width: {fileBrowserWidth}px;">
-			<FileBrowser />
-		</aside>
-		<ResizeBar resize={startResizeFileBrowser} />
+		{#if fileBrowserShown}
+			<aside style="display: flex; width: {fileBrowserWidth}px; max-width: {fileBrowserWidth}px;">
+				<FileBrowser />
+			</aside>
+			<ResizeBar resize={startResizeFileBrowser} />
+		{/if}
 		<div class="editor-group">
-			<div class="editor-toolbar">
+			<div class="toolbar">
 				<button
 					aria-label="run"
-					class="editor-toolbar-button {buttonStyle('runstop')}"
+					class="toolbar-button {buttonStyle('runstop')}"
 					title={runStopTooltip()}
 					onclick={runStop}
 				>
@@ -414,7 +418,7 @@
 				</button>
 				<button
 					aria-label="save"
-					class="editor-toolbar-button {buttonStyle('save')}"
+					class="toolbar-button {buttonStyle('save')}"
 					onclick={openSaveDialog}
 					title="Save the current file"
 				>
@@ -422,7 +426,7 @@
 				</button>
 				<button
 					aria-label="format"
-					class="editor-toolbar-button {buttonStyle('format')}"
+					class="toolbar-button {buttonStyle('format')}"
 					title={formatTooltip()}
 					onclick={formatFile}
 				>
@@ -430,21 +434,44 @@
 				</button>
 				<button
 					aria-label="trace"
-					class="editor-toolbar-button {buttonStyle('trace')}"
+					class="toolbar-button {buttonStyle('trace')}"
 					title="Generate a trace table for the current file"
 					onclick={traceFile}
 				>
 					<span class="icon fa-solid fa-magnifying-glass"></span> Trace
+				</button>
+				<div style="margin-right: auto"></div>
+				<button
+					aria-label="toggle file browser"
+					class="toolbar-aux-button {fileBrowserShown ? 'toolbar-aux-button-enabled' : ''}"
+					onclick={() => (fileBrowserShown = !fileBrowserShown)}
+				>
+					<span class="fa-solid fa-folder-tree"></span>
+				</button>
+				<button
+					aria-label="toggle terminal"
+					class="toolbar-aux-button {terminalShown ? 'toolbar-aux-button-enabled' : ''}"
+					onclick={() => (terminalShown = !terminalShown)}
+				>
+					<span class="fa-solid fa-terminal"></span>
+				</button>
+				<button aria-label="Go to project GitHub" class="toolbar-aux-button">
+					<span class="fa-brands fa-github"></span>
+				</button>
+				<button aria-label="info" class="toolbar-aux-button">
+					<span class="fa-solid fa-circle-info"></span>
 				</button>
 			</div>
 			<div class="middle">
 				<div class="editor">
 					<Editor />
 				</div>
-				<ResizeBar resize={startResizeTerm} />
-				<aside class="terminal" style="width: {terminalWidth}px;">
-					<Terminal />
-				</aside>
+				{#if terminalShown}
+					<ResizeBar resize={startResizeTerm} />
+					<aside class="terminal" style="width: {terminalWidth}px;">
+						<Terminal />
+					</aside>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -532,12 +559,39 @@
 		min-width: 0;
 	}
 
-	.editor-toolbar {
+	.toolbar {
 		display: flex;
-		margin-bottom: 0.2em;
+		margin-bottom: 0.4em;
 	}
 
-	.editor-toolbar-button {
+	.toolbar-aux-button {
+		font-size: 1em;
+		border-radius: 0.25em;
+		border: 1px solid var(--bw-surface2);
+		background-color: var(--bw-base2);
+		color: var(--bw-subtext1);
+		aspect-ratio: 1 / 1;
+		margin: 0.2em;
+		transition:
+			background-color 130ms ease,
+			color 130ms ease,
+			font-weight 130ms ease;
+		transition-delay: 0ms;
+	}
+
+	.toolbar-aux-button:hover {
+		border: 1px solid var(--bw-surface3);
+		background-color: var(--bw-surface1);
+		color: var(--bw-text);
+	}
+
+	.toolbar-aux-button-enabled {
+		border: 1px solid var(--bw-surface3);
+		background-color: var(--bw-surface1);
+		color: var(--bw-text);
+	}
+
+	.toolbar-button {
 		display: inline-flex;
 		height: 2em;
 		justify-content: center;
@@ -559,7 +613,7 @@
 		transition-delay: 0ms;
 	}
 
-	.editor-toolbar-button:hover {
+	.toolbar-button:hover {
 		transition-delay: 15ms;
 	}
 
