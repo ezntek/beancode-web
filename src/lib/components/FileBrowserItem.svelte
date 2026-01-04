@@ -87,6 +87,8 @@
 		color: var(--bw-text);
 		cursor: pointer;
 		padding: 0;
+		padding-left: 0.4em;
+		padding-right: 0.2em;
 	}
 
 	.item:hover {

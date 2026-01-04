@@ -13,7 +13,7 @@ import { post, ps as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, inputBuf, interruptBuf, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
+import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
 import { FileResponseKind } from '$lib/fstypes';
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
@@ -103,6 +103,6 @@ export async function setupWorker() {
     const W = await import('$lib/workers/pyodide.ts?worker');
     ps.worker = new W.default();
     ps.worker.onmessage = handleWorkerEvent;
-    ps.worker.postMessage({ kind: 'setup', inputBuf, interruptBuf } as EditorMessage);
+    ps.worker.postMessage({ kind: 'setup',  inputBuf: s.inputBuf!, interruptBuf: s.interruptBuf! } as EditorMessage);
     ps.worker.postMessage({ kind: 'listdir', path: s.cwd } as EditorMessage);
 };

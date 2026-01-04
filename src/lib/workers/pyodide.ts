@@ -204,7 +204,8 @@ let py: any;
 async function loadBeancode() {
     if (!py) {
         // @ts-ignore
-        const PyodideModule = await import("/pyodide/pyodide.mjs?url");
+        const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs?url");
+        //const PyodideModule = await import("/pyodide/pyodide.mjs?url");
         // @ts-ignore
         py = await PyodideModule.loadPyodide({});
         FS = py.FS;
@@ -215,7 +216,7 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const BEANCODE_VERSION = "0.7.0b2";
+        const BEANCODE_VERSION = "0.7.0b3";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
         const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\")`
         try {

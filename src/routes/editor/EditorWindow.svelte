@@ -19,15 +19,14 @@
 	import Terminal from './Terminal.svelte';
 	import { post, ps } from '$lib/workers/pyodide_state.svelte';
 	import {
-		inputBuf,
-		interruptBuf,
 		s,
 		setFileResponseCallback,
 		setDoneTracingCallback,
 		setDoneFormattingCallback,
 		setDownloadCallback,
 		setDownloadCwdCallback,
-		saveFile
+		saveFile,
+		INPUT_MAX
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
@@ -91,8 +90,10 @@
 	}
 
 	onMount(async () => {
+		s.inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
+		s.interruptBuf = new SharedArrayBuffer(1);
+		ibuf = new Uint8Array(s.interruptBuf);
 		await setupWorker();
-		ibuf = new Uint8Array(interruptBuf);
 
 		setTermWidth();
 		setFileBrowserWidth();
@@ -280,7 +281,7 @@
 	function stop() {
 		// SIGINT
 		ibuf[0] = 2;
-		const flag = new Int32Array(inputBuf, 0, 1);
+		const flag = new Int32Array(s.inputBuf!, 0, 1);
 		Atomics.store(flag, 0, 0);
 		Atomics.notify(flag, 0);
 		s.running = false;

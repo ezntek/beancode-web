@@ -1,5 +1,7 @@
 node_modules
 
+*.pem
+
 test.js
 lang.js
 lang.*.js

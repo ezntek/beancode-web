@@ -43,7 +43,7 @@
 		font-family: 'Inter', sans-serif;
 	}
 
-	@media (max-width: 1366px), (max-height: 768px) {
+	@media (max-width: 1400px), (max-height: 800px) {
 		#editor-window-wrapper > :global(*) {
 			font-size: 14px;
 		}

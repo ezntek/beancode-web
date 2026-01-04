@@ -15,7 +15,7 @@
 		type ITerminalInitOnlyOptions
 	} from '@battlefieldduck/xterm-svelte';
 	import { termState as ts } from './terminal_state.svelte';
-	import { inputBuf, s } from './state.svelte';
+	import { s } from './state.svelte';
 	import { onMount } from 'svelte';
 	import { type ITheme } from '@xterm/xterm';
 	import { THEMES, type ThemeSpec } from '$lib/themes/themes';
@@ -116,9 +116,9 @@
 		switch (ch) {
 			case '\r':
 				write('\r\n');
-				const flag = new Int32Array(inputBuf, 0, 1);
+				const flag = new Int32Array(s.inputBuf!, 0, 1);
 				Atomics.store(flag, 0, termInputBuf.length);
-				const sabdata = new Uint8Array(inputBuf, 4);
+				const sabdata = new Uint8Array(s.inputBuf!, 4);
 				// store string as well
 				const encoded = encoder.encode(termInputBuf);
 				sabdata.set(encoded);

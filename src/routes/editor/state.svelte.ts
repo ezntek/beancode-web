@@ -12,9 +12,8 @@ import { type FileResponse, type Dir } from '$lib/fstypes';
 import { post } from '$lib/workers/pyodide_state.svelte';
 import { es } from './editor_state.svelte';
 
-const INPUT_MAX = 2048;
-export const inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
-export const interruptBuf = new SharedArrayBuffer(1);
+export const INPUT_MAX = 2048;
+export const inputBuf = undefined;
 
 interface IState {
     status: string,
@@ -25,6 +24,8 @@ interface IState {
     cwd: string,
     curdir: Dir,
     running: boolean,
+    inputBuf: SharedArrayBuffer | null,
+    interruptBuf: SharedArrayBuffer | null,
 };
 
 export const s: IState = $state({
@@ -36,6 +37,8 @@ export const s: IState = $state({
     cwd: "/data/projects/default",
     curdir: new Map(), 
     running: false,
+    inputBuf: null,
+    interruptBuf: null,
 });
 
 export function saveFile(overwrite: boolean, path?: string) {
