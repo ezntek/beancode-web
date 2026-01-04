@@ -1,8 +1,8 @@
-import { LanguageSupport, LRLanguage } from "@codemirror/language";
+import { continuedIndent, foldInside, foldNodeProp, indentNodeProp, LanguageSupport, LRLanguage } from "@codemirror/language";
 import { parser } from "./parser";
 import { styleTags, tags as t } from "@lezer/highlight";
-import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
 import { beancodeCompletions } from "./completions";
+import { CaseofStatement } from "./parser.terms";
 
 const myLanguageHighlighting = styleTags({
     // comments
@@ -140,7 +140,23 @@ const myLanguageHighlighting = styleTags({
 
 export const beancodeLanguage = LRLanguage.define({
     parser: parser.configure({
-        props: [myLanguageHighlighting]
+        props: [
+            myLanguageHighlighting,
+            indentNodeProp.add({
+                IfStatement: continuedIndent({except: /THEN|ELSE|ENDIF|then|else|endif/}),
+                WhileStatement: continuedIndent({except: /ENDWHILE|endwhile/}),
+                ForStatement: continuedIndent({except: /NEXT|next/}),
+                RepeatUntilStatement: continuedIndent({except: /UNTIL|until/}),
+                FunctionStatement: continuedIndent({except: /ENDFUNCTION|endfunction/}),
+                ProcedureStatement: continuedIndent({except: /ENDPROCEDURE|endprocedure/}),
+                CaseofStatement: continuedIndent({except: /ENDCASE|endcase/})
+                //
+            }),
+            foldNodeProp.add({
+                "IfStatement WhileStatement ForStatement RepeatUntilStatement": foldInside,
+                "FunctionStatement ProcedureStatement CaseofStatement": foldInside,
+            }),
+        ]
     }),
     languageData: {
         commentTokens: {

@@ -77,7 +77,6 @@
 
 		function exts() {
 			return [
-				indentUnit.of('    '),
 				lineNumbers(),
 				highlightActiveLineGutter(),
 				highlightSpecialChars(),
@@ -101,8 +100,10 @@
 					...historyKeymap,
 					...foldKeymap,
 					...completionKeymap,
-					...lintKeymap
-				])
+					...lintKeymap,
+					{ key: 'Tab', run: insertTab }
+				]),
+				indentUnit.of('    ')
 			];
 		}
 
@@ -122,7 +123,6 @@
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),
-				keymap.of([...defaultKeymap, { key: 'Tab', run: insertTab }]),
 				es.history.of(history()),
 				highlighter.of(python()),
 				es.diag.of(beanDiagnostics),
