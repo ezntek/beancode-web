@@ -68,6 +68,11 @@
 			{#if view === 'about'}
 				<h1>About beancode web</h1>
 				<p>
+					Beancode web aims to be a portable, simple and friendly web IDE for IGCSE Computer Science
+					(0478, 2210) Pseudocode and Python, designed for students and teachers who may not be very
+					comfortable nor experienced with traditional text editors/IDEs.
+				</p>
+				<p>
 					This project is copyright (c) Eason Qin, 2025-2026. View the license tab for more
 					information.
 				</p>
@@ -90,8 +95,11 @@
 				</table>
 			{:else if view === 'license'}
 				<h1>License</h1>
-				<p>Beancode Web is copyright (c) Eason Qin 2025-2026.</p>
-				<p>Beancode is copyright (c) Eason Qin 2025-2026.</p>
+				<p>
+					Beancode Web is copyright (c) Eason Qin 2025-2026. It is licensed under the Mozilla Public
+					License, v2.0.
+				</p>
+				<p>Beancode is licensed under the Mozilla Public License, v2.0.</p>
 				<p>Pyodide is licensed under the Mozilla Public License, v2.0.</p>
 				<p>
 					If you would like to browse the Mozilla Public License, v. 2.0, online, you may visit
