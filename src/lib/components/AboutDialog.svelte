@@ -103,7 +103,7 @@
 				<p>Pyodide is licensed under the Mozilla Public License, v2.0.</p>
 				<p>
 					If you would like to browse the Mozilla Public License, v. 2.0, online, you may visit
-					<a href="http://mozilla.org/MPL/2.0/">http://mozilla.org/MPL/2.0/</a>.
+					<a href="http://mozilla.org/MPL/2.0/" target="_blank">http://mozilla.org/MPL/2.0/</a>.
 				</p>
 			{/if}
 		</div>

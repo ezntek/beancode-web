@@ -68,9 +68,9 @@
 			}
 		});
 
-		sz = 16;
+		sz = 20;
 		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
-			sz = 14;
+			sz = 18;
 		}
 
 		const style = EditorView.theme({
@@ -83,7 +83,7 @@
 		});
 
 		const fontStyle = EditorView.theme({
-			'.cm-content': { fontSize: sz + 'pt' }
+			'.cm-content': { fontSize: sz + 'px' }
 		});
 
 		function exts() {
@@ -180,17 +180,20 @@
 	});
 
 	function zoomIn() {
+		if (sz >= 64) return;
+
 		sz += 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}pt` }
+			'.cm-content': { fontSize: `${sz}px` }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
 
 	function zoomOut() {
+		if (sz <= 12) return;
 		sz -= 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}pt` }
+			'.cm-content': { fontSize: `${sz}px` }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}

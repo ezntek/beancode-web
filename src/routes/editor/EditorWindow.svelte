@@ -47,8 +47,8 @@
 	import type { TracerConfig } from '$lib/tracer';
 
 	let ibuf: Uint8Array;
-	let terminalWidth = $state(0);
-	let fileBrowserWidth = $state(0);
+	let terminalWidth = $state(300);
+	let fileBrowserWidth = $state(200);
 	let newAfterSave = $state(false);
 	let downloadFile = $state(false);
 	let terminalShown = $state(true);
@@ -104,6 +104,11 @@
 		setDownloadCallback(downloadCallback);
 		// @ts-ignore
 		setDownloadCwdCallback(downloadCwdCallback);
+	});
+
+	$effect(() => {
+		if (es.curFilePath === '') return;
+		window.localStorage.setItem('LastOpened', pathBasename(es.curFilePath));
 	});
 
 	function doneFormattingCallback(data: string, path: string) {
@@ -197,9 +202,11 @@
 	function downloadCallback(name: string, data?: string) {
 		if (data) {
 			const blob = new Blob([data], { type: 'text/plain' });
-			const url = URL.createObjectURL(blob);
-			window.open(url, '_blank', 'noopener,noreferrer');
-			URL.revokeObjectURL(url);
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = name;
+			a.click();
+			URL.revokeObjectURL(a.href);
 		} else {
 			const path = pathJoin(s.cwd, name);
 			downloadFile = true;
@@ -213,9 +220,11 @@
 			return;
 		}
 
-		const url = URL.createObjectURL(blob);
-		window.open(url, '_blank', 'noopener,noreferrer');
-		URL.revokeObjectURL(url);
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = pathBasename(s.cwd);
+		a.click();
+		URL.revokeObjectURL(a.href);
 	}
 
 	function startResizeTerm(e: any) {

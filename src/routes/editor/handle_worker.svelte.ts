@@ -14,7 +14,10 @@ import { post, ps as ps } from '$lib/workers/pyodide_state.svelte';
 import { termState as ts } from './terminal_state.svelte';
 
 import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
-import { FileResponseKind } from '$lib/fstypes';
+import { FileResponseKind, pathJoin } from '$lib/fstypes';
+import { es } from './editor_state.svelte';
+
+let loadedLastOpened = false;
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     let ter = ts.terminal!;
@@ -62,6 +65,17 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
               keyA.localeCompare(keyB)
             ));
             s.curdir = newmap;
+            // XXX: jank-3000
+            if (!loadedLastOpened) {
+                const lastOpened = window.localStorage.getItem('LastOpened');
+                if (!lastOpened) return;
+                post({kind: 'readfile', path: pathJoin(s.cwd, lastOpened)});
+                // XXX: jank
+                setTimeout(() => {
+                    es.saved = true;
+                }, 50);
+                loadedLastOpened = true;
+            }
             break;
         case 'readfile-response':
             rkind = msg.data.kind;

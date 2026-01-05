@@ -1,7 +1,7 @@
 # Beancode Web
-# 
+#
 # Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
-# 
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # license, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -18,6 +18,7 @@ from beancode.tracer import *
 from beancode.runner import *
 from beancode import __version__
 import sys
+
 __py_version__ = sys.version.split(" ")[0]
 
 
@@ -29,7 +30,16 @@ def exec_user_py(src, name):
         return 0
     except SystemExit as e:
         return e.code
+    except KeyboardInterrupt:
+        return 1
+    except EOFError:
+        warn("Caught EOF")
+        return 1
+    except RecursionError as e:
+        warn("Recursion depth exceeded! Did you forget your base case?")
+        return 1
     except Exception as e:
+        error(f'Python exception caught ({type(e)}: "{e}")')
         raise e
 
 

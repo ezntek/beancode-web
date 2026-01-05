@@ -152,6 +152,7 @@
 
 	function newFile() {
 		saveDialog.open('New File', undefined, undefined, (fileName: string, overwrite: boolean) => {
+			console.log(fileName, pathJoin(s.cwd, fileName));
 			overwrite;
 			editorNewFile();
 			post({ kind: 'newfile', path: pathJoin(s.cwd, fileName), contents: '', overwrite: false });

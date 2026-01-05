@@ -152,11 +152,17 @@
 	}
 
 	function zoomIn() {
+		const sz = ts.terminal!.options.fontSize!;
+		if (sz >= 64) return;
+
 		ts.terminal!.options.fontSize! += 1;
 		ts.termFitAddon!.fit();
 	}
 
 	function zoomOut() {
+		const sz = ts.terminal!.options.fontSize!;
+		if (sz <= 12) return;
+
 		ts.terminal!.options.fontSize! -= 1;
 		ts.termFitAddon!.fit();
 	}
