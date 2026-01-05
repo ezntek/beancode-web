@@ -36,7 +36,6 @@ export type EditorMessage =
     | { kind: 'trace', data: string, path: string, vars: string[], config: TracerConfig }
     | { kind: 'compressdir', path: string }
 
- 
 export interface BeanError {
     msg: string,
     from: number | null,

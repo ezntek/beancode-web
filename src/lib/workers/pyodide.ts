@@ -1,3 +1,13 @@
+/*
+ * Beancode Web
+ * 
+ * Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * license, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import { FileResponseKind, pathBasename, pathJoin, strerror, type Dir } from "$lib/fstypes";
 import type { PyMessage, EditorMessage, BeanError } from "./pyodide_state.svelte";
 import type { FileResponse } from "$lib/fstypes";

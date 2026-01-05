@@ -65,6 +65,8 @@
 	}
 
 	function clickItem(name: string) {
+		if (s.running) return;
+
 		if (name === '..' && atProjects) return;
 
 		lastClicked = name;

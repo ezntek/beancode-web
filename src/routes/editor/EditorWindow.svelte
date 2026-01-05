@@ -197,11 +197,9 @@
 	function downloadCallback(name: string, data?: string) {
 		if (data) {
 			const blob = new Blob([data], { type: 'text/plain' });
-			const a = document.createElement('a');
-			a.href = URL.createObjectURL(blob);
-			a.download = name;
-			a.click();
-			URL.revokeObjectURL(a.href);
+			const url = URL.createObjectURL(blob);
+			window.open(url, '_blank', 'noopener,noreferrer');
+			URL.revokeObjectURL(url);
 		} else {
 			const path = pathJoin(s.cwd, name);
 			downloadFile = true;
@@ -215,11 +213,9 @@
 			return;
 		}
 
-		const a = document.createElement('a');
-		a.href = URL.createObjectURL(blob);
-		a.download = pathBasename(s.cwd);
-		a.click();
-		URL.revokeObjectURL(a.href);
+		const url = URL.createObjectURL(blob);
+		window.open(url, '_blank', 'noopener,noreferrer');
+		URL.revokeObjectURL(url);
 	}
 
 	function startResizeTerm(e: any) {
@@ -329,6 +325,8 @@
 
 	function buttonStyle(name: string): string {
 		if (!ps.ready) return 'editor-button-grayed';
+		if (name != 'runstop' && s.running) return 'editor-button-grayed';
+
 		switch (name) {
 			case 'runstop':
 				if (s.running) {
@@ -360,6 +358,7 @@
 
 	function openSaveDialog() {
 		if (!ps.ready) return;
+		if (s.running) return;
 
 		if (es.curFilePath === '') {
 			saveDialog.open();
@@ -380,18 +379,22 @@
 
 	function formatFile() {
 		if (curExtension() !== 'bean') return;
+		if (s.running) return;
 		ps.curError = null;
+		s.running = true;
 		post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
 	}
 
 	function traceFile() {
 		if (curExtension() !== 'bean') return;
+		if (s.running) return;
 		ps.curError = null;
 		traceDialog.open(es.src);
 	}
 
 	function traceOk(vars: string[], config: TracerConfig) {
 		saveFile(true); // we can only call this function if the file is a saved beancode file anyway
+		s.running = true;
 		post({ kind: 'trace', path: es.curFilePath, data: es.src, vars: vars, config: config });
 	}
 

@@ -87,11 +87,13 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             if (msg.data !== null && msg.data !== '') {
                 doneFormattingCallback!(msg.data, msg.path);
             }
+            s.running = false;
             break; 
         case 'trace-response':
             if (msg.data !== null) {
                 doneTracingCallback!(msg.data);
             }
+            s.running = false;
             break;
         case 'compressdir-response':
             fileResponseCallback!(msg.kind, msg.path, msg.data);
