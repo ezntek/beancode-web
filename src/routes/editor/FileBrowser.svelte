@@ -157,13 +157,20 @@
 		});
 	}
 
+	function newFileOk(fileName: string, overwrite: boolean) {
+		if (s.curdir.has(fileName) && !overwrite) {
+			errorDialog.open([`File ${fileName} already exists!`], () => {
+				saveDialog.open('New File', fileName, true, newFileOk);
+			});
+			return;
+		}
+		editorNewFile();
+		// overwrite must be true as we already did the checks
+		post({ kind: 'newfile', path: pathJoin(s.cwd, fileName), contents: '', overwrite: true });
+	}
+
 	function newFile() {
-		saveDialog.open('New File', undefined, undefined, (fileName: string, overwrite: boolean) => {
-			console.log(fileName, pathJoin(s.cwd, fileName));
-			overwrite;
-			editorNewFile();
-			post({ kind: 'newfile', path: pathJoin(s.cwd, fileName), contents: '', overwrite: false });
-		});
+		saveDialog.open('New File', undefined, false, newFileOk);
 	}
 
 	async function handleFileSelect(e: Event) {
