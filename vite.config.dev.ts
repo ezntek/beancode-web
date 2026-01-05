@@ -1,6 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
 import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [
@@ -22,6 +23,10 @@ export default defineConfig({
             "Cross-Origin-Embedder-Policy": "require-corp",
             "Cross-Origin-Opener-Policy": "same-origin"
         },
+        https: {
+          key: readFileSync('./localhost+3-key.pem'),
+          cert: readFileSync('./localhost+3.pem')
+        }
     },
     define: {
         __COMMIT_HASH__: execSync('git rev-parse --short HEAD').toString(),

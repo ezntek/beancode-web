@@ -142,7 +142,14 @@
 		else downloadCallback!(name);
 	}
 
-	function renameOk(name: string) {
+	function renameOk(name: string, overwrite: boolean) {
+		if (s.curdir.has(name) && !overwrite) {
+			errorDialog.open([`File ${name} already exists!`], () => {
+				renameDialog.open('Rename', name, true);
+			});
+			return;
+		}
+
 		post({
 			kind: 'renamefile',
 			oldpath: pathJoin(s.cwd, lastClicked),

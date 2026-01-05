@@ -8,4 +8,4 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const BEANCODE_WEB_VERSION = "0.1.0-dev";
+export const BEANCODE_WEB_VERSION = "0.1.0-dev-" + __COMMIT_HASH__;
