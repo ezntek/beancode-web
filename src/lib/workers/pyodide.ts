@@ -197,7 +197,7 @@ async function doInitialSetupCheck() {
     }
     const UTIL_SCRIPT = await res.text();
 
-    await py.runPythonAsync(UTIL_SCRIPT);
+    py.runPython(UTIL_SCRIPT);
 }
 
 let py: any;
@@ -265,14 +265,14 @@ async function handleRun(src: string, path: string) {
         py.globals.set("n", pathBasename(path) || "(beanweb)");
         py.globals.set("s", src);
         py.globals.set("c", 0);
-        await py.runPythonAsync("(c,edic)=exec_user_bean(s,n)");
+        py.runPython("(c,edic)=exec_user_bean(s,n)");
         const exit_code = py.globals.get("c");
         handleBeanErr("edic");
         post({ kind: 'pyexit', code: exit_code });
         setTimeout(() => {
             post({ kind: 'status', data: 'Ready', positive: true });
         }, 500);
-        await py.runPythonAsync("del(s,n,c,edic)");
+        //py.runPython("del(s,n,c,edic)");
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
         setTimeout(() => {
@@ -287,9 +287,9 @@ async function handleRunPy(src: string, name: string){
         post({ kind: 'status', data: 'Running Python', positive: true});
         py.globals.set("s", src);
         py.globals.set("n", name);
-        await py.runPythonAsync("c=exec_user_py(s,n)");
+        py.runPython("c=exec_user_py(s,n)");
         const exit_code = py.globals.get("c");
-        await py.runPythonAsync("del(s,n,c)");
+        //py.runPython("del(s,n,c)");
         post({ kind: 'pyexit', code: exit_code });
     } catch (e: any) {
         post({ kind: 'error', data: String(e) });
@@ -304,7 +304,7 @@ function formatBean(src: string, path: string): string | null {
         py.runPython("(r,edic)=format_bean(s,n)");
         handleBeanErr("edic");
         const res = py.globals.get("r");
-        py.runPython("del(s,n,r,edic)");
+        //py.runPython("del(s,n,r,edic)");
         // @ts-ignore
         return res;
     } catch (e: any) {
@@ -321,7 +321,7 @@ function trace(src: string, path: string, vars: string[], config: TracerConfig):
     py.runPython("(res,edic)=trace_bean(s,n,v)");
     handleBeanErr("edic");
     const out = py.globals.get("res");
-    py.runPython("del(s,n,v,cfg,edic,res)"); 
+    //py.runPython("del(s,n,v,cfg,edic,res)"); 
     return out;
 }
 
