@@ -214,8 +214,8 @@ let py: any;
 async function loadBeancode() {
     if (!py) {
         // @ts-ignore
-        //const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs?url");
-        const PyodideModule = await import("/pyodide/pyodide.mjs?url");
+        const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs?url");
+        //const PyodideModule = await import("/pyodide/pyodide.mjs?url");
         // @ts-ignore
         py = await PyodideModule.loadPyodide({});
         FS = py.FS;
