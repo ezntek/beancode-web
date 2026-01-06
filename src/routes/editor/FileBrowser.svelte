@@ -9,7 +9,7 @@
 		pathJoin
 	} from '$lib/fstypes';
 	import { editorNewFile, es } from './editor_state.svelte';
-	import { downloadCallback, downloadCwdCallback, s } from './state.svelte';
+	import { downloadCallback, downloadCwdCallback, s, saveFile } from './state.svelte';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
 	import FileBrowserItem from '$lib/components/FileBrowserItem.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
@@ -64,11 +64,16 @@
 		}
 	}
 
-	function clickItem(name: string) {
-		if (s.running) return;
+	function quitProject(name: string) {
+		name;
+		if (!es.curFilePath) return;
 
-		if (name === '..' && atProjects) return;
+		saveFile(true);
+		es.curFilePath = '';
+		editorNewFile();
+	}
 
+	function openItem(name: string) {
 		lastClicked = name;
 		if (s.curdir.get(name)) {
 			s.cwd = pathJoin(s.cwd, name);
@@ -85,6 +90,29 @@
 				return;
 			}
 			read(name);
+		}
+	}
+
+	function clickItem(name: string) {
+		if (s.running) return;
+
+		if (name === '..') {
+			if (atProjects) return;
+			if (!inProjects) return;
+
+			confirmDialog.open(
+				[
+					'Are you sure you want to exit this project?',
+					'This will save and close the current file.'
+				],
+				() => {
+					quitProject(name);
+					openItem(name);
+				}
+			);
+			return;
+		} else {
+			openItem(name);
 		}
 	}
 
@@ -231,9 +259,14 @@
 <div class="file-browser">
 	<FileBrowserItem cwdDisplay onClick={() => clickItem('..')} onInfo={(e) => openInfo('..', e)}>
 		{#if inProjects}
-			<strong class="project-label">Current Project</strong>
-			<br />
-			{pathBasename(cwd)}
+			<div style="display: flex; flex-direction: row; align-items: center; gap: 0.7em;">
+				<span class="fa-solid fa-arrow-left"></span>
+				<span>
+					<strong class="project-label">Current Project</strong>
+					<br />
+					{pathBasename(cwd)}
+				</span>
+			</div>
 		{:else if atProjects}
 			<strong class="project-label">Projects</strong>
 		{:else}

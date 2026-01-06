@@ -61,11 +61,8 @@
 			<p class="title"><strong>Confirmation</strong></p>
 		</div>
 		<div class="middle">
-			{#each messages as msg, i}
+			{#each messages as msg}
 				<p class="label">{msg}</p>
-				{#if i !== messages.length}
-					<br />
-				{/if}
 			{/each}
 		</div>
 		<div class="bottom">

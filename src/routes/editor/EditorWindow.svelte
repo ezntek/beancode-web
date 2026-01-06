@@ -173,7 +173,6 @@
 				}
 
 				tick().then(() => {
-					es.curFilePath = path;
 					es.saved = true;
 				});
 				if (newAfterSave) {
