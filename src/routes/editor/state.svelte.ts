@@ -52,7 +52,7 @@ export function saveFile(overwrite: boolean, path?: string) {
 
 export type DoneFormattingCallback = (data: string, path: string) => void;
 export type DoneTracingCallback = (data: string) => void;
-export type FileResponseCallback = (msgKind: string, path: string, response?: FileResponse<any>) => void;
+export type FileResponseCallback = (msgKind: string, path: string, response: FileResponse<any>) => void;
 export type DownloadCallback = (name: string) => void;
 export type DownloadCwdCallback = (blob?: Blob) => void;
 

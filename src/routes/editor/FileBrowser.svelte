@@ -135,9 +135,6 @@
 			return;
 		}
 
-		// is a dir
-		if (s.curdir.get(name)) return;
-
 		lastClicked = name;
 		confirmDialog.open(
 			[`Are you sure you want to delete ${name}?`],
@@ -161,7 +158,8 @@
 		}
 
 		lastClicked = name;
-		renameDialog.open('Rename', name);
+		// == true used just in case if .get() returns undefined
+		renameDialog.open('Rename', name, false, undefined, s.curdir.get(name) == true);
 	}
 
 	function handleDownload(name: string) {
@@ -172,7 +170,7 @@
 	function renameOk(name: string, overwrite: boolean) {
 		if (s.curdir.has(name) && !overwrite) {
 			errorDialog.open([`File ${name} already exists!`], () => {
-				renameDialog.open('Rename', name, true);
+				renameDialog.open('Rename', name, true, undefined, s.curdir.get(name) == true);
 			});
 			return;
 		}
@@ -200,7 +198,7 @@
 	function newDirOk(dirName: string, overwrite: boolean) {
 		if (s.curdir.has(dirName) && !overwrite) {
 			errorDialog.open([`Project ${dirName} already exists!`], () => {
-				saveDialog.open('New Project (Folder)', dirName, true, newDirOk);
+				saveDialog.open('New Project (Folder)', dirName, true, newDirOk, true);
 			});
 			return;
 		}
@@ -209,9 +207,9 @@
 
 	function newItem() {
 		if (atProjects) {
-			saveDialog.open('New Project (Folder)', undefined, false, newDirOk);
+			saveDialog.open('New Project (Folder)', undefined, false, newDirOk, true);
 		} else {
-			saveDialog.open('New File', undefined, false, newFileOk);
+			saveDialog.open('New File', undefined, false, newFileOk, false);
 		}
 	}
 
@@ -336,25 +334,28 @@
 <ErrorDialog bind:this={errorDialog} />
 {#if openDropdownItem}
 	<Dropdown x={dropdownPosition.x} y={dropdownPosition.y} onClose={() => (openDropdownItem = '')}>
-		{#if !atProjects}
-			{#if openDropdownItem != '..'}
+		{#if !(atProjects && openDropdownItem === '..')}
+			{#if openDropdownItem !== '..'}
 				<button onclick={() => handleRename(openDropdownItem)}>
 					<span class="fa-solid fa-pen"></span>
 					Rename
 				</button>
 			{/if}
-			<button onclick={() => handleDownload(openDropdownItem)}>
-				<span class="fa-solid fa-download"></span>
-				Download
-			</button>
-			{#if openDropdownItem != '..'}
+			<!-- s.curdir.get() could return undefined -->
+			{#if s.curdir.get(openDropdownItem) === false}
+				<button onclick={() => handleDownload(openDropdownItem)}>
+					<span class="fa-solid fa-download"></span>
+					Download
+				</button>
+			{/if}
+			{#if openDropdownItem !== '..'}
 				<button onclick={() => handleDelete(openDropdownItem)} style="color: var(--bw-red);">
 					<span class="fa-solid fa-trash"></span>
 					Delete
 				</button>
 			{/if}
 		{:else}
-			<p class="label">No actions available.</p>
+			<p class="label">No actions available</p>
 		{/if}
 	</Dropdown>
 {/if}

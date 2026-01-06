@@ -147,23 +147,24 @@ function newDir(path: string, overwrite: boolean) : FileResponse<null> {
     return { kind: FileResponseKind.Ok, data: null };
 }
 
-function delPath(path: string) {
+function delPath(path: string): FileResponse<null> {
     if (!FS.analyzePath(path).exists)
-        return;
-
+        return { kind: FileResponseKind.AlreadyExists };
+    
     try {
-        if (FS.isDir(path)) {
+        if (FS.isDir(FS.stat(path).mode)) {
             // we have python anyway :shrug:
             py.globals.set('dir', path);
-            py.runPython(`shutil.rmtree(d);del(dir)`);    
+            py.runPython(`shutil.rmtree(dir);del(dir)`);    
         } else {
             FS.unlink(path);
             sync();
         }
     } catch (e) {
-        console.log(String(e));
         return fileResponseFromException(e);
     }
+
+    return { kind: FileResponseKind.Ok, data: null };
 }
 
 function renamePath(oldpath: string, newpath: string): FileResponse<string> {
@@ -192,7 +193,7 @@ async function compressDir(path: string): Promise<FileResponse<Blob>> {
                 continue;
 
             const itemPath = pathJoin(path, item);
-            if (FS.isDir(itemPath))
+            if (FS.isDir(FS.stat(itemPath).mode))
                 continue;
 
             console.log("item path: ", itemPath);
@@ -394,8 +395,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 post({ kind: 'newdir-response', path: msg.path, data: newDir(msg.path, msg.overwrite) });
                 break;
             case 'delfile':
-                delPath(msg.path);
-                post({ kind: 'delfile-response', path: msg.path});
+                post({ kind: 'delfile-response', path: msg.path, data: delPath(msg.path) });
                 break;
             case 'renamefile':
                 post({ kind: 'renamefile-response', path: msg.oldpath, data: renamePath(msg.oldpath, msg.newpath) });

@@ -16,7 +16,7 @@ export type PyMessage =
     | { kind: 'readfile-response', path: string, data: FileResponse<string> }
     | { kind: 'newfile-response', path: string, data: FileResponse<null> }
     | { kind: 'newdir-response', path: string, data: FileResponse<null> }
-    | { kind: 'delfile-response', path: string }
+    | { kind: 'delfile-response', path: string, data: FileResponse<null> }
     // fileresponse ok data contains new path, path contains old path
     | { kind: 'renamefile-response', path: string, data: FileResponse<string> }
     // null: error

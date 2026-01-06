@@ -80,7 +80,6 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             rkind = msg.data.kind;
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
-        case 'newdir-response':
         case 'newfile-response':
             rkind = msg.data.kind;
             if (rkind === FileResponseKind.Ok) {
@@ -89,9 +88,20 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             }
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
+        case 'newdir-response':
+            rkind = msg.data.kind;
+            if (rkind === FileResponseKind.Ok) {
+                s.cwd = msg.path; 
+                post({ kind: 'listdir', path: s.cwd });
+            }
+            fileResponseCallback!(msg.kind, msg.path, msg.data);
+            break;
         case 'delfile-response':
-            post({ kind: 'listdir', path: s.cwd });
-            fileResponseCallback!(msg.kind, msg.path);
+            rkind = msg.data.kind;
+            if (rkind === FileResponseKind.Ok) {
+                post({ kind: 'listdir', path: s.cwd });
+            }
+            fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
         case 'renamefile-response':
             post({ kind: 'listdir', path: s.cwd });

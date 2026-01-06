@@ -123,14 +123,7 @@
 		traceDoneDialog.open(undefined, 'tracer_output.html');
 	}
 
-	function fileResponseCallback(msgKind: string, path: string, response?: FileResponse<any>) {
-		if (!response) {
-			if (msgKind === 'delfile-response') {
-				if (path === es.curFilePath) editorNewFile();
-			}
-			return;
-		}
-
+	function fileResponseCallback(msgKind: string, path: string, response: FileResponse<any>) {
 		if (response.kind != FileResponseKind.Ok) {
 			errorDialog.open(
 				[
@@ -153,6 +146,11 @@
 		}
 
 		switch (msgKind) {
+			case 'delfile-response':
+				if (msgKind === 'delfile-response') {
+					if (path === es.curFilePath) editorNewFile();
+				}
+				break;
 			case 'readfile-response':
 				const dat: string = response.data;
 				if (downloadFile) {

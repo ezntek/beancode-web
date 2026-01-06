@@ -49,6 +49,7 @@
 	function submitCancel() {
 		fileName = '';
 		fileType = 'bean';
+		dir = false;
 		if (cancel) cancel();
 		innerDialog.close();
 	}
@@ -64,6 +65,7 @@
 	// @ts-ignore
 	export const close = () => {
 		fileName = '';
+		dir = false;
 		innerDialog.close();
 		if (outerThen) outerThen();
 	};
