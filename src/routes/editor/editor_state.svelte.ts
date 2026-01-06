@@ -63,6 +63,7 @@ export function changeFile(newSrc: string, newPath: string) {
         es.view!.dispatch({})
         es.saved = true;
     });
+    es.saved = true;
 }
 
 export const errField = StateField.define<BeanError | null>({

@@ -42,8 +42,6 @@ export const s: IState = $state({
 });
 
 export function saveFile(overwrite: boolean, path?: string) {
-    if (path)
-        es.curFilePath = path;
     post({
         kind: 'newfile',
         path: path ?? es.curFilePath,

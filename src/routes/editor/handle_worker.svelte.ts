@@ -71,11 +71,8 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 if (!lastOpened) return;
                 if (!s.curdir.has(lastOpened)) return;
 
-                post({kind: 'readfile', path: pathJoin(s.cwd, lastOpened)});
+                post({ kind: 'readfile', path: pathJoin(s.cwd, lastOpened) });
                 // XXX: jank
-                setTimeout(() => {
-                    es.saved = true;
-                }, 50);
                 loadedLastOpened = true;
             }
             break;

@@ -69,8 +69,6 @@
 		if (!es.curFilePath) return;
 
 		saveFile(true);
-		editorNewFile();
-		es.curFilePath = '';
 	}
 
 	function openItem(name: string) {
@@ -107,6 +105,7 @@
 				],
 				() => {
 					quitProject(name);
+					editorNewFile();
 					openItem(name);
 				}
 			);
