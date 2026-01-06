@@ -27,6 +27,11 @@
 			return;
 		}
 
+		if (fileName.search('/') !== -1) {
+			errorDialog.open(['Your file name cannot contain "/"!']);
+			return;
+		}
+
 		// throw it on the event loop for good measure
 		setTimeout(() => {
 			const n = fileName.slice();

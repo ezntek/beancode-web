@@ -250,7 +250,7 @@
 					saveDialog.open(
 						'Upload with different name',
 						newName,
-						true,
+						false,
 						(fileName: string, overwrite: boolean) => {
 							overwrite;
 							upload(fileName, fileContent);

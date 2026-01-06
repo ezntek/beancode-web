@@ -63,6 +63,10 @@ class XtermStdinHandler {
     }
 }
 
+function sync() {
+    FS.syncfs(false, () => {});
+}
+
 function listDir(path: string): Dir {
     let dir: Dir = new Map(); 
     const listing = FS.readdir(path);
@@ -97,7 +101,6 @@ function readFile(path: string): FileResponse<string> {
     let decoded: string;
 
     try {
-        console.log(path);
         data = FS.readFile(path);
     } catch (exc: any) {
         return fileResponseFromException(exc);
@@ -126,7 +129,7 @@ function newFile(path: string, contents: string, overwrite: boolean): FileRespon
         return fileResponseFromException(exc);
     }
 
-    FS.syncfs(false);
+    sync();
     return { kind: FileResponseKind.Ok, data: null };
 }
 
@@ -155,7 +158,7 @@ function delPath(path: string) {
             py.runPython(`shutil.rmtree(d);del(dir)`);    
         } else {
             FS.unlink(path);
-            FS.syncfs(false);
+            sync();
         }
     } catch (e) {
         console.log(String(e));
@@ -170,7 +173,7 @@ function renamePath(oldpath: string, newpath: string): FileResponse<string> {
         return fileResponseFromException(e);    
     } 
 
-    FS.syncfs(false);
+    sync();
     return { kind: FileResponseKind.Ok, data: newpath };
 }
 
@@ -241,7 +244,7 @@ async function loadBeancode() {
 
         FS.mkdirTree("/data");
         FS.mount(FS.filesystems.IDBFS, {}, "/data");
-        await FS.syncfs(true);
+        await FS.syncfs(true, () => {});
 
         await py.loadPackage("micropip");
 
