@@ -24,13 +24,13 @@
 	let lastClicked = '';
 	let cwd = $derived(pathJoin(s.cwd));
 	let inProjects = $derived(pathBeginsWith(s.cwd, '/data/projects') && pathCountParts(s.cwd) === 3);
-	let atProjects = $derived(pathBeginsWith(s.cwd, '/data/projects') && pathCountParts(s.cwd) === 2);
+	let atProjects = $derived(s.cwd === '/data/projects');
 	let dropdownPosition = $state({ x: 0, y: 0 });
 
 	function saveCancel() {
 		// just for good measure
 		es.saved = false;
-		read(lastClicked);
+		if (s.curdir.has(lastClicked)) read(lastClicked);
 	}
 
 	function save() {
@@ -69,8 +69,8 @@
 		if (!es.curFilePath) return;
 
 		saveFile(true);
-		es.curFilePath = '';
 		editorNewFile();
+		es.curFilePath = '';
 	}
 
 	function openItem(name: string) {
@@ -194,11 +194,26 @@
 		}
 		editorNewFile();
 		// overwrite must be true as we already did the checks
-		post({ kind: 'newfile', path: pathJoin(s.cwd, fileName), contents: '', overwrite: true });
+		const newPath = pathJoin(s.cwd, fileName);
+		post({ kind: 'newfile', path: newPath, contents: '', overwrite: true });
 	}
 
-	function newFile() {
-		saveDialog.open('New File', undefined, false, newFileOk);
+	function newDirOk(dirName: string, overwrite: boolean) {
+		if (s.curdir.has(dirName) && !overwrite) {
+			errorDialog.open([`Project ${dirName} already exists!`], () => {
+				saveDialog.open('New Project (Folder)', dirName, true, newDirOk);
+			});
+			return;
+		}
+		post({ kind: 'newdir', path: pathJoin(s.cwd, dirName), overwrite: true });
+	}
+
+	function newItem() {
+		if (atProjects) {
+			saveDialog.open('New Project (Folder)', undefined, false, newDirOk);
+		} else {
+			saveDialog.open('New File', undefined, false, newFileOk);
+		}
 	}
 
 	async function handleFileSelect(e: Event) {
@@ -252,7 +267,12 @@
 	}
 
 	function upload(name: string, content: string) {
-		post({ kind: 'newfile', path: pathJoin(s.cwd, name), contents: content, overwrite: true });
+		post({
+			kind: 'newfile',
+			path: pathJoin(s.cwd, name),
+			contents: content,
+			overwrite: true
+		});
 	}
 </script>
 
@@ -276,12 +296,14 @@
 	</FileBrowserItem>
 	<div class="toolbar">
 		<p class="toolbar-label">FILES</p>
-		<button class="toolbar-button toolbar-newfile" onclick={() => newFile()}>
+		<button class="toolbar-button toolbar-newfile" onclick={() => newItem()}>
 			<span class="icon fa-solid fa-plus"></span> New
 		</button>
-		<button class="toolbar-button toolbar-upload" onclick={() => uploadElem.click()}>
-			<span class="icon fa-solid fa-upload"></span> Upload
-		</button>
+		{#if inProjects}
+			<button class="toolbar-button toolbar-upload" onclick={() => uploadElem.click()}>
+				<span class="icon fa-solid fa-upload"></span> Upload
+			</button>
+		{/if}
 	</div>
 	<div class="file-browser-content">
 		{#if !ps.ready}

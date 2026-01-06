@@ -17,7 +17,7 @@ from beancode.formatter import Formatter
 from beancode.tracer import *
 from beancode.runner import *
 from beancode import __version__
-import sys
+import sys, shutil # we need shutil for rmtree
 
 __py_version__ = sys.version.split(" ")[0]
 

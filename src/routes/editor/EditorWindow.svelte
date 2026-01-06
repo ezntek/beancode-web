@@ -172,15 +172,19 @@
 					return;
 				}
 
-				tick().then(() => {
-					es.saved = true;
-				});
 				if (newAfterSave) {
 					editorNewFile();
 					setTimeout(() => {
 						es.saved = true;
 						// XXX: hacky AF but ig it works?!?!?
 					}, 50);
+					newAfterSave = false;
+				} else {
+					tick().then(() => {
+						es.saved = true;
+						if (s.cwd !== '/data/projects') es.curFilePath = path;
+						post({ kind: 'readfile', path: path });
+					});
 				}
 				break;
 			case 'renamefile-response':

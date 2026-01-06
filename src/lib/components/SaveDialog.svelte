@@ -31,7 +31,7 @@
 		setTimeout(() => {
 			const n = fileName.slice();
 			let name = n;
-			if (pathExtension(n) === '') {
+			if (!dir && pathExtension(n) === '') {
 				const t = fileType.slice();
 				name += t !== '' ? '.' + t : '';
 			}
@@ -44,10 +44,8 @@
 	function submitCancel() {
 		fileName = '';
 		fileType = 'bean';
-		setTimeout(() => {
-			if (cancel) cancel();
-			innerDialog.close();
-		}, 0);
+		if (cancel) cancel();
+		innerDialog.close();
 	}
 
 	let innerDialog: Dialog;
@@ -56,6 +54,7 @@
 	let fileName = $state('');
 	let fileType = $state('bean');
 	let overwrite = $state(false);
+	let dir = $state(false);
 
 	// @ts-ignore
 	export const close = () => {
@@ -69,7 +68,8 @@
 		t?: string,
 		defaultContents?: string,
 		_overwrite?: boolean,
-		then?: OkCallback
+		then?: OkCallback,
+		_dir?: boolean
 	) => {
 		if (t) title = t;
 		if (defaultContents) {
@@ -94,6 +94,7 @@
 		// we rely on JS's weird truthy stuff, don't fix
 		overwrite = false;
 		if (_overwrite) overwrite = true;
+		if (_dir) dir = true;
 
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
@@ -118,16 +119,18 @@
 				<p class="label">Name:</p>
 				<input type="text" bind:value={fileName} />
 			</div>
-			<div class="row">
-				<p class="label">Type:</p>
-				<select class="picker" style="flex: 1;" bind:value={fileType}>
-					<option value="bean" selected>Pseudocode (.bean)</option>
-					<option value="py">Python (.py)</option>
-					<option value="html">HTML (.html)</option>
-					<option value="txt">Text (.txt)</option>
-					<option value="">No File Extension</option>
-				</select>
-			</div>
+			{#if !dir}
+				<div class="row">
+					<p class="label">Type:</p>
+					<select class="picker" style="flex: 1;" bind:value={fileType}>
+						<option value="bean" selected>Pseudocode (.bean)</option>
+						<option value="py">Python (.py)</option>
+						<option value="html">HTML (.html)</option>
+						<option value="txt">Text (.txt)</option>
+						<option value="">No File Extension</option>
+					</select>
+				</div>
+			{/if}
 		</div>
 		<div class="bottom">
 			{#if overwrite}

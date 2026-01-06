@@ -77,12 +77,13 @@ function listDir(path: string): Dir {
     return dir;
 }
 
-function getFileResponseFromException(exc: any): FileResponse<any> {
+function fileResponseFromException(exc: any): FileResponse<any> {
     if (typeof exc.errno !== 'number') {
         return { kind: FileResponseKind.Exception, data: exc };
     }
 
-    if (exc.errno === 2) {
+    if (exc.errno === 2 || exc.errno === 44) {
+        console.error(`Caught exception: `, exc);
         return { kind: FileResponseKind.NotFound };
     } else if (exc.errno === 21) {
         return { kind: FileResponseKind.IsDir };
@@ -96,9 +97,10 @@ function readFile(path: string): FileResponse<string> {
     let decoded: string;
 
     try {
+        console.log(path);
         data = FS.readFile(path);
     } catch (exc: any) {
-        return getFileResponseFromException(exc);
+        return fileResponseFromException(exc);
     }
 
     const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -112,7 +114,7 @@ function readFile(path: string): FileResponse<string> {
     return { kind: FileResponseKind.Ok, data: decoded };
 }
 
-function newFile(path: string, contents: string, overwrite: boolean): FileResponse<string> {
+function newFile(path: string, contents: string, overwrite: boolean): FileResponse<null> {
     if (FS.analyzePath(path).exists && !overwrite) {
         return { kind: FileResponseKind.AlreadyExists };
     }
@@ -121,11 +123,25 @@ function newFile(path: string, contents: string, overwrite: boolean): FileRespon
     try {
         stream = FS.writeFile(path, contents);
     } catch (exc: any) {
-        return getFileResponseFromException(exc);
+        return fileResponseFromException(exc);
     }
 
     FS.syncfs(false);
-    return { kind: FileResponseKind.Ok, data: "" };
+    return { kind: FileResponseKind.Ok, data: null };
+}
+
+function newDir(path: string, overwrite: boolean) : FileResponse<null> {
+    if (FS.analyzePath(path).exists && !overwrite) {
+        return { kind: FileResponseKind.AlreadyExists };
+    }
+
+    try {
+        FS.mkdir(path);
+    } catch (exc: any) {
+        return fileResponseFromException(exc);
+    }
+
+    return { kind: FileResponseKind.Ok, data: null };
 }
 
 function delPath(path: string) {
@@ -135,12 +151,15 @@ function delPath(path: string) {
     try {
         if (FS.isDir(path)) {
             // we have python anyway :shrug:
-            py.runPython(`import shutil;shutil.rmtree(${path})`);    
+            py.globals.set('dir', path);
+            py.runPython(`shutil.rmtree(d);del(dir)`);    
         } else {
             FS.unlink(path);
+            FS.syncfs(false);
         }
     } catch (e) {
-        return getFileResponseFromException(e);
+        console.log(String(e));
+        return fileResponseFromException(e);
     }
 }
 
@@ -148,7 +167,7 @@ function renamePath(oldpath: string, newpath: string): FileResponse<string> {
     try {
         FS.rename(oldpath, newpath);
     } catch (e) {
-        return getFileResponseFromException(e);    
+        return fileResponseFromException(e);    
     } 
 
     FS.syncfs(false);
@@ -182,7 +201,7 @@ async function compressDir(path: string): Promise<FileResponse<Blob>> {
             }
         }
     } catch (e) {
-        return getFileResponseFromException(e);
+        return fileResponseFromException(e);
     }
 
     const res = await zip.generateAsync({
@@ -367,6 +386,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'newfile':
                 post({ kind: 'newfile-response', path: msg.path, data: newFile(msg.path, msg.contents, msg.overwrite) });
+                break;
+            case 'newdir':
+                post({ kind: 'newdir-response', path: msg.path, data: newDir(msg.path, msg.overwrite) });
                 break;
             case 'delfile':
                 delPath(msg.path);

@@ -14,7 +14,8 @@ export type PyMessage =
     | { kind: 'listdir-response', data: Dir }
     // path that file was read from
     | { kind: 'readfile-response', path: string, data: FileResponse<string> }
-    | { kind: 'newfile-response', path: string, data: FileResponse<string> }
+    | { kind: 'newfile-response', path: string, data: FileResponse<null> }
+    | { kind: 'newdir-response', path: string, data: FileResponse<null> }
     | { kind: 'delfile-response', path: string }
     // fileresponse ok data contains new path, path contains old path
     | { kind: 'renamefile-response', path: string, data: FileResponse<string> }
@@ -30,6 +31,7 @@ export type EditorMessage =
     | { kind: 'listdir', path: string }
     | { kind: 'readfile', path: string }
     | { kind: 'newfile', path: string, contents: string, overwrite: boolean }
+    | { kind: 'newdir', path: string, overwrite: boolean }
     | { kind: 'delfile', path: string }
     | { kind: 'renamefile', oldpath: string, newpath: string }
     | { kind: 'format', data: string, path: string }

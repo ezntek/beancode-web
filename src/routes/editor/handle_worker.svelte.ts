@@ -69,6 +69,8 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             if (!loadedLastOpened) {
                 const lastOpened = window.localStorage.getItem('LastOpened');
                 if (!lastOpened) return;
+                if (!s.curdir.has(lastOpened)) return;
+
                 post({kind: 'readfile', path: pathJoin(s.cwd, lastOpened)});
                 // XXX: jank
                 setTimeout(() => {
@@ -81,6 +83,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             rkind = msg.data.kind;
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
+        case 'newdir-response':
         case 'newfile-response':
             rkind = msg.data.kind;
             if (rkind === FileResponseKind.Ok) {
