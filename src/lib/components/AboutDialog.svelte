@@ -3,9 +3,10 @@
 
  Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
 
- This Source Code Form is subject to the terms of the Mozilla Public
- license, v. 2.0. If a copy of the MPL was not distributed with this
- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ This source code form is licensed under the GNU Affero General Public
+ License version 3 (or later). If you cannot locate the LICENSE.md file at
+ the root of the project, visit <http://www.gnu.org/licenses/> for more
+ information.
 -->
 
 <script lang="ts">
@@ -96,9 +97,17 @@
 			{:else if view === 'license'}
 				<h1>License</h1>
 				<p>
-					Beancode Web is copyright (c) Eason Qin 2025-2026. It is licensed under the Mozilla Public
-					License, v2.0.
+					Beancode Web is copyright (c) Eason Qin 2025-2026. It is licensed under the GNU Affero
+					General Public License, version 3.0 (or later).
 				</p>
+				<p>
+					If you would like to browse the GNU Affero General Public License, version 3.0, online,
+					you may visit
+					<a href="https://www.gnu.org/licenses/agpl-3.0.en.html#license-text" target="_blank">
+						https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
+					</a>.
+				</p>
+				<hr />
 				<p>Beancode is licensed under the Mozilla Public License, v2.0.</p>
 				<p>Pyodide is licensed under the Mozilla Public License, v2.0.</p>
 				<p>
@@ -126,8 +135,8 @@
 		font-family: 'IBM Plex Mono', monospace !important;
 		display: flex;
 		flex-direction: column;
-		min-width: 20vw;
-		max-width: 32vw;
+		min-width: 28vw;
+		max-width: 35vw;
 	}
 
 	.top {

@@ -3,9 +3,10 @@
  * 
  * Copyright (c) 2026-present Eason Qin <eason@ezntek.com>
  * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * license, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * This source code form is licensed under the GNU Affero General Public
+ * License version 3 (or later). If you cannot locate the LICENSE.md file at
+ * the root of the project, visit <http://www.gnu.org/licenses/> for more
+ * information.
  */
 
 export interface ThemeSpec {
