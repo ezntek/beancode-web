@@ -249,7 +249,7 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const BEANCODE_VERSION = "0.7.0b4";
+        const BEANCODE_VERSION = "0.7.0b5";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
         const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\")`
         try {

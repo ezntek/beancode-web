@@ -22,7 +22,7 @@
 	import { THEMES, type ThemeSpec } from '$lib/themes/themes';
 
 	let fontSize = 22;
-	let options: ITerminalOptions & ITerminalInitOnlyOptions;
+	let options: (ITerminalOptions & ITerminalInitOnlyOptions) | undefined = $state();
 	onMount(() => {
 		const handleResize = () => {
 			ts.termFitAddon!.fit();
@@ -37,7 +37,7 @@
 			fontFamily: 'IBM Plex Mono',
 			cursorBlink: true,
 			fontSize: fontSize,
-			theme: termTheme
+			theme: getTheme(s.themeName)
 		};
 
 		return () => {
@@ -46,29 +46,33 @@
 	});
 
 	// @ts-ignore
-	const t: ThemeSpec = THEMES[s.themeName];
-	const termTheme: ITheme = {
-		background: t.base3,
-		foreground: t.text,
-		selectionBackground: t.blue,
-		cursor: t.text,
-		black: t.base3,
-		red: t.red,
-		green: t.green,
-		yellow: t.yellow,
-		blue: t.blue,
-		magenta: t.magenta,
-		cyan: t.cyan,
-		white: t.text,
-		brightRed: t.brightRed,
-		brightGreen: t.brightGreen,
-		brightYellow: t.brightYellow,
-		brightBlue: t.brightBlue,
-		brightMagenta: t.brightMagenta,
-		brightCyan: t.brightCyan,
-		brightBlack: t.surface1,
-		brightWhite: t.text
-	};
+
+	function getTheme(name: string): ITheme {
+		// @ts-ignore
+		const t: ThemeSpec = THEMES[name];
+		return {
+			background: t.base3,
+			foreground: t.text,
+			selectionBackground: t.blue,
+			cursor: t.text,
+			black: t.base3,
+			red: t.red,
+			green: t.green,
+			yellow: t.yellow,
+			blue: t.blue,
+			magenta: t.magenta,
+			cyan: t.cyan,
+			white: t.text,
+			brightRed: t.brightRed,
+			brightGreen: t.brightGreen,
+			brightYellow: t.brightYellow,
+			brightBlue: t.brightBlue,
+			brightMagenta: t.brightMagenta,
+			brightCyan: t.brightCyan,
+			brightBlack: t.surface1,
+			brightWhite: t.text
+		};
+	}
 
 	let terminalContainer: HTMLDivElement;
 	let termInputBuf = '';
@@ -79,7 +83,7 @@
 	async function onLoad() {
 		ts.termFitAddon = new (await XtermAddon.FitAddon()).FitAddon();
 		ts.terminal!.loadAddon(ts.termFitAddon!);
-		ts.terminal!.options.theme = termTheme;
+		ts.terminal!.options.theme = getTheme(s.themeName);
 		ts.terminal!.attachCustomKeyEventHandler((data) => {
 			if (!data.ctrlKey) {
 				return true;
@@ -106,6 +110,10 @@
 		});
 		ts.termFitAddon!.fit();
 	}
+
+	$effect(() => {
+		if (ts.terminal) ts.terminal!.options.theme = getTheme(s.themeName);
+	});
 
 	function onData(data: string) {
 		data;

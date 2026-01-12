@@ -46,6 +46,7 @@
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 	import TraceDialog from '$lib/components/TraceDialog.svelte';
 	import type { TracerConfig } from '$lib/tracer';
+	import { applyTheme } from '$lib/themes/themes';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -54,6 +55,7 @@
 	let downloadFile = $state(false);
 	let terminalShown = $state(true);
 	let fileBrowserShown = $state(true);
+	let isDark = $state(true);
 	let tracerOutput = '';
 	let aboutDialog: AboutDialog;
 	let saveDialog: SaveDialog;
@@ -110,6 +112,15 @@
 	$effect(() => {
 		if (es.curFilePath === '') return;
 		window.localStorage.setItem('LastOpened', pathBasename(es.curFilePath));
+	});
+
+	$effect(() => {
+		if (!isDark) {
+			s.themeName = 'catppuccin_latte';
+		} else {
+			s.themeName = 'catppuccin_macchiato';
+		}
+		applyTheme(s.themeName);
 	});
 
 	function doneFormattingCallback(data: string, path: string) {
@@ -328,6 +339,8 @@
 			saveFile(true);
 		}
 		s.running = true;
+		ts.terminal!.clear();
+		ts.terminal!.write('\x1b[2J\x1b[H');
 		if (curExtension() === 'py') {
 			post({ kind: 'runpy', data: es.src, path: es.curFilePath });
 		} else {
@@ -482,6 +495,13 @@
 					onclick={() => (terminalShown = !terminalShown)}
 				>
 					<span class="fa-solid fa-terminal"></span>
+				</button>
+				<button
+					aria-label="toggle light/dark mode"
+					class="toolbar-aux-button {isDark ? 'toolbar-aux-button-enabled' : ''}"
+					onclick={() => (isDark = !isDark)}
+				>
+					<span class="fa-solid {isDark ? 'fa-moon' : 'fa-sun'}"></span>
 				</button>
 				<button
 					aria-label="Go to project GitHub"

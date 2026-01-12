@@ -213,6 +213,7 @@
 			});
 			return;
 		}
+		console.log('wee ', dirName);
 		post({ kind: 'newdir', path: pathJoin(s.cwd, dirName), overwrite: true });
 	}
 

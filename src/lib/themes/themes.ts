@@ -70,11 +70,21 @@ function makeCatppuccinTheme(flavor: CatppuccinFlavor): ThemeSpec {
     };
 }
 
+import { catppuccinFrappe, catppuccinLatte, catppuccinMacchiato, catppuccinMocha } from '$lib/highlighting/catppuccin'
 import { flavors, type CatppuccinFlavor } from '@catppuccin/palette'
 
 export const THEMES = {
     'catppuccin_latte': makeCatppuccinTheme(flavors.latte),
+    'catppuccin_frappe': makeCatppuccinTheme(flavors.frappe),
     'catppuccin_macchiato': makeCatppuccinTheme(flavors.macchiato),
+    'catppuccin_mocha': makeCatppuccinTheme(flavors.mocha),
+}
+
+export const CM_THEMES = {
+    'catppuccin_latte': catppuccinLatte,
+    'catppuccin_frappe': catppuccinFrappe,
+    'catppuccin_macchiato': catppuccinMacchiato,
+    'catppuccin_mocha': catppuccinMocha,
 }
 
 export function applyTheme(themeName: string) { 

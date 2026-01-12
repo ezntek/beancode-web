@@ -20,6 +20,7 @@
 	import { catppuccinMacchiato } from '$lib/highlighting/catppuccin';
 	import { python } from '@codemirror/lang-python';
 	import { beancode } from '$lib/highlighting/beancode';
+	import { s } from './state.svelte';
 
 	// custom extension setup
 	import {
@@ -51,15 +52,18 @@
 	import { lintKeymap } from '@codemirror/lint';
 	import { ps as ps } from '$lib/workers/pyodide_state.svelte';
 	import { setErrEffect } from './editor_state.svelte';
+	import { CM_THEMES } from '$lib/themes/themes';
 
 	let editor: HTMLDivElement;
 	let sz = $state(16);
 	let fontTheme: Compartment;
 	let highlighter: Compartment;
+	let themeCompartment: Compartment;
 
 	onMount(() => {
 		fontTheme = new Compartment();
 		highlighter = new Compartment();
+		themeCompartment = new Compartment();
 
 		const updateListener = EditorView.updateListener.of((update) => {
 			if (update.docChanged) {
@@ -131,7 +135,7 @@
 			doc: '',
 			extensions: [
 				...exts(),
-				catppuccinMacchiato,
+				themeCompartment.of(catppuccinMacchiato),
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),
@@ -158,6 +162,13 @@
 					}
 				});
 			}
+		});
+
+		$effect(() => {
+			es.view!.dispatch({
+				// @ts-ignore
+				effects: themeCompartment.reconfigure(CM_THEMES[s.themeName])
+			});
 		});
 
 		$effect(() => {
