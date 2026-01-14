@@ -106,6 +106,7 @@
 		if (s.running) return;
 
 		if (name === '..') {
+			return; // TODO: re-add multi project support
 			if (atProjects) return;
 			if (!inProjects) return;
 
@@ -289,7 +290,6 @@
 	<FileBrowserItem cwdDisplay onClick={() => clickItem('..')} onInfo={(e) => openInfo('..', e)}>
 		{#if inProjects}
 			<div style="display: flex; flex-direction: row; align-items: center; gap: 0.7em;">
-				<span class="fa-solid fa-arrow-left"></span>
 				<span>
 					<strong class="project-label">Current Project</strong>
 					<br />
