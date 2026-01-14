@@ -484,6 +484,7 @@
 				<div style="margin-right: auto"></div>
 				<button
 					aria-label="toggle file browser"
+					title="Toggle file browser"
 					class="toolbar-aux-button {fileBrowserShown ? 'toolbar-aux-button-enabled' : ''}"
 					onclick={() => (fileBrowserShown = !fileBrowserShown)}
 				>
@@ -491,6 +492,7 @@
 				</button>
 				<button
 					aria-label="toggle terminal"
+					title="Toggle terminal"
 					class="toolbar-aux-button {terminalShown ? 'toolbar-aux-button-enabled' : ''}"
 					onclick={() => (terminalShown = !terminalShown)}
 				>
@@ -498,6 +500,7 @@
 				</button>
 				<button
 					aria-label="toggle light/dark mode"
+					title="Toggle light/dark mode"
 					class="toolbar-aux-button {isDark ? 'toolbar-aux-button-enabled' : ''}"
 					onclick={() => (isDark = !isDark)}
 				>
@@ -506,10 +509,24 @@
 				<button
 					aria-label="Go to project GitHub"
 					class="toolbar-aux-button"
+					title="Go to this project's GitHub page"
 					onclick={() =>
 						window.open('https://github.com/ezntek/beancode-web', '_blank', 'noopener,noreferrer')}
 				>
 					<span class="fa-brands fa-github"></span>
+				</button>
+				<button
+					aria-label="Report new bug"
+					title="Report a new issue on GitHub"
+					class="toolbar-aux-button"
+					onclick={() =>
+						window.open(
+							'https://github.com/ezntek/beancode-web/issues/new',
+							'_blank',
+							'noopener,noreferrer'
+						)}
+				>
+					<span class="fa-solid fa-bug"></span>
 				</button>
 				<button aria-label="info" class="toolbar-aux-button" onclick={() => aboutDialog.open()}>
 					<span class="fa-solid fa-circle-info"></span>
