@@ -83,13 +83,13 @@ CaseofStatement { KCase KOf Expr Newline (CaseofBranch)* (KOtherwise Statement)?
 WhileStatement { KWhile Expr KDo Block KEndwhile }
 RepeatUntilStatement { KRepeat Block KUntil Expr }
 ForStatement { KFor Ident Assign Expr KTo Expr (KStep Expr)? Newline Block KNext Ident }
-ProcedureStatement { KExport? KProcedure Ident (LParen ParameterList RParen)? Block KEndprocedure }
-FunctionStatement { KExport? KFunction Ident (LParen ParameterList RParen)? KReturns Type Block KEndfunction }
+ProcedureStatement { KExport? KProcedure Ident (LParen ParameterList? RParen)? Block KEndprocedure }
+FunctionStatement { KExport? KFunction Ident (LParen ParameterList? RParen)? KReturns Type Block KEndfunction }
 CallStatement { KCall (TIdent | LibroutineIdent) (LParen ArgList RParen)? }
 ReturnStatement { KReturn Expr? }
 ScopeStatement { KScope Block KEndscope }
 IncludeStatement { KInclude StringLit }
-TraceStatement { KTrace !traceParams (LParen Ident (Comma Ident)* RParen)? (KTo StringLit)? Block KEndtrace}
+TraceStatement { KTrace !traceParams (LParen (Ident (Comma Ident)*)? RParen)? (KTo StringLit)? Block KEndtrace}
 OpenfileStatement { KOpenfile FileIdent KFor FileModeList }
 WritefileStatement { KWritefile FileIdent Comma Expr }
 ReadfileStatement { KReadfile FileIdent Comma Lvalue }
