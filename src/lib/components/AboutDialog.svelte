@@ -10,7 +10,7 @@
 -->
 
 <script lang="ts">
-	import { BEANCODE_WEB_VERSION } from '$lib/version';
+	import { BEANCODE_COMMIT_HASH, BEANCODE_WEB_VERSION } from '$lib/version';
 	import { s } from '../../routes/editor/state.svelte';
 	import Dialog from './Dialog.svelte';
 
@@ -83,6 +83,9 @@
 					<tbody>
 						<tr>
 							<td>beancode web</td><td><strong>{BEANCODE_WEB_VERSION}</strong> </td>
+						</tr>
+						<tr>
+							<td>commit hash</td><td><strong>{BEANCODE_COMMIT_HASH}</strong></td>
 						</tr>
 						{#if s.versionText !== ''}
 							<tr>

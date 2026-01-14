@@ -346,28 +346,22 @@
 <ErrorDialog bind:this={errorDialog} />
 {#if openDropdownItem}
 	<Dropdown x={dropdownPosition.x} y={dropdownPosition.y} onClose={() => (openDropdownItem = '')}>
-		{#if !(atProjects && openDropdownItem === '..')}
-			{#if openDropdownItem !== '..'}
-				<button onclick={() => handleRename(openDropdownItem)}>
-					<span class="fa-solid fa-pen"></span>
-					Rename
-				</button>
-			{/if}
-			<!-- s.curdir.get() could return undefined -->
-			{#if s.curdir.get(openDropdownItem) === false}
-				<button onclick={() => handleDownload(openDropdownItem)}>
-					<span class="fa-solid fa-download"></span>
-					Download
-				</button>
-			{/if}
-			{#if openDropdownItem !== '..'}
-				<button onclick={() => handleDelete(openDropdownItem)} style="color: var(--bw-red);">
-					<span class="fa-solid fa-trash"></span>
-					Delete
-				</button>
-			{/if}
-		{:else}
-			<p class="label">No actions available</p>
+		{#if openDropdownItem !== '..'}
+			<button onclick={() => handleRename(openDropdownItem)}>
+				<span class="fa-solid fa-pen"></span>
+				Rename
+			</button>
+		{/if}
+		<!-- s.curdir.get() could return undefined -->
+		<button onclick={() => handleDownload(openDropdownItem)}>
+			<span class="fa-solid fa-download"></span>
+			Download
+		</button>
+		{#if openDropdownItem !== '..'}
+			<button onclick={() => handleDelete(openDropdownItem)} style="color: var(--bw-red);">
+				<span class="fa-solid fa-trash"></span>
+				Delete
+			</button>
 		{/if}
 	</Dropdown>
 {/if}
