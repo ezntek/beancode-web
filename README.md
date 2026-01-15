@@ -4,20 +4,20 @@ Beancode web aims to be a portable, simple and friendly web IDE for IGCSE Comput
 
 ## Visit it!
 
-Go [https://beancode-web.pages.dev/editor](here)
+Go [here](https://beancode-web.pages.dev/editor)
 
 ## The Interpreter Backend
 
-The interpreter is written in Python (yes... I know), and you can find it [https://github.com/ezntek/beancode](here), it is called beancode.
+The interpreter is written in Python (yes... I know), and you can find it [here](https://github.com/ezntek/beancode), it is called beancode.
 
 ## Credits
 
 Despite my tireless work on the web IDE (sacrificing my entire winter break), I still used libraries that I did not make, and I'd like to thank these people for writing awesome software that this project could not have existed without:
 
-- [https://codemirror.net](CodeMirror) for the code editor component (text selection, copy paste, indentation)
-- [https://lezer.codemirror.net](The Lezer Parser System) as the syntax highlighting backend
-- [https://xtermjs.org](Xterm.js) for the terminal
-- [https://pyodide.org](Pyodide) in order to run CPython in WebAssembly, and the [https://github.com/ezntek/beancode](beancode) interpreter
+- [CodeMirror](https://codemirror.net) for the code editor component (text selection, copy paste, indentation)
+- [The Lezer Parser System](https://lezer.codemirror.net) as the syntax highlighting backend
+- [Xterm.js](https://xtermjs.org) for the terminal
+- [Pyodide](https://pyodide.org) in order to run CPython in WebAssembly, and the [beancode](https://github.com/ezntek/beancode) interpreter
 
 ## Development
 
