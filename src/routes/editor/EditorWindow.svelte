@@ -50,7 +50,7 @@
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
-	let fileBrowserWidth = $state(200);
+	let fileBrowserWidth = $state(300);
 	let newAfterSave = $state(false);
 	let downloadFile = $state(false);
 	let terminalShown = $state(true);
@@ -88,7 +88,7 @@
 		if (fbwidth) {
 			fileBrowserWidth = Number.parseInt(fbwidth);
 		} else {
-			fileBrowserWidth = window.innerWidth * 0.1;
+			fileBrowserWidth = window.innerWidth * 0.15;
 		}
 	}
 

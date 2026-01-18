@@ -87,7 +87,15 @@ def format_bean(src, name):
         return (None, err.to_dict())
 
 
-def trace_bean(s, n, v):
-    t = Tracer(v.to_py(), TracerConfig.from_dict(cfg.to_py()))
-    (c, edic) = exec_user_bean(s, n, tracer=t)
-    return (t.gen_html() if c == 0 else None, edic)
+def trace_bean(s, n, v, cfg):
+    cfg_py = cfg.to_py()
+    tc = TracerConfig()
+    for key, val in cfg_py.items():
+        if hasattr(tc, key):
+            setattr(tc, key, val)
+    t = Tracer(v.to_py(), tc)
+    (_, edic) = exec_user_bean(s, n, tracer=t)
+    if edic is not None:
+        return (None, edic)
+    else:
+        return (t.gen_html(), None)
