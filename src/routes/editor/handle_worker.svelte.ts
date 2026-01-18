@@ -115,7 +115,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             break; 
         case 'trace-response':
-            if (msg.data !== null) {
+            if (typeof msg.data === 'string') {
                 doneTracingCallback!(msg.data);
             }
             s.running = false;

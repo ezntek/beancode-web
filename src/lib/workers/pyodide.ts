@@ -249,7 +249,7 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const BEANCODE_VERSION = "0.7.0b5";
+        const BEANCODE_VERSION = "0.7.0";
         const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
         const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\")`
         try {
@@ -346,12 +346,12 @@ function formatBean(src: string, path: string): string | null {
     return null;
 }
 
-function trace(src: string, path: string, vars: string[], config: TracerConfig): string | null {
+function trace(src: string, path: string, vars: string[], config: TracerConfig): string | undefined | null {
     py.globals.set("s", src);
     py.globals.set("n", pathBasename(path));
     py.globals.set("v", vars);
     py.globals.set("cfg", tracerConfigToPython(config));
-    py.runPython("(res,edic)=trace_bean(s,n,v)");
+    py.runPython("(res,edic)=trace_bean(s,n,v,cfg)");
     handleBeanErr("edic");
     const out = py.globals.get("res");
     //py.runPython("del(s,n,v,cfg,edic,res)"); 

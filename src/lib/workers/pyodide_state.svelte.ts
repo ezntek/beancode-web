@@ -21,7 +21,7 @@ export type PyMessage =
     | { kind: 'renamefile-response', path: string, data: FileResponse<string> }
     // null: error
     | { kind: 'format-response', data: string | null, path: string }
-    | { kind: 'trace-response', data: string | null }
+    | { kind: 'trace-response', data: string | null | undefined }
     | { kind: 'compressdir-response', path: string, data: FileResponse<Blob> }
 
 export type EditorMessage = 
