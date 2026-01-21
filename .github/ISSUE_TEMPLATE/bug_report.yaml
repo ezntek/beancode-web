@@ -3,7 +3,6 @@ description: File a bug report.
 title: "[Bug]: "
 labels: ["bug", "triage"]
 projects: ["ezntek/beancode"]
-type: bug
 body:
   - type: markdown
     attributes:
@@ -14,7 +13,7 @@ body:
     attributes:
       label: What happened?
       description: What did you do to trigger the issue? What was the expected behavior?
-      value: "I was programming, and my code spontaneously combusted and turned into a marshmallow!"
+      value: "What did you do to trigger the issue?\n\nWhat was the expected behavior?"
     validations:
       required: true
   - type: textarea
