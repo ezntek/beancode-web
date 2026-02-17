@@ -22,14 +22,28 @@
 
 	import '@fontsource/ibm-plex-mono/400';
 	import '@fontsource/ibm-plex-mono/700';
+	import UnsupportedWindow from './UnsupportedWindow.svelte';
 
+	let hasSab = true;
 	onMount(() => {
 		applyTheme(s.themeName);
+
+		try {
+			var dummy: any;
+			dummy = SharedArrayBuffer;
+			dummy = Atomics;
+		} catch (err) {
+			hasSab = false;
+		}
 	});
 </script>
 
 <div id="editor-window-wrapper">
-	<EditorWindow />
+	{#if hasSab}
+		<EditorWindow />
+	{:else}
+		<UnsupportedWindow />
+	{/if}
 </div>
 
 <style>
