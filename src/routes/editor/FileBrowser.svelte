@@ -290,7 +290,7 @@
 	<FileBrowserItem cwdDisplay onClick={() => clickItem('..')} onInfo={(e) => openInfo('..', e)}>
 		{#if inProjects}
 			<div style="display: flex; flex-direction: row; align-items: center; gap: 0.7em;">
-				<span>
+				<span style="font-weight: normal;">
 					<strong class="project-label">Current Project</strong>
 					<br />
 					{pathBasename(cwd)}
@@ -323,7 +323,7 @@
 					<div style="position: relative;">
 						<FileBrowserItem onClick={() => clickItem(item)} onInfo={(e) => openInfo(item, e)}>
 							<span class={determineIcon(item)}></span>
-							{item}
+							<span style="font-weight: normal;">{item}</span>
 						</FileBrowserItem>
 					</div>
 				{/if}

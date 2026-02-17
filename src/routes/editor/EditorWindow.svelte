@@ -668,6 +668,7 @@
 		justify-content: center;
 		align-items: center;
 		font-family: 'Inter', sans-serif;
+		font-weight: normal;
 		font-size: 1em;
 		background-color: var(--bw-surface1);
 		color: var(--bw-text);
