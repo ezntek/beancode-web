@@ -40,7 +40,7 @@
 		overflow: hidden;
 		background-color: var(--bw-base1);
 		scrollbar-width: 0;
-
+		font-weight: normal;
 		font-family: 'Inter', sans-serif;
 	}
 
