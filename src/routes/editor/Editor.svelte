@@ -254,6 +254,7 @@
 		color: var(--bw-base1);
 		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
+		font-size: 0.8em;
 		transition:
 			background-color 130ms ease,
 			color 130ms ease,

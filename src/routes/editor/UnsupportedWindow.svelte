@@ -59,9 +59,6 @@
 			color 130ms ease,
 			font-weight 130ms ease;
 	}
-	.wrapper p {
-		line-height: 0em;
-	}
 	.wrapper button:hover {
 		background-color: var(--bw-blue);
 		color: var(--bw-base1);

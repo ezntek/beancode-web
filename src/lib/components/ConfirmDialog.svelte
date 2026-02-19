@@ -119,6 +119,7 @@
 		border-radius: 3px;
 		color: var(--bw-text);
 		font-weight: bold;
+		font-size: 0.8em;
 		transition:
 			background-color 130ms ease,
 			color 130ms ease,
@@ -163,6 +164,9 @@
 	.exit-button {
 		border: 0px solid black;
 		border-radius: 5px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		background-color: var(--bw-red);
 		color: var(--bw-base1);
 		text-align: center;

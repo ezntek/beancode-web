@@ -10,5 +10,5 @@
  */
 
 //export const BEANCODE_WEB_VERSION = "0.1.0-dev-" + __COMMIT_HASH__;
-export const BEANCODE_WEB_VERSION = "0.1.0-beta2"
+export const BEANCODE_WEB_VERSION = "0.1.0-beta3"
 export const BEANCODE_COMMIT_HASH = __COMMIT_HASH__;

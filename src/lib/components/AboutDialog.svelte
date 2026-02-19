@@ -176,6 +176,7 @@
 		border-radius: 3px;
 		color: var(--bw-text);
 		font-weight: bold;
+		font-size: 0.8em;
 		transition:
 			background-color 130ms ease,
 			color 130ms ease,
@@ -274,6 +275,9 @@
 		border: 0px solid black;
 		border-radius: 5px;
 		background-color: var(--bw-red);
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		color: var(--bw-base1);
 		text-align: center;
 		width: 1.5em;

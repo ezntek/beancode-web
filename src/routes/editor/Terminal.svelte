@@ -35,6 +35,8 @@
 
 		options = {
 			fontFamily: 'IBM Plex Mono',
+			// NOTE: safari fix
+			// @ts-ignore
 			cursorBlink: true,
 			fontSize: fontSize,
 			theme: getTheme(s.themeName)
@@ -214,6 +216,7 @@
 		flex-direction: row;
 		align-items: center;
 		flex-shrink: 0;
+		font-size: 1em;
 	}
 
 	.toolbar-input {
@@ -231,6 +234,8 @@
 		margin: 0.2em;
 		color: var(--bw-base1);
 		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.8em;
+		text-align: center;
 		border-radius: 0.2em;
 		transition:
 			background-color 130ms ease,
@@ -280,29 +285,29 @@
 	.terminal-container {
 		display: flex;
 		flex: 1 1 auto;
+		height: 100%;
 		min-height: 0px;
 		flex-direction: column;
-		height: 100%;
 		background-color: var(--bw-base3);
 	}
 
 	/* very gross hack*/
 	.terminal-container :global(> div) {
-		height: 100%;
 		width: 100%;
-	}
-
-	.terminal-container :global(.xterm-viewport) {
-		background-color: var(--bw-base3);
+		height: 100% !important;
 	}
 
 	.terminal-container :global(.xterm) {
 		height: 100%;
-		width: 100%;
+		width: 100% !important;
 	}
 
 	.terminal-container :global(.xterm-screen) {
 		height: 100%;
-		width: 100%;
+		width: 100% !important;
+	}
+
+	.terminal-container :global(.xterm-viewport) {
+		background-color: var(--bw-base3);
 	}
 </style>
