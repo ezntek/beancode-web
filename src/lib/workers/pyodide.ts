@@ -240,7 +240,7 @@ async function loadBeancode() {
         const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs?url");
         //const PyodideModule = await import("/pyodide/pyodide.mjs?url");
         // @ts-ignore
-        py = await PyodideModule.loadPyodide({});
+        py = await PyodideModule.loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.29.0/full/" });
         FS = py.FS;
 
         FS.mkdirTree("/data");

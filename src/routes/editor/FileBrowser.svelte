@@ -143,9 +143,10 @@
 	}
 
 	function handleDelete(name: string) {
-		if (name === '..') {
-			return;
-		}
+		// we know this is unreachable.
+		// we leave it here just in case if we implement multiple projects
+		// eventually
+		if (name === '..') return;
 
 		lastClicked = name;
 		confirmDialog.open(
@@ -413,6 +414,7 @@
 		border: 0px solid black;
 		color: var(--bw-base1);
 		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.8em;
 		border-radius: 0.2em;
 		background-color: var(--bw-surface1);
 		color: var(--bw-text);
@@ -439,6 +441,7 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+		overflow: hidden;
 	}
 
 	.file-browser-content {

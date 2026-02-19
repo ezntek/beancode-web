@@ -201,6 +201,7 @@
 		border-radius: 3px;
 		color: var(--bw-base1);
 		font-weight: bold;
+		font-size: 0.8em;
 		transition:
 			background-color 130ms ease,
 			color 130ms ease,
@@ -289,6 +290,9 @@
 		text-align: center;
 		width: 1.5em;
 		height: 1.5em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		transition:
 			background-color 130ms ease,
 			color 130ms ease,
