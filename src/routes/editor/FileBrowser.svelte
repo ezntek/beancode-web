@@ -324,7 +324,7 @@
 					<div style="position: relative;">
 						<FileBrowserItem onClick={() => clickItem(item)} onInfo={(e) => openInfo(item, e)}>
 							<span class={determineIcon(item)}></span>
-							<span style="font-weight: normal;">{item}</span>
+							<span style="font-weight: normal">{item}</span>
 						</FileBrowserItem>
 					</div>
 				{/if}

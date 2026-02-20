@@ -77,6 +77,7 @@
 		z-index: 9999;
 		padding: 0.25em;
 		min-width: 140px;
+		font-weight: normal;
 	}
 
 	.dropdown :global(button) {
@@ -93,6 +94,7 @@
 		text-align: left;
 		cursor: pointer;
 		border-radius: 4px;
+		font-weight: normal;
 		transition:
 			background 130ms ease,
 			font-weight 130ms ease;
