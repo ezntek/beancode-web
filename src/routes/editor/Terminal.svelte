@@ -245,6 +245,7 @@
 
 	.clear {
 		background-color: var(--bw-magenta);
+		font-weight: normal;
 	}
 
 	.clear:hover {
