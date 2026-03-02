@@ -120,8 +120,13 @@
 		} else {
 			s.themeName = 'catppuccin_macchiato';
 		}
+		window.localStorage.setItem('EditorTheme', s.themeName);
 		applyTheme(s.themeName);
 	});
+
+	function toggleTheme() {
+		isDark = !isDark;
+	}
 
 	function doneFormattingCallback(data: string, path: string) {
 		if (data && es.curFilePath === path) {
@@ -502,7 +507,7 @@
 					aria-label="toggle light/dark mode"
 					title="Toggle light/dark mode"
 					class="toolbar-aux-button {isDark ? 'toolbar-aux-button-enabled' : ''}"
-					onclick={() => (isDark = !isDark)}
+					onclick={() => toggleTheme()}
 				>
 					<span class="fa-solid {isDark ? 'fa-moon' : 'fa-sun'}"></span>
 				</button>

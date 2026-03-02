@@ -26,6 +26,10 @@
 
 	let hasSab = true;
 	onMount(() => {
+		const theme = window.localStorage.getItem('EditorTheme');
+		if (theme) {
+			s.themeName = theme;
+		}
 		applyTheme(s.themeName);
 
 		try {
@@ -38,6 +42,28 @@
 	});
 </script>
 
+<noscript>
+	<style>
+		#editor-window-wrapper {
+			display: none;
+		}
+		#nojs {
+			height: 100vh;
+			background-color: #0873cc;
+			color: white;
+			padding: 5%;
+		}
+	</style>
+	<div id="nojs">
+		<h1 style="font-size: 100px; margin: 0px; padding: 0px;">:(</h1>
+		<h1 style="font-size: 45px;">Oops!</h1>
+		<p style="font-size: 1.2em;">
+			Beancode Web requires <strong>JavaScript</strong>, WebAssembly, SharedArrayBuffer and Atomics
+			support to run.
+		</p>
+		<p>Your PC did not in fact run into a problem.</p>
+	</div>
+</noscript>
 <div id="editor-window-wrapper">
 	{#if hasSab}
 		<EditorWindow />
