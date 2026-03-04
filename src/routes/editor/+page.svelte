@@ -39,6 +39,21 @@
 		} catch (err) {
 			hasSab = false;
 		}
+
+		if (navigator.storage && navigator.storage.persist) {
+			try {
+				navigator.storage.persist().then((persistent: boolean) => {
+					if (!persistent)
+						console.error(
+							'Could not request for persistent storage, your data may mysteriously vanish.'
+						);
+				});
+			} catch (e) {
+				console.error(
+					'Could not request for persistent storage, your data may mysteriously vanish.'
+				);
+			}
+		}
 	});
 </script>
 
