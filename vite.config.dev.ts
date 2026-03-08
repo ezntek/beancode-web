@@ -2,10 +2,12 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { defineConfig } from 'vite';
+import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
 	plugins: [
         sveltekit(),
+        mkcert(),
         {
             name: 'configure-response-headers',
             configureServer: (server) => {
@@ -20,13 +22,11 @@ export default defineConfig({
     ],
     server: {
         host: true,
+        // @ts-ignore
+        https: true,
         headers: {
             "Cross-Origin-Embedder-Policy": "require-corp",
             "Cross-Origin-Opener-Policy": "same-origin"
-        },
-        https: {
-          key: readFileSync('./localhost+3-key.pem'),
-          cert: readFileSync('./localhost+3.pem')
         }
     },
     define: {
