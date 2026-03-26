@@ -6,7 +6,7 @@ export type PyMessage =
     | { kind: 'clear' }
     | { kind: 'output', data: string }
     | { kind: 'status', data: string, positive: boolean }
-    | { kind: 'error', data: string }
+    | { kind: 'error', data: string, fromBeancode: boolean }
     | { kind: 'beanerror', data: BeanError }
     | { kind: 'pyout', data: string }
     | { kind: 'pyin' }

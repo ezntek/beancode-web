@@ -43,7 +43,9 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.status = msg.data;
             break;
         case 'error':
-            ter.writeln('An error occurred whilst trying to interact with the Python backend:');
+            if (msg.fromBeancode)
+                ter.writeln('An error occurred in the Python backend:');
+
             ter.writeln(String(msg.data).replaceAll("\n", "\r\n"));
             break;
         case 'beanerror':

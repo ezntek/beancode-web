@@ -255,7 +255,7 @@ async function loadBeancode() {
         try {
             await py.runPythonAsync(SCRIPT)
         } catch (e) {
-            post({ kind: 'error', data: String(e) });
+            post({ kind: 'error', data: String(e), fromBeancode: true });
             pyOK = false; 
             return;
         }
@@ -270,7 +270,6 @@ async function loadBeancode() {
         const pyversion = py.globals.get("__py_version__")
         post({ kind: 'ready', version: version, pyversion: pyversion });
         post({ kind: 'output', data: 'Ready' });
-        post({ kind: 'status', data: 'Ready', positive: true });
     }
     pyOK = true;
 }
@@ -294,38 +293,40 @@ function handleBeanErr(vname: string) {
 
 async function handleRun(src: string, path: string) {
     try {
-        post({ kind: 'status', data: 'Running Beancode', positive: true});
         py.globals.set("n", pathBasename(path) || "(beanweb)");
         py.globals.set("s", src);
         py.globals.set("c", 0);
         py.runPython("(c,edic)=exec_user_bean(s,n)");
         const exit_code = py.globals.get("c");
         handleBeanErr("edic");
+
         post({ kind: 'pyexit', code: exit_code });
-        setTimeout(() => {
-            post({ kind: 'status', data: 'Ready', positive: true });
-        }, 500);
         //py.runPython("del(s,n,c,edic)");
     } catch (e: any) {
-        post({ kind: 'error', data: String(e) });
-        setTimeout(() => {
-            post({ kind: 'status', data: 'An error occurred', positive: false });
-        }, 500);
+        post({ kind: 'error', data: String(e), fromBeancode: true });
         post({ kind: 'pyexit', code: 1 });
     }
 }
 
 async function handleRunPy(src: string, name: string){
     try {
-        post({ kind: 'status', data: 'Running Python', positive: true});
         py.globals.set("s", src);
         py.globals.set("n", name);
         py.runPython("c=exec_user_py(s,n)");
         const exit_code = py.globals.get("c");
-        //py.runPython("del(s,n,c)");
+        
+        // clear the stdin buffer
+        const flag = new Int32Array(inputBuf, 0, 1);
+        const buf = new Uint8Array(inputBuf, 4); 
+        if (flag[0] == 0) {
+            flag.fill(0);
+            buf.fill(0);
+        }
+
         post({ kind: 'pyexit', code: exit_code });
     } catch (e: any) {
-        post({ kind: 'error', data: String(e) });
+        post({ kind: 'error', data: String(e), fromBeancode: false });
+
         post({ kind: 'pyexit', code: 1 });
     }
 }
@@ -341,7 +342,7 @@ function formatBean(src: string, path: string): string | null {
         // @ts-ignore
         return res;
     } catch (e: any) {
-        post({ kind: 'error', data: String(e) });
+        post({ kind: 'error', data: String(e), fromBeancode: false });
     }
     return null;
 }
@@ -417,7 +418,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             data = `Errno ${exc.errno}`;
         }
 
-        post({ kind: 'error', data: data });
+        post({ kind: 'error', data: data, fromBeancode: true });
     }
 }
 

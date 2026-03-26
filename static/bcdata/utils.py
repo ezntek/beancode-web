@@ -17,30 +17,33 @@ from beancode.formatter import Formatter
 from beancode.tracer import *
 from beancode.runner import *
 from beancode import __version__
-import sys, shutil # we need shutil for rmtree
+import sys
 
 __py_version__ = sys.version.split(" ")[0]
 
 
 def exec_user_py(src, name):
-    user_globals = {"__name__": "__main__", "__file__": name}
+    def my_exit():
+        raise SystemExit()
+
+    user_globals = {"__name__": "__main__", "__file__": name, "exit": my_exit, "__builtins__": __builtins__}
     user_locals = user_globals
+
     try:
-        exec(src, user_globals, user_locals)
+        code = compile(src, filename=name, mode="exec")
+        exec(code, user_globals, user_locals)
         return 0
     except SystemExit as e:
         return e.code
     except KeyboardInterrupt:
         return 1
-    except EOFError:
-        warn("Caught EOF")
-        return 1
-    except RecursionError as e:
-        warn("Recursion depth exceeded! Did you forget your base case?")
-        return 1
     except Exception as e:
-        error(f'Python exception caught ({type(e)}: "{e}")')
-        raise e
+        import traceback
+        tb = e.__traceback__
+        tb = tb.tb_next
+        traceback.print_exception(type(e), e, tb)
+        return 1
+    # propagate other errors
 
 
 def exec_user_bean(src, name, tracer=None):

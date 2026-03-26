@@ -1,3 +1,7 @@
+## WARNING
+
+this is the development branch. code here may not necessarily work as intended. clone from `main` instead! That's what the website is based off of.
+
 # beancode web
 
 Beancode web aims to be a portable, simple and friendly web IDE for IGCSE Computer Science (0478, 2210) Pseudocode and Python, designed for students and teachers who may not be very comfortable nor experienced with traditional text editors/IDEs. It intends to be simple, intuitive, and do one thing only, edit code well.
