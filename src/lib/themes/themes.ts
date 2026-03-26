@@ -96,4 +96,6 @@ export function applyTheme(themeName: string) {
         let v = "--bw-" + String(prop);
         document.documentElement.style.setProperty(v, color);
     }
+
+    window.localStorage.setItem("EditorTheme", themeName);
 }

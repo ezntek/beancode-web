@@ -16,7 +16,6 @@ import { termState as ts } from './terminal_state.svelte';
 
 import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
 import { FileResponseKind, pathJoin } from '$lib/fstypes';
-import { es } from './editor_state.svelte';
 
 let loadedLastOpened = false;
 

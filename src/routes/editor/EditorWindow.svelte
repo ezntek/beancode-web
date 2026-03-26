@@ -114,18 +114,17 @@
 		window.localStorage.setItem('LastOpened', pathBasename(es.curFilePath));
 	});
 
+	// FIXME: better theming system
 	$effect(() => {
-		if (!isDark) {
-			s.themeName = 'catppuccin_latte';
-		} else {
-			s.themeName = 'catppuccin_macchiato';
-		}
-		window.localStorage.setItem('EditorTheme', s.themeName);
 		applyTheme(s.themeName);
+		isDark = s.themeName == 'catppuccin_macchiato';
 	});
 
 	function toggleTheme() {
-		isDark = !isDark;
+		// TODO: proper light/dark themes
+		if (isDark) s.themeName = 'catppuccin_latte';
+		else s.themeName = 'catppuccin_macchiato';
+		isDark = s.themeName == 'catppuccin_macchiato';
 	}
 
 	function doneFormattingCallback(data: string, path: string) {
