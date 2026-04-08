@@ -29,6 +29,8 @@
 		const theme = window.localStorage.getItem('EditorTheme');
 		if (theme) {
 			s.themeName = theme;
+		} else {
+			s.themeName = 'catppuccin_macchiato';
 		}
 		applyTheme(s.themeName);
 

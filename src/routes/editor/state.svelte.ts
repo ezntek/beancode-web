@@ -31,7 +31,7 @@ interface IState {
 
 export const s: IState = $state({
     status: "",
-    themeName: "catppuccin_latte",
+    themeName: "catppuccin_macchiato",
     versionText: "",
     pyVersion: "",
     exitCode: 0,
