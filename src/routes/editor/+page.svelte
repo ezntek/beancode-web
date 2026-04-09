@@ -32,7 +32,8 @@
 		} else {
 			s.themeName = 'catppuccin_macchiato';
 		}
-		applyTheme(s.themeName);
+		s.loadedTheme = true;
+		applyTheme(s.themeName, s.loadedTheme);
 
 		try {
 			var dummy: any;

@@ -116,7 +116,7 @@
 
 	// FIXME: better theming system
 	$effect(() => {
-		applyTheme(s.themeName);
+		applyTheme(s.themeName, s.loadedTheme);
 		isDark = s.themeName == 'catppuccin_macchiato';
 	});
 
@@ -569,7 +569,7 @@
 	bind:this={traceDoneDialog}
 	ok={traceDoneOk}
 	cancel={() => saveDialog.close()}
-	title="Save tracer output"
+	title="Save Tracer Output"
 />
 <MessageDialog bind:this={messageDialog} />
 <ErrorDialog bind:this={errorDialog} />

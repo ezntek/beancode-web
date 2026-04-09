@@ -19,6 +19,7 @@ export const inputBuf = undefined;
 interface IState {
     status: string,
     themeName: string,
+    loadedTheme: boolean,
     exitCode: number,
     versionText: string,
     pyVersion: string,
@@ -32,6 +33,7 @@ interface IState {
 export const s: IState = $state({
     status: "",
     themeName: "catppuccin_macchiato",
+    loadedTheme: false,
     versionText: "",
     pyVersion: "",
     exitCode: 0,

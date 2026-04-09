@@ -87,7 +87,7 @@ export const CM_THEMES = {
     'catppuccin_mocha': catppuccinMocha,
 }
 
-export function applyTheme(themeName: string) { 
+export function applyTheme(themeName: string, loadedTheme: boolean) { 
     if (!(themeName in THEMES))
         console.error(`could not find theme ${themeName}!`);
 
@@ -97,5 +97,5 @@ export function applyTheme(themeName: string) {
         document.documentElement.style.setProperty(v, color);
     }
 
-    window.localStorage.setItem("EditorTheme", themeName);
+    if (loadedTheme) window.localStorage.setItem('EditorTheme', themeName);
 }
