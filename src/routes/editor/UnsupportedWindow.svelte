@@ -1,9 +1,9 @@
 <script lang="ts">
-	import AboutDialog from '$lib/components/AboutDialog.svelte';
+	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
 
 	let messageDialog: MessageDialog;
-	let aboutDialog: AboutDialog;
+	let settingsDialog: SettingsDialog;
 
 	function openDialog() {
 		const MSG =
@@ -27,11 +27,11 @@
 	</p>
 	<span>
 		<button onclick={() => openDialog()}>Why?</button>
-		<button onclick={() => aboutDialog.open()}>About</button>
+		<button onclick={() => settingsDialog.open()}>Settings</button>
 	</span>
 </div>
 <MessageDialog bind:this={messageDialog} />
-<AboutDialog bind:this={aboutDialog} />
+<SettingsDialog bind:this={settingsDialog} aboutOnly={true} />
 
 <style>
 	.wrapper {

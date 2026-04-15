@@ -17,7 +17,7 @@ from beancode.formatter import Formatter
 from beancode.tracer import *
 from beancode.runner import *
 from beancode import __version__
-import sys
+import sys, shutil
 
 __py_version__ = sys.version.split(" ")[0]
 
@@ -102,3 +102,9 @@ def trace_bean(s, n, v, cfg):
         return (None, edic)
     else:
         return (t.gen_html(), None)
+
+def nuke(d):
+    for itm in os.listdir(d):
+        print("removing: " + itm)
+        if itm not in {'..', '.'}:
+            os.remove(itm)

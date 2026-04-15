@@ -14,7 +14,7 @@
 
 	import Editor from './Editor.svelte';
 
-	import { BEANCODE_WEB_VERSION } from '$lib/version';
+	import { BEANCODE_IS_DEV_BUILD, BEANCODE_WEB_VERSION } from '$lib/version';
 
 	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';
@@ -42,11 +42,11 @@
 		type FileResponse
 	} from '$lib/fstypes';
 	import { changeFile, curExtension, editorNewFile, es } from './editor_state.svelte';
-	import AboutDialog from '$lib/components/AboutDialog.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 	import TraceDialog from '$lib/components/TraceDialog.svelte';
 	import type { TracerConfig } from '$lib/tracer';
 	import { applyTheme } from '$lib/themes/themes';
+	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -57,7 +57,8 @@
 	let fileBrowserShown = $state(true);
 	let isDark = $state(true);
 	let tracerOutput = '';
-	let aboutDialog: AboutDialog;
+
+	let settingsDialog: SettingsDialog;
 	let saveDialog: SaveDialog;
 	let traceDoneDialog: SaveDialog;
 	let errorDialog: ErrorDialog;
@@ -92,6 +93,16 @@
 		}
 	}
 
+	async function newDefaultFile() {
+		console.log(es.curFilePath, s.curdir);
+		es.curFilePath = 'MyProgram.bean';
+		es.src =
+			'// === Welcome to beancode web! ===\n' +
+			`// This file was created on beancode-web version ${BEANCODE_WEB_VERSION}.\n` +
+			'// Start typing some code below, delete these lines or create a new file.\n\n';
+		saveFile(true);
+	}
+
 	onMount(async () => {
 		s.inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
 		s.interruptBuf = new SharedArrayBuffer(1);
@@ -100,6 +111,11 @@
 
 		setTermWidth();
 		setFileBrowserWidth();
+
+		if (!window.localStorage.getItem('IsFirstLaunch')) {
+			newDefaultFile();
+			window.localStorage.setItem('IsFirstLaunch', 'no');
+		}
 
 		setDoneFormattingCallback(doneFormattingCallback);
 		setDoneTracingCallback(doneTracingCallback);
@@ -532,8 +548,12 @@
 				>
 					<span class="fa-solid fa-bug"></span>
 				</button>
-				<button aria-label="info" class="toolbar-aux-button" onclick={() => aboutDialog.open()}>
-					<span class="fa-solid fa-circle-info"></span>
+				<button
+					aria-label="setttings"
+					class="toolbar-aux-button"
+					onclick={() => settingsDialog.open()}
+				>
+					<span class="fa-solid fa-gear"></span>
 				</button>
 			</div>
 			<div class="middle">
@@ -550,7 +570,11 @@
 		</div>
 	</div>
 	<div class="bottom">
-		<p>Beancode Web version {BEANCODE_WEB_VERSION}</p>
+		{#if BEANCODE_IS_DEV_BUILD}
+			<p>Beancode Web version {BEANCODE_WEB_VERSION} <strong>(running locally)</strong></p>
+		{:else}
+			<p>Beancode Web version {BEANCODE_WEB_VERSION}</p>
+		{/if}
 		{#if ps.ready}
 			<p>loaded beancode <strong>v{s.versionText}</strong></p>
 		{:else}
@@ -558,7 +582,7 @@
 		{/if}
 	</div>
 </div>
-<AboutDialog bind:this={aboutDialog} />
+<SettingsDialog bind:this={settingsDialog} aboutOnly={false} />
 <SaveDialog
 	bind:this={saveDialog}
 	cancel={() => saveDialog.close()}

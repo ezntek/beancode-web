@@ -124,6 +124,12 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
         case 'compressdir-response':
             fileResponseCallback!(msg.kind, msg.path, msg.data);
             break;
+        case 'nuke-done':
+            post({ kind: 'listdir', path: s.cwd });
+            const url = new URL(location.href);
+            url.searchParams.set('_', Date.now().toString());
+            location.replace(url.toString());
+            break;
     }
 }
 

@@ -215,7 +215,7 @@
 	<div class="toolbar">
 		<p class="label">
 			{#if es.curFilePath === ''}
-				[New File]
+				[Unsaved File]
 			{:else}
 				{pathBasename(es.curFilePath)}
 			{/if}
