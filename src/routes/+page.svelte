@@ -22,38 +22,35 @@
 				<em>
 					<p style="color: var(--dark-green); font-size: 1.3em; margin: 0.8em;">
 						Beancode Web is a
-						<strong>100% Free and Open Source, Spyware and Remote server free</strong>
-						Online IDE for IGCSE/O-Level Pseudocode and Python!
+						<strong>100% Free and Open Source, fully browser-local</strong>
+						Online IDE for <br /> IGCSE/O-Level Pseudocode and Python!
 					</p>
 				</em>
 				<span style="margin: 0.8em; display: block;">
-					<form action="/editor" style="display: inline-block;">
-						<button class="btn" type="submit" title="Opens the editor.">
-							<span class="fa-solid fa-pencil"></span> Go to editor
-						</button>
-					</form>
-					<form action="https://github.com/ezntek/beancode-web" style="display: inline-block;">
-						<button
-							class="btn"
-							type="submit"
-							title="Opens https://github.com/ezntek/beancode-web. Give us a star!"
-						>
-							<span class="fa-brands fa-github"></span> Go to project GitHub
-						</button>
-					</form>
+					<a href="/editor" class="link" title="Opens the editor.">
+						<span class="fa-solid fa-pencil"></span> Go to editor
+					</a>
+					<a
+						class="link"
+						href="https://github.com/ezntek/beancode-web"
+						title="Opens https://github.com/ezntek/beancode-web. Give us a star!"
+					>
+						<span class="fa-brands fa-github"></span> Go to project GitHub
+					</a>
 				</span>
 			</center>
 
-			This is essentially a front-end for the
+			<br />
+			This is essentially the flagship IDE/a front-end for the
 			<a href="https://github.com/ezntek/beancode">beancode</a>
 			project, a
 			<strong>
-				100% syllabus-compliant Pseudocode implementation written in standard CPython, with
-				extension features!
+				100% syllabus-compliant Pseudocode implementation written in standard Python 3.10+, with
+				utilities and extension features!
 			</strong>.
 
 			<h2>About</h2>
-			This is a web IDE for Pseudocode and Python.
+			This is a web IDE for Pseudocode and Python. Here are some major features:
 			<ul>
 				<li>
 					It supports the <strong>0478, 2211, and 0984</strong> IGCSE/O-level syllabi,
@@ -72,6 +69,14 @@
 					formatting and tracing <em>do not work</em> when editing Python.
 				</li>
 			</ul>
+
+			This tool is designed to be<em>as straightforward as possible</em> for teachers and students,
+			and to hit as many use-cases as possible. If there are concerns, suggestions or feature
+			requests, please
+			<a href="mailto:eason@ezntek.com?subject=Beancode/Beancode web concerns">send me an email</a>
+			or
+			<a href="https://github.com/ezntek/beancode-web/issues/new">send a bug report on GitHub!</a>
+			Spam is not appreciated.
 
 			<h2>Editor Features</h2>
 			<ul>
@@ -239,7 +244,8 @@
 		box-shadow: 5px 5px 5px var(--shadow);
 	}
 
-	.btn {
+	.link {
+		text-decoration: none;
 		font-family: 'IBM Plex Mono', monospace !important;
 		padding: 0.3em;
 		border-width: 0px;
@@ -253,7 +259,7 @@
 			color 130ms ease,
 			font-weight 130ms ease;
 	}
-	.btn:hover {
+	.link:hover {
 		color: var(--bg-base);
 		background-color: var(--text);
 	}
