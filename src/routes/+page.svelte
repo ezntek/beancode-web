@@ -1,6 +1,8 @@
 <script lang="ts">
-	/* TODO: actually implement dark mode
-	let mode = 'Light';
+	import { onMount } from 'svelte';
+
+	// TODO: actually implement dark mode
+	let mode = $state('Light');
 
 	function toggleMode() {
 		if (mode == 'Light') {
@@ -10,17 +12,34 @@
 		}
 		document.documentElement.setAttribute('data-theme', mode);
 	}
-    */
+
+	onMount(() => {
+		const mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+		const changeTheme = () => {
+			mode = mq.matches ? 'Dark' : 'Light';
+			document.documentElement.setAttribute('data-theme', mode);
+		};
+
+		// do it once fisrt
+		changeTheme();
+		mq.addEventListener('change', changeTheme);
+
+		return () => mq.removeEventListener('change', changeTheme);
+	});
 </script>
 
 <div id="homepage">
 	<div id="island-wrap">
-		<p class="lbl">Note: this website does not support dark mode yet.</p>
 		<div id="island">
 			<center>
-				<img src="/logo.png" id="bcimg" alt="beancode logo" />
+				{#if mode === 'Light'}
+					<img src="/logo.png" id="bcimg" alt="beancode logo" />
+				{:else}
+					<img src="/logo_dark.png" id="bcimg" alt="beancode logo" />
+				{/if}
 				<em>
-					<p style="color: var(--dark-green); font-size: 1.3em; margin: 0.8em;">
+					<p style="color: var(--subtext); font-size: 1.3em; margin: 0.8em;">
 						Beancode Web is a
 						<strong>100% Free and Open Source, fully browser-local</strong>
 						Online IDE for <br /> IGCSE/O-Level Pseudocode and Python!
@@ -37,6 +56,14 @@
 					>
 						<span class="fa-brands fa-github"></span> Go to project GitHub
 					</a>
+					<button class="link" onclick={() => toggleMode()}>
+						{#if mode === 'Light'}
+							<span class="fa-solid fa-sun"></span>
+						{:else}
+							<span class="fa-solid fa-moon"></span>
+						{/if}
+						{mode}
+					</button>
 				</span>
 			</center>
 
@@ -158,7 +185,9 @@
 				</li>
 			</ul>
 		</div>
-		<p class="lbl">This website is copyright © Eason Qin (ezntek), 2026 (eason@ezntek.com)</p>
+		<div style="display: flex;">
+			<p class="lbl">This website is copyright © Eason Qin (ezntek), 2026 (eason@ezntek.com)</p>
+		</div>
 	</div>
 </div>
 
@@ -167,17 +196,39 @@
 	:global([data-theme='Light']) {
 		--bg-base: #f0f9e8;
 		--base: #dcf1c8;
-		--dark-green: #526e35;
+		--subsubtext: #618446;
+		--subtext: #526e35;
+		--border: gray;
 		--text: #30401f;
 		--shadow: gray;
+		--bg-img: url('/smalllogo.png');
 	}
 	:global([data-theme='Dark']) {
 		/* TODO: actually implment dark mode */
-		--bg-base: #f0f9e8;
-		--base: #dcf1c8;
-		--dark-green: #526e35;
-		--text: #30401f;
-		--shadow: gray;
+		--bg-base: #2a2b2b;
+		--base: #353a38;
+		--subsubtext: #dcf1c8;
+		--subtext: #618446;
+		--text: #f0f9e8;
+		--border: #575a5a;
+		--shadow: var(--border);
+		--bg-img: url('/smalllogo_dark.png');
+	}
+
+	a:link {
+		color: var(--subsubtext);
+	}
+
+	a:visited {
+		color: var(--subtext);
+	}
+
+	a:hover {
+		color: var(--text);
+	}
+
+	a:active {
+		color: var(--text);
 	}
 
 	.lbl {
@@ -186,7 +237,7 @@
 			monospace;
 		margin: 0.5em;
 		text-align: right;
-		color: var(--dark-green);
+		color: var(--subtext);
 		text-shadow: 5px 5px 5px var(--shadow);
 	}
 
@@ -209,11 +260,12 @@
 		background-color: var(--bg-base);
 		overflow: hidden;
 	}
+
 	#homepage::before {
 		content: '';
 		position: absolute;
 		inset: -50%;
-		background-image: url('/smalllogo.png');
+		background-image: var(--bg-img);
 		background-repeat: repeat;
 		background-size: 40px 40px; /* adjust spacing */
 		background-position: center;
@@ -239,13 +291,12 @@
 		background-color: var(--base);
 		font-size: 1.2em;
 		padding: 0.8em;
-		border: 2px solid gray;
+		border: 2px solid var(--border);
 		border-radius: 8px;
 		box-shadow: 5px 5px 5px var(--shadow);
 	}
 
 	.link {
-		text-decoration: none;
 		font-family: 'IBM Plex Mono', monospace !important;
 		padding: 0.3em;
 		border-width: 0px;
@@ -258,6 +309,13 @@
 			background-color 130ms ease,
 			color 130ms ease,
 			font-weight 130ms ease;
+	}
+	.link:link,
+	.link:visited,
+	.link:hover,
+	.link:active {
+		color: var(--text);
+		text-decoration: none;
 	}
 	.link:hover {
 		color: var(--bg-base);
