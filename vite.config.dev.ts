@@ -1,6 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { execSync } from 'child_process';
-import { readFileSync } from 'fs';
 import { defineConfig } from 'vite';
 import mkcert from 'vite-plugin-mkcert';
 

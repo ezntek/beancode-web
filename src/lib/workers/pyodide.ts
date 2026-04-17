@@ -13,6 +13,7 @@ import type { PyMessage, EditorMessage, BeanError } from "./pyodide_state.svelte
 import type { FileResponse } from "$lib/fstypes";
 import { tracerConfigToPython, type TracerConfig } from "$lib/tracer";
 import JSZip from "jszip";
+import { WANTED_PYODIDE_VERSION, WANTED_BEANCODE_VERSION } from "$lib/version";
 
 function post(msg: PyMessage) {
     postMessage(msg satisfies PyMessage);
@@ -236,11 +237,12 @@ async function doInitialSetupCheck() {
 let py: any;
 async function loadBeancode() {
     if (!py) {
+        // XXX: ignore the cursed concatenation. its needed.
+
         // @ts-ignore
-        const PyodideModule = await import("https://cdn.jsdelivr.net/pyodide/v0.29.0/full/pyodide.mjs?url");
-        //const PyodideModule = await import("/pyodide/pyodide.mjs?url");
+        const PyodideModule = await import(/* @vite-ignore */ "https://cdn.jsdelivr.net/pyodide/v" + WANTED_PYODIDE_VERSION + "/full/pyodide.mjs?url");
         // @ts-ignore
-        py = await PyodideModule.loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.29.0/full/" });
+        py = await PyodideModule.loadPyodide({ /* @vite-ignore */ indexURL: "https://cdn.jsdelivr.net/pyodide/v" + WANTED_PYODIDE_VERSION + "/full/" });
         FS = py.FS;
 
         FS.mkdirTree("/data");
@@ -249,8 +251,7 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const BEANCODE_VERSION = "0.7.3";
-        const PATH = `/bcdata/beancode-${BEANCODE_VERSION}-py3-none-any.whl`
+        const PATH = `/bcdata/beancode-${WANTED_BEANCODE_VERSION}-py3-none-any.whl`
         const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\")`
         try {
             await py.runPythonAsync(SCRIPT)
