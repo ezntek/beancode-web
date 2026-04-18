@@ -52,6 +52,7 @@
 		"codemirror": "6",
 		"git-rev-sync": "^3.0.2",
 		"jszip": "^3.10.1",
-		"typescript-svelte-plugin": "^0.3.50"
+		"typescript-svelte-plugin": "^0.3.50",
+		"ua-parser-js": "^2.0.9"
 	}
 }

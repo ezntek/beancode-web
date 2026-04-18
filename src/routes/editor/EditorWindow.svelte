@@ -553,7 +553,7 @@
 					class="toolbar-aux-button"
 					onclick={() => settingsDialog.open()}
 				>
-					<span class="fa-solid fa-gear"></span>
+					<span class="fa-solid fa-circle-info"></span>
 				</button>
 			</div>
 			<div class="middle">
@@ -582,7 +582,7 @@
 		{/if}
 	</div>
 </div>
-<SettingsDialog bind:this={settingsDialog} aboutOnly={false} />
+<SettingsDialog bind:this={settingsDialog} aboutOnly={true} />
 <SaveDialog
 	bind:this={saveDialog}
 	cancel={() => saveDialog.close()}

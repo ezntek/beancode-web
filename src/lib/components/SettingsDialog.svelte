@@ -10,11 +10,12 @@
 -->
 
 <script lang="ts">
-	import { BEANCODE_COMMIT_HASH, BEANCODE_WEB_VERSION } from '$lib/version';
+	import { BEANCODE_COMMIT_HASH, BEANCODE_WEB_VERSION, WANTED_PYODIDE_VERSION } from '$lib/version';
 	import { post } from '$lib/workers/pyodide_state.svelte';
 	import { editorNewFile } from '../../routes/editor/editor_state.svelte';
 	import { s } from '../../routes/editor/state.svelte';
 	import Dialog from './Dialog.svelte';
+	import { UAParser } from 'ua-parser-js';
 
 	interface IProps {
 		aboutOnly: boolean;
@@ -25,8 +26,12 @@
 	let submitButton: HTMLButtonElement;
 	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
 	type TView = (typeof possibleViews)[number];
-	let view: TView = $state('general');
 
+	// yes, we only want the initial state
+	let view: TView = $state(aboutOnly ? 'about' : 'general');
+
+	const result = new UAParser().getResult();
+	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
 		innerDialog.close();
@@ -118,9 +123,15 @@
 						<tr>
 							<td>commit hash</td><td><strong>{BEANCODE_COMMIT_HASH}</strong></td>
 						</tr>
+						<tr>
+							<td>platform</td><td><strong>{ua}</strong></td>
+						</tr>
 						{#if s.versionText !== ''}
 							<tr>
 								<td>beancode</td><td><strong>{s.versionText}</strong></td>
+							</tr>
+							<tr>
+								<td>Pyodide</td><td><strong>{WANTED_PYODIDE_VERSION}</strong></td>
 							</tr>
 							<tr>
 								<td>Python</td><td><strong>{s.pyVersion}</strong></td>
