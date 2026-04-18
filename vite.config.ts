@@ -1,12 +1,12 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { execSync } from 'child_process';
-import mkcert from 'vite-plugin-mkcert';
+//import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
 	plugins: [
         sveltekit(),
-        mkcert(),
+        //mkcert(),
         {
             name: 'configure-response-headers',
             configurePreviewServer: (server) => {
