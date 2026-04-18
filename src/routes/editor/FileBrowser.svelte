@@ -440,15 +440,18 @@
 		flex-direction: column;
 		width: 100%;
 		overflow: hidden;
+		height: 100%;
 	}
 
 	.file-browser-content {
 		display: flex;
-		flex: 1 0 auto;
+		flex: 1;
+		min-height: 0;
 		flex-direction: column;
 		background-color: var(--bw-base2);
 		gap: 0.4em;
 		padding: 0.3em;
+		overflow-y: auto;
 	}
 
 	.icon {

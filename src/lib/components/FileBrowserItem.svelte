@@ -21,7 +21,7 @@
 	const bgstyle = `background-color: var(${bgcol});`;
 </script>
 
-<div class="item" style={bgstyle}>
+<div class="file-browser-item" style={bgstyle}>
 	<button class="button" style={bgstyle} onclick={() => onClick()}>
 		<span>{@render children()}</span>
 	</button>
@@ -33,11 +33,12 @@
 </div>
 
 <style>
-	.item {
+	.file-browser-item {
 		display: flex;
 		position: relative;
 		border-radius: 0.15em;
-		overflow: hidden;
+		overflow-x: hidden;
+		flex-shrink: 0;
 	}
 	.button {
 		flex: 1;
@@ -49,7 +50,7 @@
 		font-size: 1em;
 		background-color: var(--bw-base3);
 		color: var(--bw-text);
-		overflow: hiddee-info;
+		overflow: hidden;
 	}
 
 	.button > span {
@@ -64,7 +65,7 @@
 		right: 0;
 		height: 100%;
 		display: flex;
-		margin-right: 0.5em;
+		margin-right: 0.2em;
 		align-items: center;
 		justify-content: space-evenly;
 		background-color: var(--bw-base3);
@@ -74,12 +75,12 @@
 	.actions > button {
 		opacity: 0;
 	}
-	.item:hover .actions {
+	.file-browser-item:hover .actions {
 		background-color: var(--bw-surface1);
 		opacity: 1;
 		pointer-events: auto;
 	}
-	.item:hover .actions > button {
+	.file-browser-item:hover .actions > button {
 		opacity: 1;
 	}
 	.info {
@@ -92,11 +93,11 @@
 		padding-right: 0.2em;
 	}
 
-	.item:hover {
+	.file-browser-item:hover {
 		background-color: var(--bw-surface1) !important;
 	}
 
-	.item:hover > :global(button) {
+	.file-browser-item:hover > :global(button) {
 		background-color: var(--bw-surface1) !important;
 	}
 </style>
