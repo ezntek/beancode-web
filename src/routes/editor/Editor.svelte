@@ -12,7 +12,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { EditorView, keymap } from '@codemirror/view';
-	import { history, insertTab } from '@codemirror/commands';
+	import { history, indentWithTab, insertTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
 	import { indentUnit } from '@codemirror/language';
 	import { beanDiagnostics, errField, es } from './editor_state.svelte';
@@ -117,7 +117,7 @@
 					...foldKeymap,
 					...completionKeymap,
 					...lintKeymap,
-					{ key: 'Tab', run: insertTab }
+					indentWithTab
 				]),
 				indentUnit.of('    ')
 			];
