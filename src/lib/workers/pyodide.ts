@@ -360,6 +360,12 @@ function trace(src: string, path: string, vars: string[], config: TracerConfig):
     return out;
 }
 
+function nuke() {
+    // TODO: allow nuking multiple projects
+    py.runPython("nuke('/data/projects/default')");
+    sync();
+}
+
 onmessage = async (event: MessageEvent<EditorMessage>) => { 
     try {
         await pyBeancodePromise;
@@ -410,6 +416,10 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'compressdir':
                 post({ kind: 'compressdir-response', path: msg.path, data: await compressDir(msg.path) });
+                break;
+            case 'nuke':
+                nuke();
+                post({ kind: 'nuke-done' });
                 break;
         }
     } catch (exc: any) {

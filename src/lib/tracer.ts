@@ -56,6 +56,7 @@ export function getTraceableVars(src: string): string[] {
                     if (child.name === "Ident")
                         vars.add(src.slice(child.from, child.to));
                 }
+                break;
             case 'ConstantStatement':
             case 'ForStatement':
             case 'AssignStatement':
@@ -65,6 +66,13 @@ export function getTraceableVars(src: string): string[] {
                     if (child.name === "Ident")
                         vars.add(src.slice(child.from, child.to)); 
                 }
+                break;
+            case 'Parameter':
+                node = cursor.node;
+                const child = node.firstChild;
+                if (child)
+                    vars.add(src.slice(child.from, child.to));
+                break;
             default:
                 break;
         }

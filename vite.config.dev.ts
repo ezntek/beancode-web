@@ -30,6 +30,7 @@ export default defineConfig({
     },
     define: {
         __COMMIT_HASH__: JSON.stringify(execSync('git rev-parse --short HEAD').toString().trim()),
+        __DEV__: true,
     },
     optimizeDeps: {
         include: [

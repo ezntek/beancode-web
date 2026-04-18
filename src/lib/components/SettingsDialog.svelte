@@ -11,13 +11,21 @@
 
 <script lang="ts">
 	import { BEANCODE_COMMIT_HASH, BEANCODE_WEB_VERSION } from '$lib/version';
+	import { post } from '$lib/workers/pyodide_state.svelte';
+	import { editorNewFile } from '../../routes/editor/editor_state.svelte';
 	import { s } from '../../routes/editor/state.svelte';
 	import Dialog from './Dialog.svelte';
 
+	interface IProps {
+		aboutOnly: boolean;
+	}
+	let { aboutOnly }: IProps = $props();
+
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
-	type TView = 'about' | 'license';
-	let view: TView = $state('about');
+	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
+	type TView = (typeof possibleViews)[number];
+	let view: TView = $state('general');
 
 	// @ts-ignore
 	export const close = () => {
@@ -33,9 +41,15 @@
 		submitButton.focus();
 	}
 
-	function selectorStyle(name: TView): string {
+	function selectorStyle(name: string): string {
 		if (name === view) return 'selector-selected';
 		return '';
+	}
+
+	function clearData() {
+		window.localStorage.clear();
+		editorNewFile();
+		post({ kind: 'nuke' });
 	}
 </script>
 
@@ -45,28 +59,45 @@
 			<button aria-label="close" class="exit-button" onclick={() => close()}>
 				<span class="fa-solid fa-x"></span>
 			</button>
-			<p class="title"><strong>About</strong></p>
+			<p class="title"><strong>Settings</strong></p>
 		</div>
 		<div class="selector">
-			<button
-				onclick={() => {
-					view = 'about';
-				}}
-				class={selectorStyle('about')}
-			>
-				ABOUT
-			</button>
-			<button
-				onclick={() => {
-					view = 'license';
-				}}
-				class={selectorStyle('license')}
-			>
-				LICENSE
-			</button>
+			{#if aboutOnly}
+				{#each ['about', 'license'] as viewName}
+					<button
+						onclick={() => {
+							// @ts-ignore
+							view = viewName;
+						}}
+						class={selectorStyle(viewName)}
+					>
+						{viewName.toUpperCase()}
+					</button>
+				{/each}
+			{:else}
+				{#each possibleViews as viewName}
+					<button
+						onclick={() => {
+							view = viewName;
+						}}
+						class={selectorStyle(viewName)}
+					>
+						{viewName.toUpperCase()}
+					</button>
+				{/each}
+			{/if}
 		</div>
 		<div class="middle">
-			{#if view === 'about'}
+			{#if view === 'general'}
+				<h1>General Settings</h1>
+				<p style="color: var(--bw-subtext1);">nothing to see here...</p>
+			{:else if view === 'advanced'}
+				<h1>Advanced Settings</h1>
+				<button class="button destructive-button" onclick={() => clearData()}>
+					<span class="fa-solid fa-trash"></span>
+					Clear all user data
+				</button>
+			{:else if view == 'about'}
 				<h1>About beancode web</h1>
 				<p>
 					Beancode web aims to be a portable, simple and friendly web IDE for IGCSE Computer Science
@@ -97,7 +128,7 @@
 						{/if}
 					</tbody>
 				</table>
-			{:else if view === 'license'}
+			{:else if view == 'license'}
 				<h1>License</h1>
 				<p>
 					Beancode Web is copyright (c) Eason Qin 2025-2026. It is licensed under the GNU Affero
@@ -121,7 +152,7 @@
 		</div>
 		<div class="bottom">
 			<button
-				class="ok"
+				class="button ok"
 				bind:this={submitButton}
 				onclick={() => {
 					close();
@@ -169,7 +200,7 @@
 		gap: 0.5em;
 	}
 
-	.bottom button {
+	.button {
 		font-family: 'IBM Plex Mono', monospace !important;
 		padding: 0.3em;
 		border-width: 0px;
@@ -183,11 +214,21 @@
 			font-weight 130ms ease;
 	}
 
-	.bottom .ok {
+	.destructive-button {
+		background-color: var(--bw-red);
+		color: var(--bw-base1);
+	}
+
+	.destructive-button:hover {
+		background-color: var(--bw-surface1);
+		color: var(--bw-red);
+	}
+
+	.ok {
 		background-color: var(--bw-surface1);
 	}
 
-	.bottom .ok:hover {
+	.ok:hover {
 		background-color: var(--bw-base1);
 		color: var(--bw-subtext1);
 	}
