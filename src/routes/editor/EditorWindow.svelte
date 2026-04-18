@@ -82,6 +82,10 @@
 		} else {
 			terminalWidth = window.innerWidth * 0.3;
 		}
+		setTimeout(() => {
+			// XXX: hacky way to make sure the term is actually loaded
+			ts.termFitAddon?.fit();
+		}, 50);
 	}
 
 	function setFileBrowserWidth() {
