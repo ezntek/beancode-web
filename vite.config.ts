@@ -1,16 +1,19 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { execSync } from 'child_process';
+import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
 	plugins: [
         sveltekit(),
+        mkcert(),
         {
             name: 'configure-response-headers',
-            configureServer: (server) => {
+            configurePreviewServer: (server) => {
                 server.middlewares.use((_req, res, next) => {
                     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
                     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+                    res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
                     next();
                 });
             }
@@ -20,7 +23,16 @@ export default defineConfig({
         host: true,
         headers: {
             "Cross-Origin-Embedder-Policy": "require-corp",
-            "Cross-Origin-Opener-Policy": "same-origin"
+            "Cross-Origin-Opener-Policy": "same-origin",
+            'Cross-Origin-Resource-Policy': 'cross-origin',
+        },
+    },
+    preview: {
+        host: true,
+        headers: {
+            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Cross-Origin-Opener-Policy": "same-origin",
+            'Cross-Origin-Resource-Policy': 'cross-origin',
         },
     },
     define: {

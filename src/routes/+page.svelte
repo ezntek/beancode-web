@@ -32,19 +32,19 @@
 <div id="homepage">
 	<div id="island-wrap">
 		<div id="island">
-			<center>
+			<div style="display: flex; align-items: center; flex-direction: column;">
 				{#if mode === 'Light'}
 					<img src="/logo.png" id="bcimg" alt="beancode logo" />
 				{:else}
 					<img src="/logo_dark.png" id="bcimg" alt="beancode logo" />
 				{/if}
-				<em>
-					<p style="color: var(--subtext); font-size: 1.3em; margin: 0.8em;">
+				<p style="color: var(--subtext); font-size: 1.3em; margin: 0.8em; text-align: center;">
+					<em>
 						Beancode Web is a
 						<strong>100% Free and Open Source, fully browser-local</strong>
 						Online IDE for <br /> IGCSE/O-Level Pseudocode and Python!
-					</p>
-				</em>
+					</em>
+				</p>
 				<span style="margin: 0.8em; display: block;">
 					<a href="/editor" class="link" title="Opens the editor.">
 						<span class="fa-solid fa-pencil"></span> Go to editor
@@ -65,7 +65,7 @@
 						{mode}
 					</button>
 				</span>
-			</center>
+			</div>
 
 			<br />
 			This is essentially the flagship IDE/a front-end for the
@@ -77,7 +77,7 @@
 			</strong>.
 
 			<h2>About</h2>
-			This is a web IDE for Pseudocode and Python. Here are some major features:
+			<p>This is a web IDE for Pseudocode and Python. Here are some major features:</p>
 			<ul>
 				<li>
 					It supports the <strong>0478, 2211, and 0984</strong> IGCSE/O-level syllabi,
@@ -97,13 +97,17 @@
 				</li>
 			</ul>
 
-			This tool is designed to be<em>as straightforward as possible</em> for teachers and students,
-			and to hit as many use-cases as possible. If there are concerns, suggestions or feature
-			requests, please
-			<a href="mailto:eason@ezntek.com?subject=Beancode/Beancode web concerns">send me an email</a>
-			or
-			<a href="https://github.com/ezntek/beancode-web/issues/new">send a bug report on GitHub!</a>
-			Spam is not appreciated.
+			<p>
+				This tool is designed to be <em>as straightforward as possible</em> for teachers and
+				students, and to hit as many use-cases as possible. If there are concerns, suggestions or
+				feature requests, please
+				<a href="mailto:eason@ezntek.com?subject=Beancode%2fBeancode%20web%20concerns">
+					send me an email
+				</a>
+				or
+				<a href="https://github.com/ezntek/beancode-web/issues/new">send a bug report on GitHub!</a>
+				Spam is not appreciated.
+			</p>
 
 			<h2>Editor Features</h2>
 			<ul>
