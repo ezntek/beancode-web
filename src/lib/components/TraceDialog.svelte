@@ -12,6 +12,7 @@
 <script lang="ts">
 	import { defaultTracerConfig, getTraceableVars, type TracerConfig } from '$lib/tracer';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import '$lib/styles/dialog.css';
 
 	interface IProps {
 		ok: (vars: string[], config: TracerConfig) => void;
@@ -284,7 +285,7 @@
 
 	.picker {
 		font-family: 'IBM Plex Mono', monospace !important;
-		font-size: 12pt;
+		font-size: 1.1em;
 		border-width: 0px;
 		border-radius: 3px;
 		background-color: var(--bw-surface1);
@@ -331,6 +332,7 @@
 		padding-bottom: 0.3em;
 		flex: 1;
 		font-family: 'IBM Plex Mono', monospace !important;
+		font-size: 0.9em;
 		border: 0px;
 		border-radius: 0px;
 		background-color: var(--bw-base1);
@@ -430,28 +432,5 @@
 		padding: 0px;
 		margin: 0px;
 		margin-left: 0.8em;
-	}
-
-	.exit-button {
-		border: 0px solid black;
-		border-radius: 5px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background-color: var(--bw-red);
-		color: var(--bw-base1);
-		text-align: center;
-		font-size: 0.8em;
-		width: 1.5em;
-		height: 1.5em;
-		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
-	}
-
-	.exit-button:hover {
-		background-color: var(--bw-base1);
-		color: var(--bw-red);
 	}
 </style>

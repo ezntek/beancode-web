@@ -99,7 +99,9 @@
 		es.src =
 			'// === Welcome to beancode web! ===\n' +
 			`// This file was created on beancode-web version ${BEANCODE_WEB_VERSION}.\n` +
-			'// Start typing some code below, delete these lines or create a new file.\n\n';
+			'// Start typing some Pseudocode below, delete these lines or create a new file.\n' +
+			'// You can edit Python code by creating a new file, with the file type Python.\n\n' +
+			'OUTPUT "Hello, Beancode web!"\n';
 		saveFile(true);
 	}
 

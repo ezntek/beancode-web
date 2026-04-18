@@ -1,0 +1,27 @@
+	.exit-button {
+		border: 0px solid black;
+		border-radius: 5px;
+		background-color: var(--bw-red);
+		color: var(--bw-base1);
+		text-align: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		transition:
+			background-color 130ms ease,
+			color 130ms ease,
+			font-weight 130ms ease;
+	}
+
+	@media (max-width: 1400px), (max-height: 800px) {
+		.exit-button {
+			padding: 9px;
+			width: 1.2em;
+			height: 1.2em;
+		}
+	}
+
+	.exit-button:hover {
+		background-color: var(--bw-base1);
+		color: var(--bw-red);
+	}

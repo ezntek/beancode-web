@@ -104,7 +104,7 @@
 
 	@media (max-width: 1400px), (max-height: 800px) {
 		#editor-window-wrapper > :global(*) {
-			font-size: 14px;
+			font-size: 13px;
 		}
 	}
 </style>

@@ -395,15 +395,13 @@
 		flex-shrink: 0;
 		margin-top: 0.4em;
 		gap: 0.4em;
+		padding: 0.4em;
 	}
 
 	.toolbar-label {
 		color: var(--bw-subtext2);
 		font-family: 'IBM Plex Mono', monospace;
-		padding: 0;
-		padding-bottom: 0.1em;
 		padding-left: 0.3em;
-		padding: 0.3em;
 		margin: 0;
 		margin-right: auto;
 	}

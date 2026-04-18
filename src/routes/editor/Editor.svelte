@@ -74,8 +74,8 @@
 		});
 
 		sz = 20;
-		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
-			sz = 18;
+		if (window.innerWidth <= 1400 || window.innerHeight <= 800) {
+			sz = 16;
 		}
 
 		const style = EditorView.theme({

@@ -29,8 +29,8 @@
 		};
 		window.addEventListener('resize', handleResize);
 
-		if (window.innerWidth <= 1366 || window.innerHeight <= 768) {
-			fontSize = 20;
+		if (window.innerWidth <= 1400 || window.innerHeight <= 800) {
+			fontSize = 18;
 		}
 
 		options = {

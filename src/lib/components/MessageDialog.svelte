@@ -11,6 +11,7 @@
 
 <script lang="ts">
 	import Dialog from './Dialog.svelte';
+	import '$lib/styles/dialog.css';
 
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
@@ -128,27 +129,5 @@
 		padding: 0px;
 		margin: 0px;
 		margin-left: 0.8em;
-	}
-
-	.exit-button {
-		border: 0px solid black;
-		border-radius: 5px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background-color: var(--bw-red);
-		color: var(--bw-base1);
-		text-align: center;
-		width: 1.5em;
-		height: 1.5em;
-		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
-	}
-
-	.exit-button:hover {
-		background-color: var(--bw-base1);
-		color: var(--bw-red);
 	}
 </style>

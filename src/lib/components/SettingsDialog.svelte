@@ -17,6 +17,8 @@
 	import Dialog from './Dialog.svelte';
 	import { UAParser } from 'ua-parser-js';
 
+	import '$lib/styles/dialog.css';
+
 	interface IProps {
 		aboutOnly: boolean;
 	}
@@ -254,6 +256,7 @@
 		padding-bottom: 0.3em;
 		flex: 1;
 		font-family: 'IBM Plex Mono', monospace !important;
+		font-size: 0.9em;
 		border: 0px;
 		border-radius: 0px;
 		background-color: var(--bw-base1);
@@ -321,27 +324,5 @@
 		padding: 0px;
 		margin: 0px;
 		margin-left: 0.8em;
-	}
-
-	.exit-button {
-		border: 0px solid black;
-		border-radius: 5px;
-		background-color: var(--bw-red);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		color: var(--bw-base1);
-		text-align: center;
-		width: 1.5em;
-		height: 1.5em;
-		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
-	}
-
-	.exit-button:hover {
-		background-color: var(--bw-base1);
-		color: var(--bw-red);
 	}
 </style>
