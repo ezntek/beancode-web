@@ -290,6 +290,7 @@
 		margin-left: 15vw;
 		margin-right: 15vw;
 	}
+
 	#island {
 		color: var(--text);
 		background-color: var(--base);
@@ -324,5 +325,23 @@
 	.link:hover {
 		color: var(--bg-base);
 		background-color: var(--text);
+	}
+
+	@media (max-width: 1400px), (max-height: 800px) {
+		#island-wrap {
+			margin-top: 1.5em;
+			margin-bottom: 1.5em;
+			margin-left: 10vw;
+			margin-right: 10vw;
+		}
+
+		#island {
+			font-size: 1em;
+			padding: 0.6em;
+		}
+
+		.link {
+			font-size: 1em;
+		}
 	}
 </style>
