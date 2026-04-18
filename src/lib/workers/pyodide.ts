@@ -307,6 +307,7 @@ async function handleRun(src: string, path: string) {
         post({ kind: 'error', data: String(e), fromBeancode: true });
         post({ kind: 'pyexit', code: 1 });
     }
+    sync();
 }
 
 async function handleRunPy(src: string, name: string){
@@ -330,6 +331,7 @@ async function handleRunPy(src: string, name: string){
 
         post({ kind: 'pyexit', code: 1 });
     }
+    sync();
 }
 
 function formatBean(src: string, path: string): string | null {
