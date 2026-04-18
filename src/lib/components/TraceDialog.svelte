@@ -157,17 +157,19 @@
 							<span class="fa-solid fa-trash"></span>
 						</button>
 					</div>
-					{#each usedVars as varName}
-						<button
-							aria-label="delete variable"
-							title="delete variable"
-							class="var-row"
-							onclick={() => delItem(varName)}
-						>
-							<span style="margin-right: auto;">{varName}</span>
-							<span class="icon fa-solid fa-trash" style="color: var(--bw-red)"></span>
-						</button>
-					{/each}
+					<div class="var-container">
+						{#each usedVars as varName}
+							<button
+								aria-label="delete variable"
+								title="delete variable"
+								class="var-row"
+								onclick={() => delItem(varName)}
+							>
+								<span style="margin-right: auto;">{varName}</span>
+								<span class="icon fa-solid fa-trash" style="color: var(--bw-red)"></span>
+							</button>
+						{/each}
+					</div>
 				</div>
 			{:else if view === 'options'}
 				<p class="subtext">Adjust the tracer's options:</p>
@@ -238,22 +240,24 @@
 		accent-color: var(--bw-blue);
 	}
 
+	.var-container {
+		display: flex;
+		flex-direction: column;
+		margin-top: 0.4em;
+		gap: 0.4em;
+	}
+
 	.var-row {
 		display: flex;
 		font-size: 1em;
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		margin-top: 0.5em;
 		background-color: var(--bw-base3);
 		color: var(--bw-text);
 		font-family: 'IBM Plex Mono', monospace;
 		border-radius: 0.2em;
-		padding-left: 0.3em;
-		padding-right: 0.3em;
 		border: 0px;
-		margin: 0.1 0 0.1 0em;
-
 		transition:
 			background-color 130ms ease,
 			color 130ms ease;
