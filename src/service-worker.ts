@@ -25,6 +25,7 @@ const PYODIDE_ASSETS = [
     '/pyodide_stdlib.zip',
     '/pyodide.asm.wasm',
     '/pyodide.asm.js',
+    '/pyodide.mjs?url',
 ];
 
 self.addEventListener('install', (event) => {
