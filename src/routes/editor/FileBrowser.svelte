@@ -160,6 +160,19 @@
 		);
 	}
 
+	function handleDeleteAll() {
+		confirmDialog.open(
+			[
+				'This will delete ALL FILES that you have in this project.',
+				'Are you VERY SURE? This action is NOT reversible.'
+			],
+			() => {
+				post({ kind: 'nuke' });
+			},
+			() => {}
+		);
+	}
+
 	function deleteItemForReal() {
 		const path = pathJoin(s.cwd, lastClicked);
 		post({ kind: 'delfile', path: path });
@@ -362,6 +375,11 @@
 			<button onclick={() => handleDelete(openDropdownItem)} style="color: var(--bw-red);">
 				<span class="fa-solid fa-trash"></span>
 				Delete
+			</button>
+		{:else}
+			<button onclick={() => handleDeleteAll()} style="color: var(--bw-red);">
+				<span class="fa-solid fa-trash"></span>
+				Delete All Files
 			</button>
 		{/if}
 	</Dropdown>

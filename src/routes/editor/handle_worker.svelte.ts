@@ -24,13 +24,19 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     const msg = event.data;
     let rkind: any;
     switch (msg.kind) {
+        case 'repl-done':
+            ps.ready = true;
+            s.running = false;
+            ts.canInput = false;
+            s.replRunning = false;
+            ter.write('\x1b[2J\x1b[H');
+            break;
         case 'ready':
             ps.ready = true;
             s.running = false;
             ts.canInput = false;
             s.versionText = msg.version;
             s.pyVersion = msg.pyversion;
-            ter.write('\x1b[2J\x1b[H')
             break;
         case 'clear':
             ter.write('\x1b[2J\x1b[H')

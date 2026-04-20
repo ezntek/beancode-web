@@ -332,6 +332,11 @@
 		s.running = false;
 		ts.canInput = false;
 		ts.terminal!.writeln('');
+		if (s.replRunning) {
+			s.replRunning = false;
+			ts.termFitAddon!.fit();
+			ts.terminal!.write('\x1b[2J\x1b[H');
+		}
 	}
 
 	function runStopTooltip() {
@@ -457,6 +462,26 @@
 			overwrite
 		});
 	}
+
+	function replClicked() {
+		if (!s.pyVersion) return;
+		if (s.replRunning) {
+			stop();
+			es.saved = true;
+		} else {
+			s.running = true;
+			s.replRunning = true;
+			ts.terminal!.clear();
+			ts.terminal!.write('\x1b[2J\x1b[H');
+			setTimeout(() => {
+				ts.termFitAddon!.fit();
+			}, 75);
+			saveFile(true);
+			post({
+				kind: 'repl'
+			});
+		}
+	}
 </script>
 
 <div class="editor-window">
@@ -533,6 +558,14 @@
 					<span class="fa-solid {isDark ? 'fa-moon' : 'fa-sun'}"></span>
 				</button>
 				<button
+					aria-label="toggle light/dark mode"
+					title="Run the REPL (Read-Eval-Print-Loop) to experiment with code."
+					class="toolbar-aux-button {s.replRunning ? 'toolbar-aux-button-enabled' : ''}"
+					onclick={() => replClicked()}
+				>
+					<span class="fa-solid fa-arrows-spin"></span>
+				</button>
+				<button
 					aria-label="Go to project GitHub"
 					class="toolbar-aux-button"
 					title="Go to this project's GitHub page"
@@ -563,12 +596,19 @@
 				</button>
 			</div>
 			<div class="middle">
-				<div class="editor">
-					<Editor />
-				</div>
+				{#if !s.replRunning}
+					<div class="editor">
+						<Editor />
+					</div>
+				{/if}
 				{#if terminalShown}
-					<ResizeBar resize={startResizeTerm} />
-					<aside class="terminal" style="width: {terminalWidth}px;">
+					{#if !s.replRunning}
+						<ResizeBar resize={startResizeTerm} />
+					{/if}
+					<aside
+						class="terminal"
+						style={s.replRunning ? 'width: 100%' : `width: ${terminalWidth}px;`}
+					>
 						<Terminal />
 					</aside>
 				{/if}

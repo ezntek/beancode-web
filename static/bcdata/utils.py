@@ -16,6 +16,7 @@ from beancode.error import *
 from beancode.formatter import Formatter
 from beancode.tracer import *
 from beancode.runner import *
+from beancode.repl import Repl
 from beancode import __version__
 import sys, shutil
 
@@ -105,6 +106,7 @@ def trace_bean(s, n, v, cfg):
 
 def nuke(d):
     for itm in os.listdir(d):
-        print("removing: " + itm)
         if itm not in {'..', '.'}:
+            print(f"removing: {itm}")
             os.remove(itm)
+

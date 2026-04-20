@@ -24,6 +24,7 @@ export type PyMessage =
     | { kind: 'trace-response', data: string | null | undefined }
     | { kind: 'compressdir-response', path: string, data: FileResponse<Blob> }
     | { kind: 'nuke-done' }
+    | { kind: 'repl-done' }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, path: string }
@@ -39,6 +40,7 @@ export type EditorMessage =
     | { kind: 'trace', data: string, path: string, vars: string[], config: TracerConfig }
     | { kind: 'compressdir', path: string }
     | { kind: 'nuke' }
+    | { kind: 'repl' }
 
 export interface BeanError {
     msg: string,

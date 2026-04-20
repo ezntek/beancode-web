@@ -26,6 +26,7 @@ interface IState {
     cwd: string,
     curdir: Dir,
     running: boolean,
+    replRunning: boolean,
     inputBuf: SharedArrayBuffer | null,
     interruptBuf: SharedArrayBuffer | null,
 };
@@ -40,6 +41,7 @@ export const s: IState = $state({
     cwd: "/data/projects/default",
     curdir: new Map(), 
     running: false,
+    replRunning: false,
     inputBuf: null,
     interruptBuf: null,
 });

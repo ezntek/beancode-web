@@ -16,4 +16,4 @@ export const BEANCODE_IS_DEV_BUILD = __DEV__;
 
 // XXX: you MUST change THIS variable when updating pyodide! 
 export const WANTED_PYODIDE_VERSION = "0.29.3";
-export const WANTED_BEANCODE_VERSION = "0.7.3";
+export const WANTED_BEANCODE_VERSION = "0.7.4";

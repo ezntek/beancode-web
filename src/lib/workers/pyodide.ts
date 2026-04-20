@@ -368,6 +368,11 @@ function nuke() {
     sync();
 }
 
+function repl() {
+    py.runPython("Repl().repl(handle_ctrlc=False)");
+    sync();
+}
+
 onmessage = async (event: MessageEvent<EditorMessage>) => { 
     try {
         await pyBeancodePromise;
@@ -422,6 +427,10 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             case 'nuke':
                 nuke();
                 post({ kind: 'nuke-done' });
+                break;
+            case "repl":
+                repl();
+                post({ kind: 'repl-done' });
                 break;
         }
     } catch (exc: any) {
