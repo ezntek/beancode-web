@@ -96,7 +96,7 @@ self.addEventListener('fetch', (e) => {
 			// if we're offline, fetch can return a value that is not a Response
 			// instead of throwing - and we can't pass this non-Response to respondWith
 			if (!(response instanceof Response))
-				throw new Error('invalid response from fetch');
+				throw new Error('invalid response ' + response + ' from fetch');
 
 			if (response.status === 200)
 				cache.put(e.request, response.clone());

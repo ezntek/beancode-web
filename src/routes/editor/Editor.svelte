@@ -295,4 +295,28 @@
 		height: 100%;
 		overflow: hidden;
 	}
+
+	.editor::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	.editor::-webkit-scrollbar-thumb {
+		background: var(--bw-surface1);
+	}
+
+	.editor::-webkit-scrollbar-thumb:hover {
+		background: var(--bw-surface2);
+	}
+
+	.editor::-webkit-scrollbar-track {
+		background: var(--bw-base3);
+	}
+
+	@supports (scrollbar-width: thin) {
+		.editor {
+			scrollbar-color: var(--bw-surface1) var(--bw-base3);
+			scrollbar-width: thin;
+		}
+	}
 </style>
