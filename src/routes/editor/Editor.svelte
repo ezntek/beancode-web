@@ -17,7 +17,7 @@
 	import { indentUnit } from '@codemirror/language';
 	import { beanDiagnostics, errField, es } from './editor_state.svelte';
 	import { pathBasename, pathExtension } from '$lib/fstypes';
-	import { catppuccinMacchiato, halfDarkCodemirror } from '$lib/themes/themes';
+	import { catppuccinMacchiato, defaultDarkCodemirror } from '$lib/themes/themes';
 	import { python } from '@codemirror/lang-python';
 	import { beancode } from '$lib/highlighting/beancode';
 	import { s } from './state.svelte';
@@ -136,7 +136,7 @@
 			extensions: [
 				...exts(),
 				// @ts-ignore
-				themeCompartment.of(CM_THEMES[s.themeName] ?? CM_THEMES['half_dark']),
+				themeCompartment.of(CM_THEMES[s.themeName] ?? CM_THEMES['default_dark']),
 				updateListener,
 				style,
 				fontTheme.of(fontStyle),

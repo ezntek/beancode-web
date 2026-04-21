@@ -138,7 +138,8 @@
 	});
 
 	// FIXME: better theming system
-	const darkThemeName = 'half_dark';
+	const darkThemeName = 'default_dark';
+	const lightThemeName = 'default_light';
 	$effect(() => {
 		applyTheme(s.themeName, s.loadedTheme);
 		isDark = s.themeName == darkThemeName;
@@ -146,7 +147,7 @@
 
 	function toggleTheme() {
 		// TODO: proper light/dark themes
-		if (isDark) s.themeName = 'catppuccin_latte';
+		if (isDark) s.themeName = lightThemeName;
 		else s.themeName = darkThemeName;
 		isDark = s.themeName == darkThemeName;
 	}

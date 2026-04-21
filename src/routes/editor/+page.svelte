@@ -34,7 +34,7 @@
 		if (theme) {
 			s.themeName = theme;
 		} else {
-			s.themeName = 'catppuccin_macchiato';
+			s.themeName = 'default_dark';
 		}
 		s.loadedTheme = true;
 		applyTheme(s.themeName, s.loadedTheme);
