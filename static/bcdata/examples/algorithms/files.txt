@@ -1,0 +1,5 @@
+#BubbleSort.bean
+#IterativeBinarySearch.bean
+#LinearSearch.bean
+#MinMax.bean
+#SelectionSort.bean

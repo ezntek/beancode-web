@@ -13,7 +13,6 @@
 	import { applyTheme } from '$lib/themes/themes';
 	import { onMount } from 'svelte';
 	import { s } from './state.svelte';
-    import { es } from './editor_state.svelte';
 
 	import '@fontsource/inter/400';
 	import '@fontsource/inter/500';
@@ -27,8 +26,8 @@
 	import EditorWindow from './EditorWindow.svelte';
 	import UnsupportedWindow from './UnsupportedWindow.svelte';
 
-	let hasSab = true;
-    let windowCount = $state(0);
+	let hasSab = $state(true);
+	let windowCount = $state(1);
 	onMount(() => {
 		const theme = window.localStorage.getItem('EditorTheme');
 		if (theme) {
@@ -62,17 +61,16 @@
 			}
 		}
 
-        // XXX: cursed JS
-        windowCount = +window.localStorage.getItem('WindowCount');
-        if (windowCount === NaN)
-            windowCount = 0;
-        window.localStorage.setItem('WindowCount', String(windowCount + 1));
+		// XXX: cursed JS
+		windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
+		window.localStorage.setItem('WindowCount', String(windowCount + 1));
 
-        window.addEventListener('beforeunload', (event) => {
-            windowCount = +window.localStorage.getItem('WindowCount');
-            window.localStorage.setItem('WindowCount', String(windowCount - 1));
-            event.returnValue = '';
-        });
+		window.addEventListener('beforeunload', (event) => {
+			windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
+			window.localStorage.setItem('WindowCount', String(windowCount - 1));
+
+			event.returnValue = '';
+		});
 	});
 </script>
 
@@ -99,8 +97,8 @@
 	</div>
 </noscript>
 <div id="editor-window-wrapper">
-    {#if windowCount >= 1}
-        <AlreadyLoadedWindow />
+	{#if windowCount >= 1}
+		<AlreadyLoadedWindow />
 	{:else if hasSab}
 		<EditorWindow />
 	{:else}

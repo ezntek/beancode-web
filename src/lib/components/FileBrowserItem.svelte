@@ -12,11 +12,18 @@
 <script lang="ts">
 	interface IProps {
 		onClick: Function;
+		displayEllipsis?: boolean;
 		onInfo?: (e: MouseEvent) => void;
 		cwdDisplay?: boolean;
 		children: any;
 	}
-	let { onClick, onInfo = () => {}, cwdDisplay = false, children }: IProps = $props();
+	let {
+		onClick,
+		displayEllipsis = true,
+		onInfo = () => {},
+		cwdDisplay = false,
+		children
+	}: IProps = $props();
 	const bgcol = (() => cwdDisplay)() ? '--bw-surface1' : '--bw-base3';
 	const bgstyle = `background-color: var(${bgcol});`;
 </script>
@@ -26,9 +33,11 @@
 		<span>{@render children()}</span>
 	</button>
 	<div class="actions">
-		<button aria-label="info" class="info" onclick={(e) => onInfo(e)}>
-			<span class="fa-solid fa-ellipsis-vertical"></span>
-		</button>
+		{#if displayEllipsis}
+			<button aria-label="info" class="info" onclick={(e) => onInfo(e)}>
+				<span class="fa-solid fa-ellipsis-vertical"></span>
+			</button>
+		{/if}
 	</div>
 </div>
 

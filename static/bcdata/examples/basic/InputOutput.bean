@@ -1,0 +1,27 @@
+// You can output stuff like this:
+OUTPUT "Text"
+OUTPUT 1
+OUTPUT 3.14
+OUTPUT TRUE
+OUTPUT 'a'
+
+// Declare a variable and input into it:
+DECLARE ProductName: STRING
+
+// You should output a prompt first!
+OUTPUT "Enter product name:"
+// reads the name from the terminal, and puts the result into ProductName
+INPUT ProductName 
+
+OUTPUT "Enter product price:"
+// You may as well not declare it, but it is a NON-STANDARD way of doing
+// things.
+INPUT ProductPrice // Beancode will guess what type it is.
+
+// Output many things with commas between the items:
+OUTPUT "Name: ", ProductName, ", Price: ", ProductPrice
+
+// you can also output the type of variables/values like so.
+// (beancode-only feature)
+OUTPUT "Type of ProductPrice is: ", TYPEOF(ProductPrice)
+

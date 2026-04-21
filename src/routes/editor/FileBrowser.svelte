@@ -26,12 +26,14 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Dropdown from '$lib/components/Dropdown.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import LoadExampleDialog from '$lib/components/LoadExampleDialog.svelte';
 
 	let saveDialog: SaveDialog;
 	let renameDialog: SaveDialog;
 	let confirmDialog: ConfirmDialog;
 	let uploadElem: HTMLInputElement;
 	let errorDialog: ErrorDialog;
+	let loadExampleDialog: LoadExampleDialog;
 	let lastClicked = '';
 	let cwd = $derived(pathJoin(s.cwd));
 	let inProjects = $derived(pathBeginsWith(s.cwd, '/data/projects') && pathCountParts(s.cwd) === 3);
@@ -263,14 +265,11 @@
 					const dotIdx = name.lastIndexOf('.');
 					const namePart = name.slice(0, dotIdx);
 					const extPart = name.slice(dotIdx + 1);
-					let addedNum: number;
+
+					let addedNum = 1;
 					let newName: string;
-					for (
-						addedNum = 1;
-						s.curdir.has((newName = `${namePart} (${addedNum}).${extPart}`));
-						addedNum++
-					)
-						continue;
+					while (s.curdir.has((newName = `${namePart} (${addedNum}).${extPart}`))) addedNum++;
+
 					saveDialog.open(
 						'Upload with different name',
 						newName,
@@ -297,6 +296,20 @@
 			contents: content,
 			overwrite: true
 		});
+	}
+
+	function loadExample() {
+		loadExampleDialog.open();
+	}
+
+	async function selectedExample(exampleUrl: string, name: string) {
+		let resp = await fetch(exampleUrl);
+		if (resp.status !== 200) {
+			console.error(`Could not load example at ${exampleUrl}`);
+			return;
+		}
+		let text = await resp.text();
+		upload('Ex_' + name, text);
 	}
 </script>
 
@@ -337,7 +350,7 @@
 					<div style="position: relative;">
 						<FileBrowserItem onClick={() => clickItem(item)} onInfo={(e) => openInfo(item, e)}>
 							<span class={determineIcon(item)}></span>
-							<span style="font-weight: normal">{item}</span>
+							<span style="font-weight: normal; overflow-wrap: true; overflow: auto;">{item}</span>
 						</FileBrowserItem>
 					</div>
 				{/if}
@@ -358,6 +371,7 @@
 <SaveDialog bind:this={renameDialog} ok={renameOk} cancel={() => {}} />
 <ConfirmDialog bind:this={confirmDialog} okText="Yes" cancelText="No" />
 <ErrorDialog bind:this={errorDialog} />
+<LoadExampleDialog bind:this={loadExampleDialog} doneCallback={selectedExample} />
 {#if openDropdownItem}
 	<Dropdown x={dropdownPosition.x} y={dropdownPosition.y} onClose={() => (openDropdownItem = '')}>
 		{#if openDropdownItem !== '..'}
@@ -377,6 +391,10 @@
 				Delete
 			</button>
 		{:else}
+			<button onclick={() => loadExample()}>
+				<span class="fa-solid fa-star"></span>
+				Load Examples
+			</button>
 			<button onclick={() => handleDeleteAll()} style="color: var(--bw-red);">
 				<span class="fa-solid fa-trash"></span>
 				Delete All Files

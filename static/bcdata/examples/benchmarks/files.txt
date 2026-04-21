@@ -1,0 +1,4 @@
+BSortTorture.bean
+ForTorture.bean
+PrimeTorture.bean
+QSortTorture.bean

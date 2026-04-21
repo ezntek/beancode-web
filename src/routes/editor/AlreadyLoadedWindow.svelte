@@ -1,13 +1,14 @@
 <script lang="ts">
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
-    import MessageDialog from '$lib/components/MessageDialog.svelte'; 
+	import MessageDialog from '$lib/components/MessageDialog.svelte';
 
 	let settingsDialog: SettingsDialog;
-    let messageDialog: MessageDialog;
+	let messageDialog: MessageDialog;
 
 	function openDialog() {
-        const MSG = "Beancode web does not send your data to servers outside your computer. All of your data (your code and settings) are stored within your web browser. However, since every instance (tab, window) of beancode web shares the same storage since you are using the same web browser, trying to use both instances at the same time can lead to data corruption, data loss, and desynchronised files/settings.";
-        messageDialog.open(MSG);
+		const MSG =
+			'Beancode web does not send your data to servers outside your computer. All of your data (your code and settings) are stored within your web browser. However, since every instance (tab, window) of beancode web shares the same storage since you are using the same web browser, trying to use both instances at the same time can lead to data corruption, data loss, and desynchronised files/settings.';
+		messageDialog.open(MSG);
 	}
 </script>
 
@@ -17,10 +18,11 @@
 		<p class="title">Another instance of Beancode Web is open...</p>
 	</div>
 	<p class="ualabel">
-        Two or more instances of Beancode Web cannot be open simultaneously. Dangerous things (like file corruption) may happen if this is allowed! 
+		Two or more instances of Beancode Web cannot be open simultaneously. Dangerous things (like file
+		corruption) may happen if this is allowed!
 	</p>
 	<span>
-        <button onclick={() => openDialog()}>I'm confused!</button>
+		<button onclick={() => openDialog()}>I'm confused!</button>
 		<button onclick={() => settingsDialog.open()}>About</button>
 	</span>
 </div>
@@ -45,6 +47,7 @@
 		border-width: 0px;
 		background-color: var(--bw-base3);
 		color: var(--bw-text);
+		font-family: 'Inter', sans-serif;
 		font-size: 1.5em;
 		border-radius: 0.3em;
 		padding: 0.3em;
