@@ -25,6 +25,7 @@
 	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
 	import EditorWindow from './EditorWindow.svelte';
 	import UnsupportedWindow from './UnsupportedWindow.svelte';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/version';
 
 	let hasSab = $state(true);
 	let windowCount = $state(1);
@@ -97,7 +98,7 @@
 	</div>
 </noscript>
 <div id="editor-window-wrapper">
-	{#if windowCount >= 1}
+	{#if windowCount >= 1 && !BEANCODE_IS_DEV_BUILD}
 		<AlreadyLoadedWindow />
 	{:else if hasSab}
 		<EditorWindow />

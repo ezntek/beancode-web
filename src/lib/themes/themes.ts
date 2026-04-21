@@ -70,21 +70,64 @@ function makeCatppuccinTheme(flavor: CatppuccinFlavor): ThemeSpec {
     };
 }
 
-import { catppuccinFrappe, catppuccinLatte, catppuccinMacchiato, catppuccinMocha } from '$lib/highlighting/catppuccin'
+const halfDark = {
+    base1: "#1b1f24",
+    base2: "#21252b",
+    base3: "#272b32",
+    surface1: "#2e343b",
+    surface2: "#40474f",
+    surface3: "#4b5263",
+    overlay1: "#4b5263",
+    overlay2: "#5c6370",
+    overlay3: "#636d83",
+    subtext1: "#828997",
+    subtext2: "#9da5b4",
+    text: "#abb2bf",
+    red: "#e06c75",
+    green: "#98c379",
+    yellow: "#e5c07b",
+    blue: "#61afef",
+    magenta: "#c678dd",
+    cyan: "#56b6c2",
+    brightRed: "#e06c75",
+    brightGreen: "#98c379",
+    brightYellow: "#e5c07b",
+    brightBlue: "#61afef",
+    brightMagenta: "#56b6c2",
+    brightCyan: "#c678dd",
+    orange: "#d19a66",
+    purple: "#be5046",
+};
+
+
+import { createCodemirrorTheme } from '$lib/highlighting/catppuccin'
 import { flavors, type CatppuccinFlavor } from '@catppuccin/palette'
+import { type Extension } from "@codemirror/state";
 
 export const THEMES = {
     'catppuccin_latte': makeCatppuccinTheme(flavors.latte),
     'catppuccin_frappe': makeCatppuccinTheme(flavors.frappe),
     'catppuccin_macchiato': makeCatppuccinTheme(flavors.macchiato),
     'catppuccin_mocha': makeCatppuccinTheme(flavors.mocha),
+    'half_dark': halfDark,
 }
+
+export const catppuccinLatte: Extension = createCodemirrorTheme(
+    THEMES['catppuccin_latte'], false);
+export const catppuccinFrappe: Extension = createCodemirrorTheme(
+    THEMES['catppuccin_frappe'], true);
+export const catppuccinMacchiato: Extension = createCodemirrorTheme(
+    THEMES['catppuccin_macchiato'], true);
+export const catppuccinMocha: Extension = createCodemirrorTheme(
+    THEMES['catppuccin_mocha'], true);
+export const halfDarkCodemirror: Extension = createCodemirrorTheme(halfDark, true);
 
 export const CM_THEMES = {
     'catppuccin_latte': catppuccinLatte,
     'catppuccin_frappe': catppuccinFrappe,
     'catppuccin_macchiato': catppuccinMacchiato,
     'catppuccin_mocha': catppuccinMocha,
+    'half_dark': halfDarkCodemirror,
 }
 
 export function applyTheme(themeName: string, loadedTheme: boolean) { 

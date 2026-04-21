@@ -138,16 +138,17 @@
 	});
 
 	// FIXME: better theming system
+	const darkThemeName = 'half_dark';
 	$effect(() => {
 		applyTheme(s.themeName, s.loadedTheme);
-		isDark = s.themeName == 'catppuccin_macchiato';
+		isDark = s.themeName == darkThemeName;
 	});
 
 	function toggleTheme() {
 		// TODO: proper light/dark themes
 		if (isDark) s.themeName = 'catppuccin_latte';
-		else s.themeName = 'catppuccin_macchiato';
-		isDark = s.themeName == 'catppuccin_macchiato';
+		else s.themeName = darkThemeName;
+		isDark = s.themeName == darkThemeName;
 	}
 
 	function doneFormattingCallback(data: string, path: string) {
