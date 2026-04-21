@@ -285,8 +285,8 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const PATH = `/bcdata/beancode-${WANTED_BEANCODE_VERSION}-py3-none-any.whl`
-        const SCRIPT = `import micropip,os;await micropip.install(\"${PATH}\")`
+        const BEANCODE_WHEEL_PATH = `/bcdata/beancode-${WANTED_BEANCODE_VERSION}-py3-none-any.whl`
+        const SCRIPT = `import micropip,os;await micropip.install(\"${BEANCODE_WHEEL_PATH}\")`
         try {
             await py.runPythonAsync(SCRIPT)
         } catch (e) {
@@ -384,6 +384,19 @@ function formatBean(src: string, path: string): string | null {
     return null;
 }
 
+function formatPy(src: string, name: string): string | null {
+    try {
+        py.globals.set("s", src);
+        py.globals.set("n", name);
+        py.runPython("r=format_py(s,n)");
+        const res = py.globals.get("r");
+        return res;
+    } catch (e: any) {
+        post({ kind: 'error', data: String(e), fromBeancode: false });
+    }
+    return null;
+}
+
 function trace(src: string, path: string, vars: string[], config: TracerConfig): string | undefined | null {
     py.globals.set("s", src);
     py.globals.set("n", pathBasename(path));
@@ -451,6 +464,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'format':
                 post({ kind: 'format-response', data: formatBean(msg.data, msg.path), path: msg.path });
+                break;
+            case 'formatpy':
+                post({ kind: 'formatpy-response', data: formatPy(msg.data, msg.name) });
                 break;
             case 'trace':
                 post({ kind: 'trace-response', data: trace(msg.data, msg.path, msg.vars, msg.config) });

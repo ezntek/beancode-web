@@ -410,7 +410,7 @@
 			case 'new':
 				return 'editor-button-new';
 			case 'format':
-				if (curExtension() === 'bean') return 'editor-button-format';
+				if (curExtension() === 'bean' || curExtension() === 'py') return 'editor-button-format';
 				else return 'editor-button-grayed';
 			case 'trace':
 				if (curExtension() === 'bean') return 'editor-button-trace';
@@ -436,17 +436,30 @@
 	}
 
 	function formatTooltip() {
-		if (curExtension() !== 'bean')
-			return 'You can only format Beancode (Pseudocode) files right now.';
+		if (curExtension() !== 'bean' && curExtension() !== 'py')
+			return 'You can only format Beancode (Pseudocode) and Python files right now.';
 		return 'Format (prettify) your current source code file.';
 	}
 
+	function traceTooltip() {
+		if (curExtension() !== 'bean')
+			return 'You can only trace Beancode (Pseudocode) files right now.';
+		return 'Generate a trace table for the current file';
+	}
+
 	function formatFile() {
-		if (curExtension() !== 'bean') return;
 		if (s.running) return;
-		ps.curError = null;
-		s.running = true;
-		post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
+		if (curExtension() === 'py') {
+			ts.terminal!.write('\x1b[2J\x1b[H');
+			ps.curError = null;
+			s.running = true;
+			post({ kind: 'formatpy', data: es.src, name: pathBasename(es.curFilePath) });
+		} else if (curExtension() === 'bean') {
+			ts.terminal!.write('\x1b[2J\x1b[H');
+			ps.curError = null;
+			s.running = true;
+			post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
+		}
 	}
 
 	function traceFile() {
@@ -536,7 +549,7 @@
 				<button
 					aria-label="trace"
 					class="toolbar-button {buttonStyle('trace')}"
-					title="Generate a trace table for the current file"
+					title={traceTooltip()}
 					onclick={traceFile}
 				>
 					<span class="icon fa-solid fa-magnifying-glass"></span> Trace
