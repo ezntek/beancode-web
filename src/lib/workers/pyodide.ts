@@ -216,6 +216,41 @@ async function compressDir(path: string): Promise<FileResponse<Blob>> {
     return { kind: FileResponseKind.Ok, data: res};
 }
 
+async function unpack(dir: string, data: Uint8Array<ArrayBuffer>) {
+    // XXX: this algorithm is very inefficient. This should be rewritten in the future (recursive)
+    const archive = await JSZip.loadAsync(data);
+
+    const entries = Object.entries(archive.files);
+    for (const [name, file] of entries) {
+        let files: Record<string, string> = {};
+        if (file.dir) {
+            const dirname = file.name;
+
+            for (const [innerName, innerFile] of Object.entries(archive.files)) {
+                if (
+                    !innerFile.dir && innerName.startsWith(dirname) 
+                    // disallow more nesting
+                    && !innerName.slice(dirname.length).includes("/")
+                ) {
+                    files[innerName] = await innerFile.async("string");
+                }
+            }
+        } else {
+            files[name] = await file.async("string");
+        }
+
+        for (const [name, data] of Object.entries(files)) {
+            try {
+                FS.writeFile(pathJoin(dir, name), data);
+            } catch (exc: any) {
+                post({ kind: "output", data: `Could not unpack ${name}: ${exc}` })
+            }
+        }
+    }
+
+    sync();
+}
+
 async function doInitialSetupCheck() {
     if (!FS.analyzePath("/data/projects").exists)
         FS.mkdirTree("/data/projects");
@@ -422,6 +457,10 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'compressdir':
                 post({ kind: 'compressdir-response', path: msg.path, data: await compressDir(msg.path) });
+                break;
+            case 'unpack':
+                await unpack(msg.dir, msg.data);
+                post({kind: 'unpack-response' });
                 break;
             case 'nuke':
                 nuke();

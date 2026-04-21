@@ -242,6 +242,19 @@
 		}
 	}
 
+	function handleUploadZip(content: Uint8Array<ArrayBuffer>) {
+		confirmDialog.open(
+			[
+				'Uploading a zip file will unpack everything inside into the current project.',
+				'This action may overwrite files, if they have the same name as in the archive. Are you sure?'
+			],
+			() => {
+				post({ kind: 'unpack', dir: s.cwd, data: content });
+			},
+			undefined
+		);
+	}
+
 	async function handleFileSelect(e: Event) {
 		const target = e.target as HTMLInputElement;
 		const file = target.files?.item(0);
@@ -249,6 +262,11 @@
 		if (!file) return;
 
 		const name = file.name;
+
+		if (pathExtension(name) === 'zip') {
+			handleUploadZip(await file.bytes());
+			return;
+		}
 
 		let fileContent = '';
 		try {
@@ -363,7 +381,7 @@
 <input
 	bind:this={uploadElem}
 	type="file"
-	accept=".txt,.py,.html,.bean,text/*"
+	accept=".txt,.py,.html,.bean,text/*,.zip,application/zip"
 	onchange={handleFileSelect}
 	hidden
 />

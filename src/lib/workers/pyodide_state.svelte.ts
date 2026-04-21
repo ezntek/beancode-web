@@ -25,6 +25,7 @@ export type PyMessage =
     | { kind: 'compressdir-response', path: string, data: FileResponse<Blob> }
     | { kind: 'nuke-done' }
     | { kind: 'repl-done' }
+    | { kind: 'unpack-response' }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, path: string }
@@ -41,6 +42,7 @@ export type EditorMessage =
     | { kind: 'compressdir', path: string }
     | { kind: 'nuke' }
     | { kind: 'repl' }
+    | { kind: 'unpack', dir: string, data: Uint8Array<ArrayBuffer> }
 
 export interface BeanError {
     msg: string,

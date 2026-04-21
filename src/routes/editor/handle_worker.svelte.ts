@@ -136,6 +136,9 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             url.searchParams.set('_', Date.now().toString());
             location.replace(url.toString());
             break;
+        case 'unpack-response':
+            post({ kind: 'listdir', path: s.cwd });
+            break;
     }
 }
 
