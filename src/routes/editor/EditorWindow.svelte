@@ -472,6 +472,7 @@
 	}
 
 	function replClicked() {
+		if (s.running) return;
 		if (!s.pyVersion) return;
 		if (s.replRunning) {
 			stop();
