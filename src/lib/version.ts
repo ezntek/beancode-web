@@ -10,8 +10,8 @@
  */
 
 //export const BEANCODE_WEB_VERSION = "0.1.0-dev-" + __COMMIT_HASH__;
-export const BEANCODE_WEB_VERSION = "0.1.0-beta6"
-export const BEANCODE_COMMIT_HASH = __COMMIT_HASH__;
+export const BEANCODE_WEB_VERSION = "0.1.0-beta7"
+export const BEANCODE_COMMIT_HASH = __COMMIT_HASH__ && '<unknown>';
 export const BEANCODE_IS_DEV_BUILD = __DEV__;
 
 // XXX: you MUST change THIS variable when updating pyodide! 
