@@ -93,6 +93,7 @@ export function createCodemirrorTheme(ts: ThemeSpec, isDark: boolean = false) {
           backgroundColor: ts.surface2,
           color: ts.text,
         },
+        color: ts.subtext2,
       },
     },
     { dark: isDark }

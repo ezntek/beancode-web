@@ -23,7 +23,7 @@ function keywords(): Completion[] {
         "CLOSEFILE", "READ", "WRITE",
     ];
     const KEYWORDS_EXT = [ 
-        "APPEND", "TRACE", "ENDTRACE", "SCOPE", "ENDSCOPE", "INCLUDE",
+        "TRACE", "ENDTRACE", "SCOPE", "ENDSCOPE", "INCLUDE",
         "EXPORT", "PRINT",
     ];
     return [
@@ -48,7 +48,7 @@ function libroutines(): Completion[] {
     ];
     const LIBROUTINES_EXT = [
         "SQRT", "GETCHAR", "PUTCHAR", "EXIT", "SLEEP", "FLUSH", "SIN",
-        "COS", "TAN", "FORMAT", "INITARRAY"
+        "COS", "TAN", "FORMAT", "INITARRAY", "TYPE", "TYPEOF"
     ];
     return [
         LIBROUTINES.map((itm) => ({ label: itm, type: "function" })),

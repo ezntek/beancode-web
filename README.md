@@ -25,4 +25,21 @@ Despite my tireless work on the web IDE (sacrificing my entire winter break), I 
 
 ## Development
 
-`bun run dev`
+*NOTE: Always `npm install` or `bun install`* first.
+
+### Dev Server:
+
+Bun: `bun run dev`
+npm: `npm run dev`
+
+### Preview
+
+(make sure you have https enabled in `vite.config.ts` first)
+
+Bun: `bun run build; bun run preview`
+npm: `npm run build; npm run preview`
+
+### Generate Lezer Parser
+
+Bun: `bunx lezer-generator beancode.grammar -o src/lib/highlighting/parser.js`
+npm: `npx lezer-generator beancode.grammar -o src/lib/highlighting/parser.js`
