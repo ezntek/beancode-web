@@ -197,7 +197,6 @@ async function compressDir(path: string): Promise<FileResponse<Blob>> {
             if (FS.isDir(FS.stat(itemPath).mode))
                 continue;
 
-            console.log("item path: ", itemPath);
             data = FS.readFile(itemPath);
             try {
                 zip.file(item, decoder.decode(data));

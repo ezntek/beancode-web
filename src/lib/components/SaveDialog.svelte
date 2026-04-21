@@ -86,19 +86,7 @@
 			const parts = defaultContents!.split('.');
 			fileName = parts[0];
 			const ext = parts[parts.length - 1];
-			if (ext) {
-				switch (ext) {
-					case 'bean':
-					case 'py':
-					case 'txt':
-					case 'html':
-						fileType = ext;
-						break;
-					default:
-						fileName = defaultContents;
-						fileType = '';
-				}
-			}
+			if (ext) fileType = ext;
 		}
 
 		// we rely on JS's weird truthy stuff, don't fix
@@ -137,6 +125,13 @@
 						<option value="py">Python (.py)</option>
 						<option value="html">HTML (.html)</option>
 						<option value="txt">Text (.txt)</option>
+						{#if !['bean', 'py', 'html', 'txt'].includes(fileType) && fileType !== ''}
+							{#if fileType === 'zip'}
+								<option value="zip">Zip Archive (.zip)</option>
+							{:else}
+								<option value={fileType}>.{fileType} File</option>
+							{/if}
+						{/if}
 						<option value="">No File Extension</option>
 					</select>
 				</div>

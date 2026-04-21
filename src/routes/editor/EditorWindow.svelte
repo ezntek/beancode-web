@@ -39,7 +39,8 @@
 		pathBasename,
 		pathJoin,
 		FileResponseKind,
-		type FileResponse
+		type FileResponse,
+		pathExtension
 	} from '$lib/fstypes';
 	import { changeFile, curExtension, editorNewFile, es } from './editor_state.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
@@ -254,17 +255,24 @@
 		}
 	}
 
-	function downloadCwdCallback(blob: Blob) {
+	function downloadCwdCallback(blob?: Blob) {
 		if (!blob) {
 			post({ kind: 'compressdir', path: s.cwd });
 			return;
 		}
 
-		const a = document.createElement('a');
-		a.href = URL.createObjectURL(blob);
-		a.download = pathBasename(s.cwd);
-		a.click();
-		URL.revokeObjectURL(a.href);
+		let cb = (name: string, overwrite: boolean) => {
+			overwrite;
+
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+
+			if (pathExtension(name) != 'zip') name += '.zip';
+			a.download = name;
+			a.click();
+			URL.revokeObjectURL(a.href);
+		};
+		saveDialog.open('Save Project As...', pathBasename(s.cwd) + '.zip', false, cb, false);
 	}
 
 	function startResizeTerm(e: any) {
