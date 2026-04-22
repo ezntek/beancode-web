@@ -5,6 +5,8 @@ export interface IConfig {
     terminalFont: string,
     editorFontSize: number,
     terminalFontSize: number,
+    fileBrowserShown: boolean,
+    terminalShown: boolean,
 };
 
 export function getDefaultConfig(): IConfig {
@@ -15,6 +17,8 @@ export function getDefaultConfig(): IConfig {
         terminalFont: 'IBM Plex Mono',
         editorFontSize: 20,
         terminalFontSize: 20,
+        fileBrowserShown: true,
+        terminalShown: true,
     };
 }
 
@@ -31,3 +35,8 @@ export function isValidConfig(obj: any): obj is IConfig {
         typeof obj.terminalFontSize === 'number'
     );
 }
+
+export function saveConfig(cfg: IConfig) {
+    if (window)
+        window.localStorage.setItem("Config", JSON.stringify(cfg));
+} 

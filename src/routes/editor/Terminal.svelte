@@ -294,6 +294,7 @@
 		min-height: 0px;
 		flex-direction: column;
 		background-color: var(--bw-base3);
+		padding: 2px;
 	}
 
 	/* very gross hack*/

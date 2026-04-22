@@ -49,7 +49,7 @@
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import type { TracerConfig } from '$lib/tracer';
 	import { applyTheme } from '$lib/themes/themes';
-	import type { IConfig } from '$lib/config';
+	import { saveConfig, type IConfig } from '$lib/config';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -130,6 +130,9 @@
 			s.config = JSON.parse(cfg) satisfies IConfig;
 		}
 
+		terminalShown = s.config.terminalShown;
+		fileBrowserShown = s.config.fileBrowserShown;
+
 		setDoneFormattingCallback(doneFormattingCallback);
 		setDoneTracingCallback(doneTracingCallback);
 		setFileResponseCallback(fileResponseCallback);
@@ -149,6 +152,14 @@
 		isDark = s.themeName == s.config.preferredDarkTheme;
 	});
 
+	$effect(() => {
+		s.config.terminalShown = terminalShown;
+	});
+
+	$effect(() => {
+		s.config.fileBrowserShown = fileBrowserShown;
+	});
+
 	function toggleTheme() {
 		// TODO: proper light/dark themes
 		if (isDark) s.themeName = s.config.preferredLightTheme;
@@ -161,8 +172,7 @@
 		if (isDark) s.themeName = s.config.preferredDarkTheme;
 		else s.themeName = s.config.preferredLightTheme;
 		applyTheme(s.themeName, s.loadedTheme);
-		const c = JSON.stringify(s.config);
-		window.localStorage.setItem('Config', c);
+		saveConfig(s.config);
 	}
 
 	function doneFormattingCallback(data: string, path: string) {
