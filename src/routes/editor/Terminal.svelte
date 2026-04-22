@@ -162,6 +162,11 @@
 		ts.terminal!.clear();
 	}
 
+	$effect(() => {
+		if (ts.terminal)
+			ts.terminal!.options.fontFamily = s.config.editorFont || 'Lilex' + ', monospace';
+	});
+
 	function zoomIn() {
 		const sz = ts.terminal!.options.fontSize!;
 		if (sz >= 64) return;

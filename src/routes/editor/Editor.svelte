@@ -81,14 +81,20 @@
 		const style = EditorView.theme({
 			'&': { height: '100%' },
 			'.cm-scroller': { overflow: 'auto' },
-			'.cm-content': { fontFamily: 'IBM Plex Mono' },
 			'.cm-gutter': { fontFamily: 'IBM Plex Mono', fontSize: '0.75em' },
 			'.cm-gutterElement': { display: 'flex', alignItems: 'center' },
 			'.cm-tooltip': { fontFamily: 'IBM Plex Mono', fontSize: '14px' }
 		});
 
-		const fontStyle = EditorView.theme({
-			'.cm-content': { fontSize: sz + 'px' }
+		const fontThemeStyle = EditorView.theme({
+			'.cm-content': { fontSize: sz + 'px', fontFamily: s.config.editorFont + ', monospace' }
+		});
+
+		$effect(() => {
+			const newTheme = EditorView.theme({
+				'.cm-content': { fontSize: sz + 'px', fontFamily: s.config.editorFont + ', monospace' }
+			});
+			es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 		});
 
 		function exts() {
@@ -139,10 +145,10 @@
 				themeCompartment.of(CM_THEMES[s.themeName] ?? CM_THEMES['default_dark']),
 				updateListener,
 				style,
-				fontTheme.of(fontStyle),
 				es.history.of(history()),
 				highlighter.of(python()),
 				es.diag.of(beanDiagnostics),
+				fontTheme.of(fontThemeStyle),
 				errField
 			]
 		});
@@ -197,7 +203,7 @@
 
 		sz += 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}px` }
+			'.cm-content': { fontSize: `${sz}px`, fontFamily: s.config.editorFont }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
@@ -206,7 +212,7 @@
 		if (sz <= 12) return;
 		sz -= 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}px` }
+			'.cm-content': { fontSize: `${sz}px`, fontFamily: s.config.editorFont }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}

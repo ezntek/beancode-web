@@ -21,6 +21,10 @@
 
 	import '@fontsource/ibm-plex-mono/400';
 	import '@fontsource/ibm-plex-mono/700';
+	import '@fontsource/lilex/400';
+	import '@fontsource/lilex/700';
+	import '@fontsource/lilex/400-italic';
+	import '@fontsource/lilex/700-italic';
 
 	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
 	import EditorWindow from './EditorWindow.svelte';

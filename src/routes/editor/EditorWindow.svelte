@@ -157,7 +157,7 @@
 		isDark = s.themeName == s.config.preferredDarkTheme;
 	}
 
-	function closeSettings() {
+	function applySettings() {
 		if (isDark) s.themeName = s.config.preferredDarkTheme;
 		else s.themeName = s.config.preferredLightTheme;
 		applyTheme(s.themeName, s.loadedTheme);
@@ -667,8 +667,8 @@
 <SettingsDialog
 	bind:this={settingsDialog}
 	aboutOnly={false}
-	cfg={s.config}
-	onClose={() => closeSettings()}
+	bind:cfg={s.config}
+	onClose={() => applySettings()}
 />
 <SaveDialog
 	bind:this={saveDialog}

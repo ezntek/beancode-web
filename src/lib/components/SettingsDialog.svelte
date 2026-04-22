@@ -28,11 +28,12 @@
 		cfg?: IConfig;
 		onClose?: Function;
 	}
-	let { aboutOnly, cfg = getDefaultConfig(), onClose }: IProps = $props();
+	let { aboutOnly, cfg = $bindable(getDefaultConfig()), onClose }: IProps = $props();
 
 	let confirmDialog: ConfirmDialog;
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
+	let editorFont = $state(cfg.editorFont);
 	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
 	type TView = (typeof possibleViews)[number];
 
@@ -43,6 +44,7 @@
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
+		cfg.editorFont = editorFont;
 		if (onClose) onClose();
 		innerDialog.close();
 	};
@@ -131,7 +133,14 @@
 						/>
 						<tr>
 							<td><span class="label">Editor Font</span></td>
-							<td><input type="text" class="input-box" /></td>
+							<td
+								><input
+									type="text"
+									spellcheck="false"
+									class="input-box"
+									bind:value={editorFont}
+								/></td
+							>
 						</tr>
 					</tbody>
 				</table>
