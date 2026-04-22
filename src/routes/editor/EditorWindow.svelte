@@ -14,7 +14,8 @@
 
 	import Editor from './Editor.svelte';
 
-	import { BEANCODE_IS_DEV_BUILD, BEANCODE_WEB_VERSION } from '$lib/version';
+	import { BEANCODE_WEB_VERSION } from '$lib/version';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
 
 	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';
@@ -48,6 +49,7 @@
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import type { TracerConfig } from '$lib/tracer';
 	import { applyTheme } from '$lib/themes/themes';
+	import type { IConfig } from '$lib/config';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -99,7 +101,6 @@
 	}
 
 	async function newDefaultFile() {
-		console.log(es.curFilePath, s.curdir);
 		es.curFilePath = 'MyProgram.bean';
 		es.src =
 			'// === Welcome to beancode web! ===\n' +
@@ -124,6 +125,11 @@
 			window.localStorage.setItem('IsFirstLaunch', 'no');
 		}
 
+		const cfg = window.localStorage.getItem('Config');
+		if (cfg !== null) {
+			s.config = JSON.parse(cfg) satisfies IConfig;
+		}
+
 		setDoneFormattingCallback(doneFormattingCallback);
 		setDoneTracingCallback(doneTracingCallback);
 		setFileResponseCallback(fileResponseCallback);
@@ -140,14 +146,23 @@
 	// FIXME: better theming system
 	$effect(() => {
 		applyTheme(s.themeName, s.loadedTheme);
-		isDark = s.themeName == 'catppuccin_macchiato';
+		isDark = s.themeName == s.config.preferredDarkTheme;
 	});
 
 	function toggleTheme() {
 		// TODO: proper light/dark themes
-		if (isDark) s.themeName = 'catppuccin_latte';
-		else s.themeName = 'catppuccin_macchiato';
-		isDark = s.themeName == 'catppuccin_macchiato';
+		if (isDark) s.themeName = s.config.preferredLightTheme;
+		else s.themeName = s.config.preferredDarkTheme;
+		isDark = s.themeName == s.config.preferredDarkTheme;
+	}
+
+	function applySettings(cfg: IConfig) {
+		s.config = { ...cfg } satisfies IConfig;
+		if (isDark) s.themeName = s.config.preferredDarkTheme;
+		else s.themeName = s.config.preferredLightTheme;
+		applyTheme(s.themeName, s.loadedTheme);
+		const c = JSON.stringify(s.config);
+		window.localStorage.setItem('Config', c);
 	}
 
 	function doneFormattingCallback(data: string, path: string) {
@@ -614,7 +629,7 @@
 					class="toolbar-aux-button"
 					onclick={() => settingsDialog.open()}
 				>
-					<span class="fa-solid fa-circle-info"></span>
+					<span class="fa-solid fa-gear"></span>
 				</button>
 			</div>
 			<div class="middle">
@@ -650,7 +665,6 @@
 		{/if}
 	</div>
 </div>
-<SettingsDialog bind:this={settingsDialog} aboutOnly={true} />
 <SaveDialog
 	bind:this={saveDialog}
 	cancel={() => saveDialog.close()}
@@ -666,6 +680,12 @@
 <MessageDialog bind:this={messageDialog} />
 <ErrorDialog bind:this={errorDialog} />
 <TraceDialog bind:this={traceDialog} ok={traceOk} cancel={() => traceDialog.close()} />
+<SettingsDialog
+	bind:this={settingsDialog}
+	aboutOnly={false}
+	bind:cfg={s.config}
+	onClose={(cfg: IConfig) => applySettings(cfg)}
+/>
 
 <style>
 	.icon {

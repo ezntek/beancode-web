@@ -17,6 +17,7 @@ import { termState as ts } from './terminal_state.svelte';
 import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
 import { FileResponseKind, pathJoin } from '$lib/fstypes';
 import { es } from './editor_state.svelte';
+import { getDefaultConfig } from '$lib/config';
 
 let loadedLastOpened = false;
 
@@ -139,6 +140,10 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'nuke-done':
             post({ kind: 'listdir', path: s.cwd });
+            // our magic $effect hooks will retain our current config, so we manually set it
+            s.config = getDefaultConfig();
+            s.themeName = s.config.preferredDarkTheme;
+			window.localStorage.clear();
             const url = new URL(location.href);
             url.searchParams.set('_', Date.now().toString());
             location.replace(url.toString());

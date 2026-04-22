@@ -13,8 +13,9 @@ import { continuedIndent, foldInside, foldNodeProp, indentNodeProp, LanguageSupp
 import { parser } from "./parser";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { beancodeCompletions } from "./completions";
+import { LTypeof } from "./parser.terms";
 
-const myLanguageHighlighting = styleTags({
+const beancodeHighlighting = styleTags({
     // comments
     LineComment: t.lineComment,
     BlockComment: t.blockComment,
@@ -135,6 +136,7 @@ const myLanguageHighlighting = styleTags({
     LCos: t.number,
     LTan: t.number,
     LInitarray: t.number,
+    LTypeof: t.number,
 
     "FunctionStatement/Ident!": t.function(t.definition(t.variableName)),
     "ProcedureStatement/Ident!": t.function(t.definition(t.variableName)),
@@ -151,7 +153,7 @@ const myLanguageHighlighting = styleTags({
 export const beancodeLanguage = LRLanguage.define({
     parser: parser.configure({
         props: [
-            myLanguageHighlighting,
+            beancodeHighlighting,
             indentNodeProp.add({
                 IfStatement: continuedIndent({except: /THEN|ELSE|ENDIF|then|else|endif/}),
                 WhileStatement: continuedIndent({except: /ENDWHILE|endwhile/}),

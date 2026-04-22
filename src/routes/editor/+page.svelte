@@ -22,42 +22,68 @@
 	import '@fontsource/ibm-plex-mono/400';
 	import '@fontsource/ibm-plex-mono/700';
 
+	import '@fontsource/fira-code/400';
+	import '@fontsource/fira-code/700';
+
+	import '@fontsource/dejavu-mono/400';
+	import '@fontsource/dejavu-mono/700';
+
+	import '@fontsource/ubuntu-mono/400';
+	import '@fontsource/ubuntu-mono/700';
+
+	import '@fontsource/noto-mono/400';
+
+	import '@fontsource/roboto-mono/400';
+	import '@fontsource/roboto-mono/700';
+
 	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
 	import EditorWindow from './EditorWindow.svelte';
 	import UnsupportedWindow from './UnsupportedWindow.svelte';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
+
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	let hasSab = $state(true);
 	let windowCount = $state(1);
+	let errorDialog: ErrorDialog;
+
 	onMount(() => {
 		const theme = window.localStorage.getItem('EditorTheme');
 		if (theme) {
 			s.themeName = theme;
 		} else {
-			s.themeName = 'catppuccin_macchiato';
+			s.themeName = 'default_dark';
 		}
 		s.loadedTheme = true;
 		applyTheme(s.themeName, s.loadedTheme);
 
 		try {
-			var dummy: any;
-			dummy = SharedArrayBuffer;
-			dummy = Atomics;
+			SharedArrayBuffer;
+			Atomics;
 		} catch (err) {
 			hasSab = false;
+		}
+
+		function noPersistErr() {
+			if (window.localStorage.getItem('ShownPersistError') !== 'yes') {
+				errorDialog.open(
+					[
+						'Could not request for persistent storage! Your data and settings could mysteriously vanish.',
+						"Either bookmark this site, manually allow persistent storage in the browser's settings, or run the risk of your data vanishing!",
+						'This error will not appear again.'
+					],
+					() => window.localStorage.setItem('ShownPersistError', 'yes')
+				);
+			}
 		}
 
 		if (navigator.storage && navigator.storage.persist) {
 			try {
 				navigator.storage.persist().then((persistent: boolean) => {
-					if (!persistent)
-						console.error(
-							'Could not request for persistent storage, your data may mysteriously vanish.'
-						);
+					if (!persistent) noPersistErr();
 				});
 			} catch (e) {
-				console.error(
-					'Could not request for persistent storage, your data may mysteriously vanish.'
-				);
+				noPersistErr();
 			}
 		}
 
@@ -68,6 +94,9 @@
 		window.addEventListener('beforeunload', (event) => {
 			windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
 			window.localStorage.setItem('WindowCount', String(windowCount - 1));
+
+			const cfg = JSON.stringify(s.config);
+			window.localStorage.setItem('Config', cfg);
 
 			event.returnValue = '';
 		});
@@ -97,7 +126,7 @@
 	</div>
 </noscript>
 <div id="editor-window-wrapper">
-	{#if windowCount >= 1}
+	{#if windowCount >= 1 && !BEANCODE_IS_DEV_BUILD}
 		<AlreadyLoadedWindow />
 	{:else if hasSab}
 		<EditorWindow />
@@ -105,6 +134,7 @@
 		<UnsupportedWindow />
 	{/if}
 </div>
+<ErrorDialog bind:this={errorDialog} />
 
 <style>
 	#editor-window-wrapper {

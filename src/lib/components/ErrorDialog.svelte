@@ -72,6 +72,7 @@
 		font-family: 'IBM Plex Mono', monospace !important;
 		display: flex;
 		flex-direction: column;
+		max-width: 35vw;
 	}
 
 	.top {

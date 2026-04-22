@@ -6,8 +6,10 @@
 	let settingsDialog: SettingsDialog;
 
 	function openDialog() {
-		const MSG =
-			'Beancode Web needs a feature in your browser called SharedArrayBuffer to function properly (to support the INPUT statement in Pseudocode and the input() function in Python). Your browser does not seem to support this, therefore Beancode Web cannot run properly.';
+		const MSG = [
+			'Beancode Web needs a feature in your browser called SharedArrayBuffer to function properly (to support the INPUT statement in Pseudocode and the input() function in Python).',
+			'Your browser does not seem to support this, therefore Beancode Web cannot run properly.'
+		];
 		messageDialog.open(MSG);
 	}
 

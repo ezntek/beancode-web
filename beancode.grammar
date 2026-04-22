@@ -165,7 +165,7 @@ KNull { @specialize<TIdent, "null" | "NULL"> }
 LibroutineIdent {
     LUcase | LLcase | LDiv | LMod | LSubstring | LRound | LSqrt
     | LLength | LGetchar | LRandom | LPutchar | LExit | LSleep
-    | LFlush | LSin | LCos | LTan | LInitarray
+    | LFlush | LSin | LCos | LTan | LInitarray | LTypeof
 }
 LUcase { @specialize<TIdent, "ucase" | "UCASE"> }
 LLcase { @specialize<TIdent, "lcase" | "LCASE"> }
@@ -185,6 +185,7 @@ LSin { @specialize<TIdent, "sin" | "SIN"> }
 LCos { @specialize<TIdent, "cos" | "COS"> }
 LTan { @specialize<TIdent, "tan" | "TAN"> }
 LInitarray { @specialize<TIdent, "initarray" | "INITARRAY"> }
+LTypeof { @specialize<TIdent, "type" | "TYPE" | "typeof" | "TYPEOF"> }
 
 Ident { LibroutineIdent | TIdent }
 

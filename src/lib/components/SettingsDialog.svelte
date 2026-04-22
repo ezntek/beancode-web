@@ -10,7 +10,8 @@
 -->
 
 <script lang="ts">
-	import { BEANCODE_COMMIT_HASH, BEANCODE_WEB_VERSION, WANTED_PYODIDE_VERSION } from '$lib/version';
+	import { BEANCODE_WEB_VERSION, WANTED_PYODIDE_VERSION } from '$lib/version';
+	import { BEANCODE_COMMIT_HASH } from '$lib/constants';
 	import { post } from '$lib/workers/pyodide_state.svelte';
 	import { editorNewFile } from '../../routes/editor/editor_state.svelte';
 	import { s } from '../../routes/editor/state.svelte';
@@ -18,14 +19,26 @@
 	import { UAParser } from 'ua-parser-js';
 
 	import '$lib/styles/dialog.css';
+	import ConfirmDialog from './ConfirmDialog.svelte';
+	import { getDefaultConfig, isValidConfig, type IConfig } from '$lib/config';
+	import ThemePickerRow from './settings/ThemePickerRow.svelte';
+	import ErrorDialog from './ErrorDialog.svelte';
 
 	interface IProps {
 		aboutOnly: boolean;
+		cfg?: IConfig;
+		onClose?: (cfg: IConfig) => void;
 	}
-	let { aboutOnly }: IProps = $props();
+	let { aboutOnly, cfg = $bindable(getDefaultConfig()), onClose }: IProps = $props();
 
+	let confirmDialog: ConfirmDialog;
+	let errorDialog: ErrorDialog;
 	let innerDialog: Dialog;
+	let uploadElem: HTMLInputElement;
 	let submitButton: HTMLButtonElement;
+	// yes, we only want the initial state
+	let ourCfg = $state({ ...cfg } satisfies IConfig);
+
 	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
 	type TView = (typeof possibleViews)[number];
 
@@ -38,10 +51,12 @@
 	export const close = () => {
 		innerDialog.close();
 	};
+
 	// @ts-ignore
 	export const open = () => {
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
+		ourCfg = { ...cfg } satisfies IConfig;
 	};
 
 	export function focus() {
@@ -54,9 +69,51 @@
 	}
 
 	function clearData() {
-		window.localStorage.clear();
-		editorNewFile();
-		post({ kind: 'nuke' });
+		const nuke = () => {
+			editorNewFile();
+			post({ kind: 'nuke' });
+		};
+		confirmDialog.open(
+			[
+				'This will remove ALL user data that you have, including all your settings and files.',
+				'This action is IRREVERSIBLE. Are you SURE you want to do this?',
+				'This feature is mostly intended for developers; make a backup of your files before you click.'
+			],
+			nuke,
+			undefined
+		);
+	}
+
+	function downloadSettings() {
+		const blob = new Blob([JSON.stringify(ourCfg)], { type: 'text/plain' });
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = 'beancode_web_settings.json';
+		a.click();
+		URL.revokeObjectURL(a.href);
+	}
+
+	async function uploadSettings(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.item(0);
+
+		if (!file) return;
+
+		const txt = await file.text();
+		let res;
+		try {
+			res = JSON.parse(txt);
+
+			if (!isValidConfig(res)) {
+				errorDialog.open([`${file.name} is an invalid configuration!`]);
+				return;
+			}
+		} catch (e) {
+			errorDialog.open([`Could not parse ${file.name}`, String(e)]);
+			return;
+		}
+
+		ourCfg = res satisfies IConfig;
 	}
 </script>
 
@@ -97,9 +154,84 @@
 		<div class="middle">
 			{#if view === 'general'}
 				<h1>General Settings</h1>
-				<p style="color: var(--bw-subtext1);">nothing to see here...</p>
+				<hr />
+				<table class="option-table">
+					<tbody>
+						<ThemePickerRow
+							label="Preferred Light Theme"
+							value={ourCfg.preferredLightTheme}
+							onChange={(v) => (ourCfg.preferredLightTheme = v)}
+						/>
+						<ThemePickerRow
+							label="Preferred Dark Theme"
+							value={ourCfg.preferredDarkTheme}
+							onChange={(v) => (ourCfg.preferredDarkTheme = v)}
+						/>
+						<tr>
+							<td><span class="label">Editor Font</span></td>
+							<td
+								><input
+									type="text"
+									spellcheck="false"
+									class="input-box"
+									bind:value={ourCfg.editorFont}
+								/></td
+							>
+						</tr>
+						<tr>
+							<td><span class="label">Editor Font Size</span></td>
+							<td
+								><input
+									type="number"
+									spellcheck="false"
+									class="input-box"
+									bind:value={ourCfg.editorFontSize}
+								/></td
+							>
+						</tr>
+						<tr>
+							<td><span class="label">Terminal Font</span></td>
+							<td
+								><input
+									type="text"
+									spellcheck="false"
+									class="input-box"
+									bind:value={ourCfg.terminalFont}
+								/></td
+							>
+						</tr>
+						<tr>
+							<td><span class="label">Terminal Font Size</span></td>
+							<td
+								><input
+									type="number"
+									spellcheck="false"
+									class="input-box"
+									bind:value={ourCfg.terminalFontSize}
+								/></td
+							>
+						</tr>
+					</tbody>
+				</table>
 			{:else if view === 'advanced'}
 				<h1>Advanced Settings</h1>
+				<hr />
+				<button
+					class="button normal"
+					onclick={() => {
+						downloadSettings();
+					}}
+				>
+					<span class="fa-solid fa-download"></span> Download Settings
+				</button>
+				<button
+					class="button normal"
+					onclick={() => {
+						uploadElem.click();
+					}}
+				>
+					<span class="fa-solid fa-upload"></span> Upload Settings
+				</button>
 				<button class="button destructive-button" onclick={() => clearData()}>
 					<span class="fa-solid fa-trash"></span>
 					Clear all user data
@@ -117,7 +249,7 @@
 				</p>
 				<hr />
 				<p><strong>Version info</strong></p>
-				<table>
+				<table class="info-table">
 					<tbody>
 						<tr>
 							<td>beancode web</td><td><strong>{BEANCODE_WEB_VERSION}</strong> </td>
@@ -168,22 +300,27 @@
 				class="button ok"
 				bind:this={submitButton}
 				onclick={() => {
+					if (onClose) onClose(ourCfg);
 					close();
 				}}
 			>
-				Ok
+				<span class="fa-solid fa-check"></span> Ok
 			</button>
 		</div>
 	</div>
 </Dialog>
+<ConfirmDialog bind:this={confirmDialog} />
+<ErrorDialog bind:this={errorDialog} />
+<input bind:this={uploadElem} type="file" accept=".json,text/*" onchange={uploadSettings} hidden />
 
 <style>
 	.vstack {
 		font-family: 'IBM Plex Mono', monospace !important;
 		display: flex;
 		flex-direction: column;
-		min-width: 28vw;
+		min-width: 35vw;
 		max-width: 35vw;
+		min-height: 35vw;
 	}
 
 	.top {
@@ -209,8 +346,39 @@
 		flex-direction: row;
 		justify-content: right;
 		margin: 0.5em;
-		margin-top: 0px;
 		gap: 0.5em;
+		margin-top: auto;
+	}
+
+	.label {
+		color: var(--bw-text);
+		margin: 0;
+		margin-right: 0.8em;
+		padding: 0;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.input-box {
+		font-family: 'IBM Plex Mono', monospace !important;
+		background-color: var(--bw-base1);
+		border-radius: 5px;
+		border: 0px solid black;
+		flex: 1;
+		color: var(--bw-text);
+		font-size: 1.1em;
+		width: 100%;
+	}
+
+	.input-box:focus {
+		background-color: var(--bw-surface1);
+		outline: 0px solid black;
+		caret-shape: block;
+		caret-color: var(--bw-blue);
 	}
 
 	.button {
@@ -237,13 +405,23 @@
 		color: var(--bw-red);
 	}
 
-	.ok {
+	.normal {
 		background-color: var(--bw-surface1);
+		color: var(--bw-text);
+	}
+
+	.normal:hover {
+		background-color: var(--bw-surface2);
+	}
+
+	.ok {
+		background-color: var(--bw-green);
+		color: var(--bw-base1);
 	}
 
 	.ok:hover {
-		background-color: var(--bw-base1);
-		color: var(--bw-subtext1);
+		background-color: var(--bw-base3);
+		color: var(--bw-green);
 	}
 
 	.selector {
@@ -281,7 +459,6 @@
 		font-size: 16pt;
 		color: var(--bw-text);
 		margin: 0;
-		margin-bottom: 0.5em;
 	}
 
 	.middle p {
@@ -300,22 +477,41 @@
 		width: 100%;
 	}
 
-	.middle table {
+	.option-table {
+		border-collapse: separate;
+		border-spacing: 0 0.5em;
+	}
+
+	.option-table tbody {
+		border: 0px solid black;
+		border: 0px solid black;
+	}
+
+	.option-table td {
+		margin-bottom: 0.3em;
+		border: 0px solid black;
+	}
+
+	.option-table :global(td):first-child {
+		width: 40%;
+	}
+
+	.info-table {
 		table-layout: fixed;
 		border-collapse: collapse;
 	}
 
-	.middle tbody,
-	.middle td {
+	.info-table tbody,
+	.info-table td {
 		color: var(--bw-text);
 		border: 1px solid var(--bw-subtext1);
 		border-color: var(--bw-subtext1);
 	}
-	.middle td {
-		padding: 0.2em;
+
+	.info-table td {
 		width: min-content;
 	}
-	.middle td:last-child {
+	.info-table td:last-child {
 		width: auto;
 	}
 
