@@ -50,7 +50,6 @@
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
-		s.themeName = origTheme;
 		innerDialog.close();
 	};
 
