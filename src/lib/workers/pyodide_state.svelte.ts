@@ -21,6 +21,7 @@ export type PyMessage =
     | { kind: 'renamefile-response', path: string, data: FileResponse<string> }
     // null: error
     | { kind: 'format-response', data: string | null, path: string }
+    | { kind: 'formatpy-response', data: string | null }
     | { kind: 'trace-response', data: string | null | undefined }
     | { kind: 'compressdir-response', path: string, data: FileResponse<Blob> }
     | { kind: 'nuke-done' }
@@ -38,6 +39,7 @@ export type EditorMessage =
     | { kind: 'delfile', path: string }
     | { kind: 'renamefile', oldpath: string, newpath: string }
     | { kind: 'format', data: string, path: string }
+    | { kind: 'formatpy', data: string, name: string }
     | { kind: 'trace', data: string, path: string, vars: string[], config: TracerConfig }
     | { kind: 'compressdir', path: string }
     | { kind: 'nuke' }

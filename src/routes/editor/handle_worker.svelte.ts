@@ -16,6 +16,7 @@ import { termState as ts } from './terminal_state.svelte';
 
 import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
 import { FileResponseKind, pathJoin } from '$lib/fstypes';
+import { es } from './editor_state.svelte';
 
 let loadedLastOpened = false;
 
@@ -118,6 +119,12 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
         case 'format-response':
             if (msg.data !== null && msg.data !== '') {
                 doneFormattingCallback!(msg.data, msg.path);
+            }
+            s.running = false;
+            break; 
+        case 'formatpy-response':
+            if (msg.data !== null && msg.data !== '') {
+                doneFormattingCallback!(msg.data, es.curFilePath);
             }
             s.running = false;
             break; 

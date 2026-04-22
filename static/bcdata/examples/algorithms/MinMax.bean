@@ -1,0 +1,44 @@
+// NOTE: the idea of the algorithm is to keep a number index
+// of the smallest/biggest item we saw so far.
+//
+// For this demo, we will rely on continuously inputting numbers.
+//
+
+DECLARE CurNumber, SmallestSoFar, GreatestSoFar: INTEGER
+
+// We assume the smallest so far is a massive number, meaning that
+// any number should have the potential of being smaller.
+SmallestSoFar <- 99999999
+
+// Similar logic for the greatest, any number should have the
+// potential to be greater.
+GreatestSoFar <- -99999999
+
+REPEAT
+    OUTPUT "Enter a number (0 to stop)"
+    INPUT CurNumber
+
+    // If the current number is not equal to 0, do checks.
+    // If we do checks and output, it makes no sense, as 0
+    // means stop.
+    IF CurNumber <> 0
+      THEN
+        IF CurNumber < SmallestSoFar
+          THEN
+            // If the current number is smaller than the smallest we have
+            // seen so far, it is now the smallest
+            SmallestSoFar <- CurNumber
+          ELSE
+            IF CurNumber > GreatestSoFar
+              THEN
+                // Similar Logic
+                GreatestSoFar <- CurNumber
+              ELSE 
+            ENDIF
+        ENDIF
+
+        OUTPUT "Smallest: ", SmallestSoFar, ", Greatest: ", GreatestSoFar
+    ENDIF
+
+// Keep going until the current number is 0
+UNTIL CurNumber = 0

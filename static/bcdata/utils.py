@@ -18,7 +18,7 @@ from beancode.tracer import *
 from beancode.runner import *
 from beancode.repl import Repl
 from beancode import __version__
-import sys, shutil
+import black, ast, sys, shutil
 
 __py_version__ = sys.version.split(" ")[0]
 
@@ -110,3 +110,20 @@ def nuke(d):
             print(f"removing: {itm}")
             os.remove(itm)
 
+def format_py(src, name):
+    try: 
+        return black.format_str(src, mode=black.Mode())
+    except black.InvalidInput:
+         pass
+
+    try:
+        ast.parse(src, filename=name)
+    except SyntaxError as e:
+        print(f"\x1b[1m{e.filename}: \x1b[31merror\x1b[0m at line {e.lineno} column {e.offset}:")
+        print(e.msg)
+        begin = f" \x1b[31;1m{e.lineno}\x1b[0m | "
+        padding = len(str(e.lineno)) + 4 # space, space, |, space
+        print(f"{begin}{e.text.rstrip() if e.text else ''}")
+        if e.offset:
+            spaces = '' * padding
+            print(f"{spaces}\x1b[33m{' ' * (e.offset - 1 + padding)}^{'~' * (e.end_offset - e.offset - 1)}\x1b[0m")
