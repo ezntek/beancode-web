@@ -18,7 +18,7 @@ from beancode.tracer import *
 from beancode.runner import *
 from beancode.repl import Repl
 from beancode import __version__
-import ast, sys, shutil
+import black, ast, sys, shutil
 
 __py_version__ = sys.version.split(" ")[0]
 
@@ -112,8 +112,12 @@ def nuke(d):
 
 def format_py(src, name):
     try: 
-        s = ast.unparse(ast.parse(src, filename=name))
-        return s
+        return black.format_str(src, mode=black.Mode())
+    except black.InvalidInput:
+         pass
+
+    try:
+        ast.parse(src, filename=name)
     except SyntaxError as e:
         print(f"\x1b[1m{e.filename}: \x1b[31merror\x1b[0m at line {e.lineno} column {e.offset}:")
         print(e.msg)

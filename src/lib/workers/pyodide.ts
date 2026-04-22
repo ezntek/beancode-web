@@ -286,7 +286,8 @@ async function loadBeancode() {
         await py.loadPackage("micropip");
 
         const BEANCODE_WHEEL_PATH = `/bcdata/beancode-${WANTED_BEANCODE_VERSION}-py3-none-any.whl`
-        const SCRIPT = `import micropip,os;await micropip.install(\"${BEANCODE_WHEEL_PATH}\")`
+        const BLACK_WHEEL_PATH = "/bcdata/black-26.3.1-py3-none-any.whl";
+        const SCRIPT = `import micropip,os;await micropip.install(\"${BEANCODE_WHEEL_PATH}\");await micropip.install("${BLACK_WHEEL_PATH}")`;
         try {
             await py.runPythonAsync(SCRIPT)
         } catch (e) {
