@@ -101,7 +101,6 @@
 	}
 
 	async function newDefaultFile() {
-		console.log(es.curFilePath, s.curdir);
 		es.curFilePath = 'MyProgram.bean';
 		es.src =
 			'// === Welcome to beancode web! ===\n' +
@@ -629,7 +628,7 @@
 					class="toolbar-aux-button"
 					onclick={() => settingsDialog.open()}
 				>
-					<span class="fa-solid fa-circle-info"></span>
+					<span class="fa-solid fa-gear"></span>
 				</button>
 			</div>
 			<div class="middle">

@@ -49,9 +49,9 @@
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
-		if (onClose) onClose(ourCfg);
 		innerDialog.close();
 	};
+
 	// @ts-ignore
 	export const open = () => {
 		innerDialog.open();
@@ -70,7 +70,6 @@
 
 	function clearData() {
 		const nuke = () => {
-			window.localStorage.clear();
 			editorNewFile();
 			post({ kind: 'nuke' });
 		};
@@ -301,6 +300,7 @@
 				class="button ok"
 				bind:this={submitButton}
 				onclick={() => {
+					if (onClose) onClose(ourCfg);
 					close();
 				}}
 			>
