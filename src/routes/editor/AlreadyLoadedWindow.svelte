@@ -1,14 +1,21 @@
 <script lang="ts">
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
 
 	let settingsDialog: SettingsDialog;
 	let messageDialog: MessageDialog;
 
 	function openDialog() {
-		const MSG =
-			'Beancode web does not send your data to servers outside your computer. All of your data (your code and settings) are stored within your web browser. However, since every instance (tab, window) of beancode web shares the same storage since you are using the same web browser, trying to use both instances at the same time can lead to data corruption, data loss, and desynchronised files/settings.';
+		const MSG = [
+			'Beancode web does not send your data to servers outside your computer. All of your data (your code and settings) are stored within your web browser.',
+			'However, since every instance (tab, window) of beancode web shares the same storage since you are using the same web browser, trying to use both instances at the same time can lead to data corruption, data loss, and desynchronised files/settings.'
+		];
 		messageDialog.open(MSG);
+	}
+
+	function nukeLocalStorage() {
+		window.localStorage.clear();
 	}
 </script>
 
@@ -24,6 +31,9 @@
 	<span>
 		<button onclick={() => openDialog()}>I'm confused!</button>
 		<button onclick={() => settingsDialog.open()}>About</button>
+		{#if BEANCODE_IS_DEV_BUILD}
+			<button onclick={() => nukeLocalStorage()}>Nuke localStorage</button>
+		{/if}
 	</span>
 </div>
 <MessageDialog bind:this={messageDialog} />

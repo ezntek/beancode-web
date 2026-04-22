@@ -27,8 +27,12 @@
 	import UnsupportedWindow from './UnsupportedWindow.svelte';
 	import { BEANCODE_IS_DEV_BUILD } from '$lib/version';
 
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+
 	let hasSab = $state(true);
 	let windowCount = $state(1);
+	let errorDialog: ErrorDialog;
+
 	onMount(() => {
 		const theme = window.localStorage.getItem('EditorTheme');
 		if (theme) {
@@ -40,25 +44,32 @@
 		applyTheme(s.themeName, s.loadedTheme);
 
 		try {
-			var dummy: any;
-			dummy = SharedArrayBuffer;
-			dummy = Atomics;
+			SharedArrayBuffer;
+			Atomics;
 		} catch (err) {
 			hasSab = false;
+		}
+
+		function noPersistErr() {
+			if (window.localStorage.getItem('ShownPersistError') !== 'yes') {
+				errorDialog.open(
+					[
+						'Could not request for persistent storage! Your data and settings could mysteriously vanish.',
+						"Either bookmark this site, manually allow persistent storage in the browser's settings, or run the risk of your data vanishing!",
+						'This error will not appear again.'
+					],
+					() => window.localStorage.setItem('ShownPersistError', 'yes')
+				);
+			}
 		}
 
 		if (navigator.storage && navigator.storage.persist) {
 			try {
 				navigator.storage.persist().then((persistent: boolean) => {
-					if (!persistent)
-						console.error(
-							'Could not request for persistent storage, your data may mysteriously vanish.'
-						);
+					if (!persistent) noPersistErr();
 				});
 			} catch (e) {
-				console.error(
-					'Could not request for persistent storage, your data may mysteriously vanish.'
-				);
+				noPersistErr();
 			}
 		}
 
@@ -106,6 +117,7 @@
 		<UnsupportedWindow />
 	{/if}
 </div>
+<ErrorDialog bind:this={errorDialog} />
 
 <style>
 	#editor-window-wrapper {
