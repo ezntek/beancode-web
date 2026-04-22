@@ -49,6 +49,7 @@
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import type { TracerConfig } from '$lib/tracer';
 	import { applyTheme } from '$lib/themes/themes';
+	import type { IConfig } from '../../config';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -125,6 +126,11 @@
 			window.localStorage.setItem('IsFirstLaunch', 'no');
 		}
 
+		const cfg = window.localStorage.getItem('Config');
+		if (cfg !== null) {
+			s.config = JSON.parse(cfg) satisfies IConfig;
+		}
+
 		setDoneFormattingCallback(doneFormattingCallback);
 		setDoneTracingCallback(doneTracingCallback);
 		setFileResponseCallback(fileResponseCallback);
@@ -139,18 +145,24 @@
 	});
 
 	// FIXME: better theming system
-	const darkThemeName = 'default_dark';
-	const lightThemeName = 'default_light';
 	$effect(() => {
 		applyTheme(s.themeName, s.loadedTheme);
-		isDark = s.themeName == darkThemeName;
+		isDark = s.themeName == s.config.preferredDarkTheme;
 	});
 
 	function toggleTheme() {
 		// TODO: proper light/dark themes
-		if (isDark) s.themeName = lightThemeName;
-		else s.themeName = darkThemeName;
-		isDark = s.themeName == darkThemeName;
+		if (isDark) s.themeName = s.config.preferredLightTheme;
+		else s.themeName = s.config.preferredDarkTheme;
+		isDark = s.themeName == s.config.preferredDarkTheme;
+	}
+
+	function closeSettings() {
+		if (isDark) s.themeName = s.config.preferredDarkTheme;
+		else s.themeName = s.config.preferredLightTheme;
+		applyTheme(s.themeName, s.loadedTheme);
+		const cfg = JSON.stringify(s.config);
+		window.localStorage.setItem('Config', cfg);
 	}
 
 	function doneFormattingCallback(data: string, path: string) {
@@ -652,7 +664,12 @@
 		{/if}
 	</div>
 </div>
-<SettingsDialog bind:this={settingsDialog} aboutOnly={true} />
+<SettingsDialog
+	bind:this={settingsDialog}
+	aboutOnly={false}
+	cfg={s.config}
+	onClose={() => closeSettings()}
+/>
 <SaveDialog
 	bind:this={saveDialog}
 	cancel={() => saveDialog.close()}

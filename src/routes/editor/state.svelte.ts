@@ -11,6 +11,7 @@
 
 import { type FileResponse, type Dir } from '$lib/fstypes';
 import { post } from '$lib/workers/pyodide_state.svelte';
+import { getDefaultConfig, type IConfig } from '$lib/config';
 import { es } from './editor_state.svelte';
 
 export const INPUT_MAX = 2048;
@@ -29,6 +30,7 @@ interface IState {
     replRunning: boolean,
     inputBuf: SharedArrayBuffer | null,
     interruptBuf: SharedArrayBuffer | null,
+    config: IConfig, 
 };
 
 export const s: IState = $state({
@@ -44,6 +46,7 @@ export const s: IState = $state({
     replRunning: false,
     inputBuf: null,
     interruptBuf: null,
+    config: getDefaultConfig(),
 });
 
 export function saveFile(overwrite: boolean, path?: string) {

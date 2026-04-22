@@ -19,12 +19,18 @@
 	import { UAParser } from 'ua-parser-js';
 
 	import '$lib/styles/dialog.css';
+	import ConfirmDialog from './ConfirmDialog.svelte';
+	import { getDefaultConfig, type IConfig } from '$lib/config';
+	import ThemePickerRow from './settings/ThemePickerRow.svelte';
 
 	interface IProps {
 		aboutOnly: boolean;
+		cfg?: IConfig;
+		onClose?: Function;
 	}
-	let { aboutOnly }: IProps = $props();
+	let { aboutOnly, cfg = getDefaultConfig(), onClose }: IProps = $props();
 
+	let confirmDialog: ConfirmDialog;
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
 	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
@@ -37,6 +43,7 @@
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
+		if (onClose) onClose();
 		innerDialog.close();
 	};
 	// @ts-ignore
@@ -55,9 +62,20 @@
 	}
 
 	function clearData() {
-		window.localStorage.clear();
-		editorNewFile();
-		post({ kind: 'nuke' });
+		const nuke = () => {
+			window.localStorage.clear();
+			editorNewFile();
+			post({ kind: 'nuke' });
+		};
+		confirmDialog.open(
+			[
+				'This will remove ALL user data that you have, including all your settings and files.',
+				'This action is IRREVERSIBLE. Are you SURE you want to do this?',
+				'This feature is mostly intended for developers; make a backup of your files before you click.'
+			],
+			nuke,
+			undefined
+		);
 	}
 </script>
 
@@ -98,9 +116,28 @@
 		<div class="middle">
 			{#if view === 'general'}
 				<h1>General Settings</h1>
-				<p style="color: var(--bw-subtext1);">nothing to see here...</p>
+				<hr />
+				<table class="option-table">
+					<tbody>
+						<ThemePickerRow
+							label="Preferred Light Theme"
+							value={cfg.preferredLightTheme}
+							onChange={(v) => (cfg.preferredLightTheme = v)}
+						/>
+						<ThemePickerRow
+							label="Preferred Dark Theme"
+							value={cfg.preferredDarkTheme}
+							onChange={(v) => (cfg.preferredDarkTheme = v)}
+						/>
+						<tr>
+							<td><span class="label">Editor Font</span></td>
+							<td><input type="text" class="input-box" /></td>
+						</tr>
+					</tbody>
+				</table>
 			{:else if view === 'advanced'}
 				<h1>Advanced Settings</h1>
+				<hr />
 				<button class="button destructive-button" onclick={() => clearData()}>
 					<span class="fa-solid fa-trash"></span>
 					Clear all user data
@@ -118,7 +155,7 @@
 				</p>
 				<hr />
 				<p><strong>Version info</strong></p>
-				<table>
+				<table class="info-table">
 					<tbody>
 						<tr>
 							<td>beancode web</td><td><strong>{BEANCODE_WEB_VERSION}</strong> </td>
@@ -177,14 +214,16 @@
 		</div>
 	</div>
 </Dialog>
+<ConfirmDialog bind:this={confirmDialog} />
 
 <style>
 	.vstack {
 		font-family: 'IBM Plex Mono', monospace !important;
 		display: flex;
 		flex-direction: column;
-		min-width: 28vw;
+		min-width: 35vw;
 		max-width: 35vw;
+		min-height: 35vw;
 	}
 
 	.top {
@@ -210,8 +249,39 @@
 		flex-direction: row;
 		justify-content: right;
 		margin: 0.5em;
-		margin-top: 0px;
 		gap: 0.5em;
+		margin-top: auto;
+	}
+
+	.label {
+		color: var(--bw-text);
+		margin: 0;
+		margin-right: 0.8em;
+		padding: 0;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.input-box {
+		font-family: 'IBM Plex Mono', monospace !important;
+		background-color: var(--bw-base1);
+		border-radius: 5px;
+		border: 0px solid black;
+		flex: 1;
+		color: var(--bw-text);
+		font-size: 1.1em;
+		width: 100%;
+	}
+
+	.input-box:focus {
+		background-color: var(--bw-surface1);
+		outline: 0px solid black;
+		caret-shape: block;
+		caret-color: var(--bw-blue);
 	}
 
 	.button {
@@ -282,7 +352,6 @@
 		font-size: 16pt;
 		color: var(--bw-text);
 		margin: 0;
-		margin-bottom: 0.5em;
 	}
 
 	.middle p {
@@ -301,22 +370,41 @@
 		width: 100%;
 	}
 
-	.middle table {
+	.option-table {
+		border-collapse: separate;
+		border-spacing: 0 0.5em;
+	}
+
+	.option-table tbody {
+		border: 0px solid black;
+		border: 0px solid black;
+	}
+
+	.option-table td {
+		margin-bottom: 0.3em;
+		border: 0px solid black;
+	}
+
+	.option-table :global(td):first-child {
+		width: 40%;
+	}
+
+	.info-table {
 		table-layout: fixed;
 		border-collapse: collapse;
 	}
 
-	.middle tbody,
-	.middle td {
+	.info-table tbody,
+	.info-table td {
 		color: var(--bw-text);
 		border: 1px solid var(--bw-subtext1);
 		border-color: var(--bw-subtext1);
 	}
-	.middle td {
-		padding: 0.2em;
+
+	.info-table td {
 		width: min-content;
 	}
-	.middle td:last-child {
+	.info-table td:last-child {
 		width: auto;
 	}
 

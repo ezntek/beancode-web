@@ -25,7 +25,7 @@
 	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
 	import EditorWindow from './EditorWindow.svelte';
 	import UnsupportedWindow from './UnsupportedWindow.svelte';
-	import { BEANCODE_IS_DEV_BUILD } from '$lib/version';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
 
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
