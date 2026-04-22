@@ -109,9 +109,6 @@
 		setTermWidth();
 		setFileBrowserWidth();
 
-		terminalShown = s.config.terminalShown;
-		fileBrowserShown = s.config.fileBrowserShown;
-
 		setDoneFormattingCallback(doneFormattingCallback);
 		setDoneTracingCallback(doneTracingCallback);
 		setFileResponseCallback(fileResponseCallback);
@@ -129,6 +126,12 @@
 	$effect(() => {
 		applyTheme(s.themeName, s.loadedTheme);
 		isDark = s.themeName == s.config.preferredDarkTheme;
+	});
+
+	// XXX: this is disgusting. must refactor
+	$effect(() => {
+		terminalShown = s.config.terminalShown;
+		fileBrowserShown = s.config.fileBrowserShown;
 	});
 
 	$effect(() => {
