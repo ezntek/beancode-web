@@ -26,13 +26,14 @@
 	interface IProps {
 		aboutOnly: boolean;
 		cfg?: IConfig;
-		onClose?: Function;
+		onClose?: (cfg: IConfig) => void;
 	}
 	let { aboutOnly, cfg = $bindable(getDefaultConfig()), onClose }: IProps = $props();
 
 	let confirmDialog: ConfirmDialog;
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
+	// yes, we only want the initial state
 	let ourCfg = $state({ ...cfg } satisfies IConfig);
 
 	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
@@ -45,14 +46,14 @@
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
-		cfg = { ...ourCfg } satisfies IConfig;
-		if (onClose) onClose();
+		if (onClose) onClose(ourCfg);
 		innerDialog.close();
 	};
 	// @ts-ignore
 	export const open = () => {
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
+		ourCfg = { ...cfg } satisfies IConfig;
 	};
 
 	export function focus() {
@@ -129,7 +130,7 @@
 						/>
 						<ThemePickerRow
 							label="Preferred Dark Theme"
-							value={cfg.preferredDarkTheme}
+							value={ourCfg.preferredDarkTheme}
 							onChange={(v) => (ourCfg.preferredDarkTheme = v)}
 						/>
 						<tr>
@@ -144,6 +145,17 @@
 							>
 						</tr>
 						<tr>
+							<td><span class="label">Editor Font Size</span></td>
+							<td
+								><input
+									type="number"
+									spellcheck="false"
+									class="input-box"
+									bind:value={ourCfg.editorFontSize}
+								/></td
+							>
+						</tr>
+						<tr>
 							<td><span class="label">Terminal Font</span></td>
 							<td
 								><input
@@ -151,6 +163,17 @@
 									spellcheck="false"
 									class="input-box"
 									bind:value={ourCfg.terminalFont}
+								/></td
+							>
+						</tr>
+						<tr>
+							<td><span class="label">Terminal Font Size</span></td>
+							<td
+								><input
+									type="number"
+									spellcheck="false"
+									class="input-box"
+									bind:value={ourCfg.terminalFontSize}
 								/></td
 							>
 						</tr>

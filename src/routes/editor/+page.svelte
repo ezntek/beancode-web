@@ -95,6 +95,9 @@
 			windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
 			window.localStorage.setItem('WindowCount', String(windowCount - 1));
 
+			const cfg = JSON.stringify(s.config);
+			window.localStorage.setItem('Config', cfg);
+
 			event.returnValue = '';
 		});
 	});

@@ -3,6 +3,8 @@ export interface IConfig {
     preferredLightTheme: string,
     editorFont: string,
     terminalFont: string,
+    editorFontSize: number,
+    terminalFontSize: number,
 };
 
 export function getDefaultConfig(): IConfig {
@@ -11,5 +13,7 @@ export function getDefaultConfig(): IConfig {
         preferredLightTheme: "catppuccin_latte",
         editorFont: 'IBM Plex Mono',
         terminalFont: 'IBM Plex Mono',
+        editorFontSize: 20,
+        terminalFontSize: 20,
     };
 }

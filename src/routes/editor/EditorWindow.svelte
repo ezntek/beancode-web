@@ -49,7 +49,7 @@
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import type { TracerConfig } from '$lib/tracer';
 	import { applyTheme } from '$lib/themes/themes';
-	import type { IConfig } from '../../config';
+	import type { IConfig } from '$lib/config';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -157,12 +157,13 @@
 		isDark = s.themeName == s.config.preferredDarkTheme;
 	}
 
-	function applySettings() {
+	function applySettings(cfg: IConfig) {
+		s.config = { ...cfg } satisfies IConfig;
 		if (isDark) s.themeName = s.config.preferredDarkTheme;
 		else s.themeName = s.config.preferredLightTheme;
 		applyTheme(s.themeName, s.loadedTheme);
-		const cfg = JSON.stringify(s.config);
-		window.localStorage.setItem('Config', cfg);
+		const c = JSON.stringify(s.config);
+		window.localStorage.setItem('Config', c);
 	}
 
 	function doneFormattingCallback(data: string, path: string) {
@@ -664,12 +665,6 @@
 		{/if}
 	</div>
 </div>
-<SettingsDialog
-	bind:this={settingsDialog}
-	aboutOnly={false}
-	bind:cfg={s.config}
-	onClose={() => applySettings()}
-/>
 <SaveDialog
 	bind:this={saveDialog}
 	cancel={() => saveDialog.close()}
@@ -685,6 +680,12 @@
 <MessageDialog bind:this={messageDialog} />
 <ErrorDialog bind:this={errorDialog} />
 <TraceDialog bind:this={traceDialog} ok={traceOk} cancel={() => traceDialog.close()} />
+<SettingsDialog
+	bind:this={settingsDialog}
+	aboutOnly={false}
+	bind:cfg={s.config}
+	onClose={(cfg: IConfig) => applySettings(cfg)}
+/>
 
 <style>
 	.icon {

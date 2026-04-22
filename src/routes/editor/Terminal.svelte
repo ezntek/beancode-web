@@ -21,7 +21,6 @@
 	import { type ITheme } from '@xterm/xterm';
 	import { THEMES, type ThemeSpec } from '$lib/themes/themes';
 
-	let fontSize = 22;
 	let options: (ITerminalOptions & ITerminalInitOnlyOptions) | undefined = $state();
 	onMount(() => {
 		const handleResize = () => {
@@ -29,16 +28,12 @@
 		};
 		window.addEventListener('resize', handleResize);
 
-		if (window.innerWidth <= 1400 || window.innerHeight <= 800) {
-			fontSize = 18;
-		}
-
 		options = {
 			fontFamily: s.config.terminalFont,
 			// NOTE: safari fix
 			// @ts-ignore
 			cursorBlink: true,
-			fontSize: fontSize,
+			fontSize: s.config.terminalFontSize,
 			theme: getTheme(s.themeName)
 		};
 
@@ -170,20 +165,21 @@
 		}
 	});
 
-	function zoomIn() {
-		const sz = ts.terminal!.options.fontSize!;
-		if (sz >= 64) return;
+	$effect(() => {
+		if (ts.terminal) {
+			ts.terminal!.options.fontSize = s.config.terminalFontSize;
+			ts.termFitAddon?.fit();
+		}
+	});
 
-		ts.terminal!.options.fontSize! += 1;
-		ts.termFitAddon!.fit();
+	function zoomIn() {
+		if (s.config.terminalFontSize >= 80) return;
+		s.config.terminalFontSize += 1;
 	}
 
 	function zoomOut() {
-		const sz = ts.terminal!.options.fontSize!;
-		if (sz <= 12) return;
-
-		ts.terminal!.options.fontSize! -= 1;
-		ts.termFitAddon!.fit();
+		if (s.config.terminalFontSize <= 10) return;
+		s.config.terminalFontSize -= 1;
 	}
 </script>
 

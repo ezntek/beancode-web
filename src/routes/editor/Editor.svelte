@@ -55,7 +55,6 @@
 	import { CM_THEMES } from '$lib/themes/themes';
 
 	let editor: HTMLDivElement;
-	let sz = $state(16);
 	let fontTheme: Compartment;
 	let highlighter: Compartment;
 	let themeCompartment: Compartment;
@@ -73,11 +72,6 @@
 			}
 		});
 
-		sz = 20;
-		if (window.innerWidth <= 1400 || window.innerHeight <= 800) {
-			sz = 16;
-		}
-
 		const style = EditorView.theme({
 			'&': { height: '100%' },
 			'.cm-scroller': { overflow: 'auto' },
@@ -87,12 +81,18 @@
 		});
 
 		const fontThemeStyle = EditorView.theme({
-			'.cm-content': { fontSize: sz + 'px', fontFamily: s.config.editorFont + ', monospace' }
+			'.cm-content': {
+				fontSize: s.config.editorFontSize + 'px',
+				fontFamily: s.config.editorFont + ', monospace'
+			}
 		});
 
 		$effect(() => {
 			const newTheme = EditorView.theme({
-				'.cm-content': { fontSize: sz + 'px', fontFamily: s.config.editorFont + ', monospace' }
+				'.cm-content': {
+					fontSize: s.config.editorFontSize + 'px',
+					fontFamily: s.config.editorFont + ', monospace'
+				}
 			});
 			es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 		});
@@ -199,20 +199,20 @@
 	});
 
 	function zoomIn() {
-		if (sz >= 64) return;
+		if (s.config.editorFontSize >= 64) return;
 
-		sz += 1;
+		s.config.editorFontSize += 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}px`, fontFamily: s.config.editorFont }
+			'.cm-content': { fontSize: `${s.config.editorFontSize}px`, fontFamily: s.config.editorFont }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
 
 	function zoomOut() {
-		if (sz <= 12) return;
-		sz -= 1;
+		if (s.config.editorFontSize <= 12) return;
+		s.config.editorFontSize -= 1;
 		const newTheme = EditorView.theme({
-			'.cm-content': { fontSize: `${sz}px`, fontFamily: s.config.editorFont }
+			'.cm-content': { fontSize: `${s.config.editorFontSize}px`, fontFamily: s.config.editorFont }
 		});
 		es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
 	}
