@@ -45,7 +45,6 @@
 
 	// yes, we only want the initial state
 	let view: TView = $state('about');
-	let origTheme = String(s.themeName);
 
 	const result = new UAParser().getResult();
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
@@ -120,10 +119,6 @@
 
 		ourCfg = res satisfies IConfig;
 	}
-
-	function tempApply(theme: string) {
-		s.themeName = theme;
-	}
 </script>
 
 <Dialog bind:this={innerDialog}>
@@ -169,12 +164,12 @@
 						<ThemePickerRow
 							label="Preferred Light Theme"
 							value={ourCfg.preferredLightTheme}
-							onChange={(v) => tempApply((ourCfg.preferredLightTheme = v))}
+							onChange={(v) => (ourCfg.preferredLightTheme = v)}
 						/>
 						<ThemePickerRow
 							label="Preferred Dark Theme"
 							value={ourCfg.preferredDarkTheme}
-							onChange={(v) => tempApply((ourCfg.preferredDarkTheme = v))}
+							onChange={(v) => (ourCfg.preferredDarkTheme = v)}
 						/>
 						<tr>
 							<td><span class="label">Editor Font</span></td>

@@ -32,7 +32,9 @@ export function isValidConfig(obj: any): obj is IConfig {
         typeof obj.editorFont === 'string' &&
         typeof obj.terminalFont === 'string' &&
         typeof obj.editorFontSize === 'number' &&
-        typeof obj.terminalFontSize === 'number'
+        typeof obj.terminalFontSize === 'number' &&
+        typeof obj.fileBrowserShown === 'boolean' &&
+        typeof obj.terminalShown === 'boolean'
     );
 }
 
