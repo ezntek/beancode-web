@@ -162,6 +162,15 @@ export const CM_THEMES = {
     'default_light': defaultLightCodemirror,
 }
 
+export const THEME_NAMES = {
+    'catppuccin_latte': 'Catppuccin Latte',
+    'catppuccin_frappe': 'Catppuccin Frappe',
+    'catppuccin_macchiato': 'Catppuccin Macchiato',
+    'catppuccin_mocha': 'Catppuccin Mocha',
+    'default_dark': 'Default Dark',
+    'default_light': 'Default Light',
+};
+
 export function applyTheme(themeName: string, loadedTheme: boolean) { 
     if (!(themeName in THEMES))
         console.error(`could not find theme ${themeName}!`);

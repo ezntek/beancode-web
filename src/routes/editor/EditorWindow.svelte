@@ -287,7 +287,7 @@
 			a.click();
 			URL.revokeObjectURL(a.href);
 		};
-		saveDialog.open('Save Project As...', pathBasename(s.cwd) + '.zip', false, cb, false);
+		saveDialog.open('Download Project As...', pathBasename(s.cwd) + '.zip', false, cb, false);
 	}
 
 	function startResizeTerm(e: any) {

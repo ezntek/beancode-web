@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { THEMES } from '$lib/themes/themes';
+	import { THEME_NAMES, THEMES } from '$lib/themes/themes';
 
 	interface IProps {
 		label: string;
@@ -20,7 +20,9 @@
 			onchange={(e) => onChange(e.currentTarget.value)}
 		>
 			{#each Object.keys(THEMES) as theme}
-				<option value={theme} selected={value === theme}>{theme}</option>
+				<option value={theme} selected={value === theme}>
+					{(THEME_NAMES as any)[theme]}
+				</option>
 			{/each}
 		</select>
 	</td>

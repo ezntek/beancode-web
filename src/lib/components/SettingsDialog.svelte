@@ -21,7 +21,7 @@
 	import '$lib/styles/dialog.css';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 	import { getDefaultConfig, isValidConfig, type IConfig } from '$lib/config';
-	import ThemePickerRow from './settings/ThemePickerRow.svelte';
+	import ThemePickerRow from '$lib/components/settings/ThemePickerRow.svelte';
 	import ErrorDialog from './ErrorDialog.svelte';
 
 	interface IProps {
@@ -36,27 +36,32 @@
 	let innerDialog: Dialog;
 	let uploadElem: HTMLInputElement;
 	let submitButton: HTMLButtonElement;
-	// yes, we only want the initial state
+
+	// copy the state so that we don't trigger too many $effect's while the user is in the menu
 	let ourCfg = $state({ ...cfg } satisfies IConfig);
 
 	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
 	type TView = (typeof possibleViews)[number];
 
 	// yes, we only want the initial state
-	let view: TView = $state(aboutOnly ? 'about' : 'general');
+	let view: TView = $state('about');
+	let origTheme = String(s.themeName);
 
 	const result = new UAParser().getResult();
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
+		s.themeName = origTheme;
 		innerDialog.close();
 	};
 
 	// @ts-ignore
 	export const open = () => {
+		view = aboutOnly ? 'about' : 'general';
+		ourCfg = { ...cfg } satisfies IConfig;
+
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
-		ourCfg = { ...cfg } satisfies IConfig;
 	};
 
 	export function focus() {
@@ -115,6 +120,10 @@
 
 		ourCfg = res satisfies IConfig;
 	}
+
+	function tempApply(theme: string) {
+		s.themeName = theme;
+	}
 </script>
 
 <Dialog bind:this={innerDialog}>
@@ -160,12 +169,12 @@
 						<ThemePickerRow
 							label="Preferred Light Theme"
 							value={ourCfg.preferredLightTheme}
-							onChange={(v) => (ourCfg.preferredLightTheme = v)}
+							onChange={(v) => tempApply((ourCfg.preferredLightTheme = v))}
 						/>
 						<ThemePickerRow
 							label="Preferred Dark Theme"
 							value={ourCfg.preferredDarkTheme}
-							onChange={(v) => (ourCfg.preferredDarkTheme = v)}
+							onChange={(v) => tempApply((ourCfg.preferredDarkTheme = v))}
 						/>
 						<tr>
 							<td><span class="label">Editor Font</span></td>
@@ -506,6 +515,7 @@
 		color: var(--bw-text);
 		border: 1px solid var(--bw-subtext1);
 		border-color: var(--bw-subtext1);
+		padding: 0.2em;
 	}
 
 	.info-table td {
