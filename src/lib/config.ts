@@ -16,7 +16,7 @@ export function getDefaultConfig(): IConfig {
         editorFont: 'IBM Plex Mono',
         terminalFont: 'IBM Plex Mono',
         editorFontSize: 20,
-        terminalFontSize: 20,
+        terminalFontSize: 22,
         fileBrowserShown: true,
         terminalShown: true,
     };

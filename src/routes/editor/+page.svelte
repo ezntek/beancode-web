@@ -40,6 +40,7 @@
 	import EditorWindow from './EditorWindow.svelte';
 	import UnsupportedWindow from './UnsupportedWindow.svelte';
 	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
+	import { getDefaultConfig, type IConfig } from '$lib/config';
 
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
@@ -48,11 +49,18 @@
 	let errorDialog: ErrorDialog;
 
 	onMount(() => {
+		const cfg = window.localStorage.getItem('Config');
+		if (cfg !== null) {
+			s.config = JSON.parse(cfg) satisfies IConfig;
+		} else {
+			s.config = getDefaultConfig();
+		}
+
 		const theme = window.localStorage.getItem('EditorTheme');
-		if (theme) {
+		if (theme && (theme == s.config.preferredDarkTheme || theme == s.config.preferredLightTheme)) {
 			s.themeName = theme;
 		} else {
-			s.themeName = 'default_dark';
+			s.themeName = s.config.preferredDarkTheme;
 		}
 		s.loadedTheme = true;
 		applyTheme(s.themeName, s.loadedTheme);

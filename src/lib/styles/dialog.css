@@ -3,7 +3,6 @@
     border-radius: 5px;
     background-color: var(--bw-red);
     color: var(--bw-base1);
-    text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,6 +13,12 @@
     padding: 5px;
     width: 1.5em;
     height: 1.5em;
+}
+
+.exit-button .fa-solid {
+    line-height: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 @media (max-width: 1400px), (max-height: 800px) {

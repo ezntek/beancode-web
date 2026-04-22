@@ -14,12 +14,25 @@ import { post, ps as ps } from '$lib/workers/pyodide_state.svelte';
 
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback } from './state.svelte';
+import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback, saveFile } from './state.svelte';
 import { FileResponseKind, pathJoin } from '$lib/fstypes';
 import { es } from './editor_state.svelte';
 import { getDefaultConfig } from '$lib/config';
+import { BEANCODE_WEB_VERSION } from '$lib/version';
 
 let loadedLastOpened = false;
+
+async function newDefaultFile() {
+    es.curFilePath = 'MyProgram.bean';
+    es.src =
+        '// === Welcome to beancode web! ===\n' +
+        `// This file was created on beancode-web version ${BEANCODE_WEB_VERSION}.\n` +
+        '// Start typing some Pseudocode below, delete these lines or create a new file.\n' +
+        '// You can edit Python code by creating a new file, with the file type Python.\n\n' +
+        'OUTPUT "Hello, Beancode web!"\n';
+    saveFile(true);
+}
+
 
 function handleWorkerEvent(event: MessageEvent<PyMessage>) {
     let ter = ts.terminal!;
@@ -39,6 +52,10 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             ts.canInput = false;
             s.versionText = msg.version;
             s.pyVersion = msg.pyversion;
+            if (!window.localStorage.getItem('IsFirstLaunch')) {
+                newDefaultFile();
+                window.localStorage.setItem('IsFirstLaunch', 'no');
+            }
             break;
         case 'clear':
             ter.write('\x1b[2J\x1b[H')

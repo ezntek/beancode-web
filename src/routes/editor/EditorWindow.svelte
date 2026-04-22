@@ -100,17 +100,6 @@
 		}
 	}
 
-	async function newDefaultFile() {
-		es.curFilePath = 'MyProgram.bean';
-		es.src =
-			'// === Welcome to beancode web! ===\n' +
-			`// This file was created on beancode-web version ${BEANCODE_WEB_VERSION}.\n` +
-			'// Start typing some Pseudocode below, delete these lines or create a new file.\n' +
-			'// You can edit Python code by creating a new file, with the file type Python.\n\n' +
-			'OUTPUT "Hello, Beancode web!"\n';
-		saveFile(true);
-	}
-
 	onMount(async () => {
 		s.inputBuf = new SharedArrayBuffer(INPUT_MAX + 4);
 		s.interruptBuf = new SharedArrayBuffer(1);
@@ -119,16 +108,6 @@
 
 		setTermWidth();
 		setFileBrowserWidth();
-
-		if (!window.localStorage.getItem('IsFirstLaunch')) {
-			newDefaultFile();
-			window.localStorage.setItem('IsFirstLaunch', 'no');
-		}
-
-		const cfg = window.localStorage.getItem('Config');
-		if (cfg !== null) {
-			s.config = JSON.parse(cfg) satisfies IConfig;
-		}
 
 		terminalShown = s.config.terminalShown;
 		fileBrowserShown = s.config.fileBrowserShown;
