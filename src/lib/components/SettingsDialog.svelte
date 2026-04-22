@@ -20,8 +20,9 @@
 
 	import '$lib/styles/dialog.css';
 	import ConfirmDialog from './ConfirmDialog.svelte';
-	import { getDefaultConfig, type IConfig } from '$lib/config';
+	import { getDefaultConfig, isValidConfig, type IConfig } from '$lib/config';
 	import ThemePickerRow from './settings/ThemePickerRow.svelte';
+	import ErrorDialog from './ErrorDialog.svelte';
 
 	interface IProps {
 		aboutOnly: boolean;
@@ -31,7 +32,9 @@
 	let { aboutOnly, cfg = $bindable(getDefaultConfig()), onClose }: IProps = $props();
 
 	let confirmDialog: ConfirmDialog;
+	let errorDialog: ErrorDialog;
 	let innerDialog: Dialog;
+	let uploadElem: HTMLInputElement;
 	let submitButton: HTMLButtonElement;
 	// yes, we only want the initial state
 	let ourCfg = $state({ ...cfg } satisfies IConfig);
@@ -80,6 +83,38 @@
 			nuke,
 			undefined
 		);
+	}
+
+	function downloadSettings() {
+		const blob = new Blob([JSON.stringify(ourCfg)], { type: 'text/plain' });
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = 'beancode_web_settings.json';
+		a.click();
+		URL.revokeObjectURL(a.href);
+	}
+
+	async function uploadSettings(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.item(0);
+
+		if (!file) return;
+
+		const txt = await file.text();
+		let res;
+		try {
+			res = JSON.parse(txt);
+
+			if (!isValidConfig(res)) {
+				errorDialog.open([`${file.name} is an invalid configuration!`]);
+				return;
+			}
+		} catch (e) {
+			errorDialog.open([`Could not parse ${file.name}`, String(e)]);
+			return;
+		}
+
+		ourCfg = res satisfies IConfig;
 	}
 </script>
 
@@ -182,6 +217,22 @@
 			{:else if view === 'advanced'}
 				<h1>Advanced Settings</h1>
 				<hr />
+				<button
+					class="button normal"
+					onclick={() => {
+						downloadSettings();
+					}}
+				>
+					<span class="fa-solid fa-download"></span> Download Settings
+				</button>
+				<button
+					class="button normal"
+					onclick={() => {
+						uploadElem.click();
+					}}
+				>
+					<span class="fa-solid fa-upload"></span> Upload Settings
+				</button>
 				<button class="button destructive-button" onclick={() => clearData()}>
 					<span class="fa-solid fa-trash"></span>
 					Clear all user data
@@ -253,12 +304,14 @@
 					close();
 				}}
 			>
-				Ok
+				<span class="fa-solid fa-check"></span> Ok
 			</button>
 		</div>
 	</div>
 </Dialog>
 <ConfirmDialog bind:this={confirmDialog} />
+<ErrorDialog bind:this={errorDialog} />
+<input bind:this={uploadElem} type="file" accept=".json,text/*" onchange={uploadSettings} hidden />
 
 <style>
 	.vstack {
@@ -352,13 +405,23 @@
 		color: var(--bw-red);
 	}
 
-	.ok {
+	.normal {
 		background-color: var(--bw-surface1);
+		color: var(--bw-text);
+	}
+
+	.normal:hover {
+		background-color: var(--bw-surface2);
+	}
+
+	.ok {
+		background-color: var(--bw-green);
+		color: var(--bw-base1);
 	}
 
 	.ok:hover {
-		background-color: var(--bw-base1);
-		color: var(--bw-subtext1);
+		background-color: var(--bw-base3);
+		color: var(--bw-green);
 	}
 
 	.selector {
