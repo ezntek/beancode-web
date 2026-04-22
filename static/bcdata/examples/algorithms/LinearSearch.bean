@@ -1,0 +1,62 @@
+// NOTE: This is just one possible way of doing linear search.
+// There are better ways to do this, but the general idea is to
+// use a loop to traverse an array, go through each item and
+// check if that's what you want.
+
+// Assume we have some food items in an array.
+DECLARE Food: ARRAY[1:10] OF STRING
+Food[1] <- "Burger"
+Food[2] <- "Chilli Crab"
+Food[3] <- "Paneer Tikka"
+Food[4] <- "Fried Rice"
+Food[5] <- "Beans on Toast"
+Food[6] <- "Chicken Shawarma"
+Food[7] <- "Char Kway Teow"
+Food[8] <- "Nasi Lemak"
+Food[9] <- "Rojak"
+Food[10] <- "Schnitzel"
+
+// Set up a counter
+DECLARE Counter: INTEGER
+
+// Set up this flag to check if we found the item or not
+DECLARE Found: BOOLEAN
+
+// This will contain our target item 
+DECLARE Target: STRING
+
+// Ask the user what they want to find
+OUTPUT "What do you want to find?"
+INPUT Target
+
+// Set up a counter and initialize it to 1
+Counter <- 1
+
+// Assume we haven't found anything yet
+Found <- FALSE
+
+REPEAT
+    IF Food[Counter] = Target
+      THEN
+        Found <- TRUE
+      ELSE
+        // If we didn't find it, increase the counter's
+        // value by 1
+        Counter <- Counter + 1
+    ENDIF
+
+    // Keep checking until found was set to true OR
+    // the counter exceeds 10
+UNTIL (Found = TRUE) OR (Counter > 10)
+
+// If the counter is less than or equal to 10, it means the
+// loop ended when the counter referred to a valid index of
+// the array, i.e. the first condition of the until was hit.
+IF Counter <= 10
+  THEN
+    OUTPUT "Found item at index ", Counter
+  ELSE
+    // This implies the counter exceeded 10, and that caused
+    // the loop to end when Found was still FALSE.
+    OUTPUT "Not Found"
+ENDIF
