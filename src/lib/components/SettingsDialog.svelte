@@ -33,7 +33,8 @@
 	let confirmDialog: ConfirmDialog;
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
-	let editorFont = $state(cfg.editorFont);
+	let ourCfg = $state({ ...cfg } satisfies IConfig);
+
 	const possibleViews = ['general', 'advanced', 'about', 'license'] as const;
 	type TView = (typeof possibleViews)[number];
 
@@ -44,7 +45,7 @@
 	let ua = `${result.browser.name} ${result.browser.version} on ${result.os.name}`;
 	// @ts-ignore
 	export const close = () => {
-		cfg.editorFont = editorFont;
+		cfg = { ...ourCfg } satisfies IConfig;
 		if (onClose) onClose();
 		innerDialog.close();
 	};
@@ -123,13 +124,13 @@
 					<tbody>
 						<ThemePickerRow
 							label="Preferred Light Theme"
-							value={cfg.preferredLightTheme}
-							onChange={(v) => (cfg.preferredLightTheme = v)}
+							value={ourCfg.preferredLightTheme}
+							onChange={(v) => (ourCfg.preferredLightTheme = v)}
 						/>
 						<ThemePickerRow
 							label="Preferred Dark Theme"
 							value={cfg.preferredDarkTheme}
-							onChange={(v) => (cfg.preferredDarkTheme = v)}
+							onChange={(v) => (ourCfg.preferredDarkTheme = v)}
 						/>
 						<tr>
 							<td><span class="label">Editor Font</span></td>
@@ -138,7 +139,18 @@
 									type="text"
 									spellcheck="false"
 									class="input-box"
-									bind:value={editorFont}
+									bind:value={ourCfg.editorFont}
+								/></td
+							>
+						</tr>
+						<tr>
+							<td><span class="label">Terminal Font</span></td>
+							<td
+								><input
+									type="text"
+									spellcheck="false"
+									class="input-box"
+									bind:value={ourCfg.terminalFont}
 								/></td
 							>
 						</tr>

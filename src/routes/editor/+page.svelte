@@ -21,10 +21,20 @@
 
 	import '@fontsource/ibm-plex-mono/400';
 	import '@fontsource/ibm-plex-mono/700';
-	import '@fontsource/lilex/400';
-	import '@fontsource/lilex/700';
-	import '@fontsource/lilex/400-italic';
-	import '@fontsource/lilex/700-italic';
+
+	import '@fontsource/fira-code/400';
+	import '@fontsource/fira-code/700';
+
+	import '@fontsource/dejavu-mono/400';
+	import '@fontsource/dejavu-mono/700';
+
+	import '@fontsource/ubuntu-mono/400';
+	import '@fontsource/ubuntu-mono/700';
+
+	import '@fontsource/noto-mono/400';
+
+	import '@fontsource/roboto-mono/400';
+	import '@fontsource/roboto-mono/700';
 
 	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
 	import EditorWindow from './EditorWindow.svelte';

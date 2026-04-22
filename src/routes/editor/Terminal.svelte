@@ -34,7 +34,7 @@
 		}
 
 		options = {
-			fontFamily: 'IBM Plex Mono',
+			fontFamily: s.config.terminalFont,
 			// NOTE: safari fix
 			// @ts-ignore
 			cursorBlink: true,
@@ -163,8 +163,11 @@
 	}
 
 	$effect(() => {
-		if (ts.terminal)
-			ts.terminal!.options.fontFamily = s.config.editorFont || 'Lilex' + ', monospace';
+		if (ts.terminal) {
+			ts.terminal!.options.fontFamily = s.config.terminalFont + ', monospace';
+			ts.terminal!.reset();
+			ts.termFitAddon?.fit();
+		}
 	});
 
 	function zoomIn() {
