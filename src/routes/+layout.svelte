@@ -1,6 +1,6 @@
 <script lang="ts">
 	let { children } = $props();
-	import { BEANCODE_IS_DEV_BUILD } from '$lib/version';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
 	import '../app.css';
 </script>
 

@@ -10,7 +10,8 @@
 -->
 
 <script lang="ts">
-	import { BEANCODE_COMMIT_HASH, BEANCODE_WEB_VERSION, WANTED_PYODIDE_VERSION } from '$lib/version';
+	import { BEANCODE_WEB_VERSION, WANTED_PYODIDE_VERSION } from '$lib/version';
+	import { BEANCODE_COMMIT_HASH } from '$lib/constants';
 	import { post } from '$lib/workers/pyodide_state.svelte';
 	import { editorNewFile } from '../../routes/editor/editor_state.svelte';
 	import { s } from '../../routes/editor/state.svelte';

@@ -14,7 +14,8 @@
 
 	import Editor from './Editor.svelte';
 
-	import { BEANCODE_IS_DEV_BUILD, BEANCODE_WEB_VERSION } from '$lib/version';
+	import { BEANCODE_WEB_VERSION } from '$lib/version';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
 
 	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';

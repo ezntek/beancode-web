@@ -3,6 +3,14 @@ import { defineConfig } from 'vite';
 import { execSync } from 'child_process';
 import mkcert from 'vite-plugin-mkcert';
 
+let commitHash = '<unknown>';
+try {
+    console.log("Prod Config");
+    commitHash = execSync('git rev-parse --short HEAD').toString().trim();
+} catch (e) {
+    console.warn('Could not get commit hash:', e);
+}
+
 export default defineConfig({
 	plugins: [
         sveltekit(),
@@ -36,7 +44,7 @@ export default defineConfig({
         },
     },
     define: {
-        __COMMIT_HASH__: JSON.stringify(execSync('git rev-parse --short HEAD').toString().trim()),
+        __COMMIT_HASH__: JSON.stringify(commitHash),
         __DEV__: false,
     },
     optimizeDeps: {

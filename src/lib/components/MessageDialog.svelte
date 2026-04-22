@@ -15,14 +15,15 @@
 
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
-	let message = $state('');
+	let message: string[] = $state([]);
 
 	// @ts-ignore
 	export const close = () => {
+		message = [];
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = (msg: string) => {
+	export const open = (msg: string[]) => {
 		message = msg;
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
@@ -42,7 +43,9 @@
 			<p class="title"><strong>Message</strong></p>
 		</div>
 		<div class="middle">
-			<p class="label">{message}</p>
+			{#each message as line}
+				<p class="label">{line}</p>
+			{/each}
 		</div>
 		<div class="bottom">
 			<button
