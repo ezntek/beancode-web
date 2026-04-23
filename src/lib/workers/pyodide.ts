@@ -421,6 +421,52 @@ function repl() {
     sync();
 }
 
+async function execJS(src: string) {
+    const output = (text: string) => {
+        text = text.replaceAll("\n", "\r\n");
+        post({ kind: 'pyout', data: text });
+    }
+
+    const prompt = () => {
+        post({ kind: 'pyin' });
+        const flag = new Int32Array(inputBuf, 0, 1);
+        const buf = new Uint8Array(inputBuf, 4); 
+        Atomics.wait(flag, 0, 0);
+        if (flag[0] == 0) {
+            // KeyboardInterrupt
+            flag.fill(0);
+            buf.fill(0);
+            return "";
+        }
+        const sliced = buf.slice(0, flag[0]);
+        const res = new TextDecoder('utf-8').decode(sliced);
+        Atomics.store(flag, 0, 0);
+        buf.fill(0);
+        return res;
+    }
+
+    const input = (s: any) => { 
+        if (s)
+            output(String(s)); 
+        return prompt();
+    };
+
+    const consoleWrapper = {
+        log: (s: string) => { output(s + '\n') },
+        error: (s: string) => { output(`\x1b[31m[err]\x1b[0m ${s}\n`) },
+        warn: (s: string) => { output(`\x1b[33m[warn]\x1b[0m ${s}\n`) },
+    }
+
+    const AsyncFunction = Object.getPrototypeOf(async function (){}).constructor;
+    const fn = new AsyncFunction('console', 'input', 'prompt', 'importScripts', 'globalThis', src);
+
+    try {
+        await fn(consoleWrapper, input, input, {}, undefined);
+    } catch (e) {
+        consoleWrapper.error(String(e));
+    }
+}
+
 onmessage = async (event: MessageEvent<EditorMessage>) => { 
     try {
         await pyBeancodePromise;
@@ -486,6 +532,10 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             case "repl":
                 repl();
                 post({ kind: 'repl-done' });
+                break;
+            case 'runjs':
+                execJS(msg.data);
+                post({ kind: 'runjs-done' });
                 break;
         }
     } catch (exc: any) {

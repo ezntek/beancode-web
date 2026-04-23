@@ -12,13 +12,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { EditorView, keymap } from '@codemirror/view';
-	import { history, indentWithTab, insertTab } from '@codemirror/commands';
+	import { history, indentWithTab } from '@codemirror/commands';
 	import { Compartment, EditorState } from '@codemirror/state';
 	import { indentUnit } from '@codemirror/language';
 	import { beanDiagnostics, errField, es } from './editor_state.svelte';
 	import { pathBasename, pathExtension } from '$lib/fstypes';
-	import { catppuccinMacchiato, defaultDarkCodemirror } from '$lib/themes/themes';
 	import { python } from '@codemirror/lang-python';
+	import { javascript } from '@codemirror/lang-javascript';
 	import { beancode } from '$lib/highlighting/beancode';
 	import { s } from './state.svelte';
 
@@ -186,6 +186,9 @@
 					break;
 				case 'py':
 					es.view!.dispatch({ effects: highlighter.reconfigure(python()) });
+					break;
+				case 'js':
+					es.view!.dispatch({ effects: highlighter.reconfigure(javascript()) });
 					break;
 				default:
 					es.view!.dispatch({ effects: highlighter.reconfigure([]) });

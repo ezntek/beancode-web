@@ -57,6 +57,11 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 window.localStorage.setItem('IsFirstLaunch', 'no');
             }
             break;
+        case 'runjs-done':
+            s.running = false;
+            ts.canInput = false;
+            //post({ kind: 'listdir', path: s.cwd });
+            break;
         case 'clear':
             ter.write('\x1b[2J\x1b[H')
             break;

@@ -37,6 +37,7 @@
 		"@battlefieldduck/xterm-svelte": "^2.2.1",
 		"@catppuccin/palette": "^1.8.0",
 		"@codemirror/autocomplete": "^6.20.1",
+		"@codemirror/lang-javascript": "^6.2.5",
 		"@codemirror/lang-python": "^6.2.1",
 		"@codemirror/language": "^6.12.3",
 		"@codemirror/lint": "^6.9.5",

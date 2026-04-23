@@ -341,6 +341,9 @@
 	function stop() {
 		// SIGINT
 		ibuf[0] = 2;
+		if (curExtension() === 'js') {
+			ts.terminal!.write('\x1b[2J\x1b[H');
+		}
 		const flag = new Int32Array(s.inputBuf!, 0, 1);
 		Atomics.store(flag, 0, 0);
 		Atomics.notify(flag, 0);
@@ -364,6 +367,8 @@
 				return 'Run your code';
 			case 'py':
 				return 'Run your Python code';
+			case 'js':
+				return 'Run your JavaScript code';
 			default:
 				return 'You cannot run this file type.';
 		}
@@ -379,7 +384,7 @@
 			return;
 		}
 
-		if (curExtension() !== 'py' && curExtension() !== 'bean') return;
+		if (!['py', 'js', 'bean', 'pseudo', 'psc'].includes(curExtension())) return;
 
 		if (es.curFilePath !== '') {
 			saveFile(true);
@@ -389,6 +394,8 @@
 		ts.terminal!.write('\x1b[2J\x1b[H');
 		if (curExtension() === 'py') {
 			post({ kind: 'runpy', data: es.src, path: es.curFilePath });
+		} else if (curExtension() === 'js') {
+			post({ kind: 'runjs', data: es.src });
 		} else {
 			post({ kind: 'run', data: es.src, path: es.curFilePath });
 		}
@@ -406,6 +413,8 @@
 					switch (curExtension()) {
 						case 'py':
 							return 'editor-button-runpy';
+						case 'js':
+							return 'editor-button-runjs';
 						case 'bean':
 							return 'editor-button-run';
 						default:
@@ -511,6 +520,17 @@
 			});
 		}
 	}
+
+	function determineIcon() {
+		switch (curExtension()) {
+			case 'py':
+				return 'fa-brands fa-python';
+			case 'js':
+				return 'fa-brands fa-square-js';
+			default:
+				return 'fa-solid fa-play';
+		}
+	}
 </script>
 
 <div class="editor-window">
@@ -530,9 +550,7 @@
 					onclick={runStop}
 				>
 					{#if !s.running}
-						<span
-							class="icon {curExtension() === 'py' ? 'fa-brands fa-python' : 'fa-solid fa-play'}"
-						></span> Run
+						<span class="icon {determineIcon()}"></span> Run
 					{:else}
 						<span class="icon fa-solid fa-stop"></span> Stop
 					{/if}
@@ -816,6 +834,17 @@
 	.editor-button-runpy:hover {
 		background-color: var(--bw-base2);
 		color: var(--bw-blue);
+		font-weight: bold;
+	}
+
+	.editor-button-runjs {
+		background-color: var(--bw-yellow);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-runjs:hover {
+		background-color: var(--bw-base2);
+		color: var(--bw-yellow);
 		font-weight: bold;
 	}
 

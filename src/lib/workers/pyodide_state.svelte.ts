@@ -27,6 +27,7 @@ export type PyMessage =
     | { kind: 'nuke-done' }
     | { kind: 'repl-done' }
     | { kind: 'unpack-response' }
+    | { kind: 'runjs-done' }
 
 export type EditorMessage = 
     | { kind: 'run', data: string, path: string }
@@ -45,6 +46,7 @@ export type EditorMessage =
     | { kind: 'nuke' }
     | { kind: 'repl' }
     | { kind: 'unpack', dir: string, data: Uint8Array<ArrayBuffer> }
+    | { kind: 'runjs', data: string }
 
 export interface BeanError {
     msg: string,
