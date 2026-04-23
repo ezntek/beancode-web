@@ -118,9 +118,26 @@
 
 		ourCfg = res satisfies IConfig;
 	}
+
+	const FONTS = [
+		'IBM Plex Mono',
+		'Fira Code',
+		'Noto Mono',
+		'Roboto Mono',
+		'DejaVu Mono',
+		'Iosevka',
+		'Iosevka Term',
+		'JetBrains Mono',
+		'monospace'
+	];
 </script>
 
 <Dialog bind:this={innerDialog}>
+	<datalist id="fontdata">
+		{#each FONTS as theme}
+			<option value={theme}></option>
+		{/each}
+	</datalist>
 	<div class="vstack">
 		<div class="top">
 			<button aria-label="close" class="exit-button" onclick={() => close()}>
@@ -172,25 +189,26 @@
 						/>
 						<tr>
 							<td><span class="label">Editor Font</span></td>
-							<td
-								><input
+							<td>
+								<input
 									type="text"
 									spellcheck="false"
 									class="input-box"
+									list="fontdata"
 									bind:value={ourCfg.editorFont}
-								/></td
-							>
+								/>
+							</td>
 						</tr>
 						<tr>
 							<td><span class="label">Editor Font Size</span></td>
-							<td
-								><input
+							<td>
+								<input
 									type="number"
 									spellcheck="false"
 									class="input-box"
 									bind:value={ourCfg.editorFontSize}
-								/></td
-							>
+								/>
+							</td>
 						</tr>
 						<tr>
 							<td><span class="label">Terminal Font</span></td>
@@ -199,6 +217,7 @@
 									type="text"
 									spellcheck="false"
 									class="input-box"
+									list="fontdata"
 									bind:value={ourCfg.terminalFont}
 								/></td
 							>

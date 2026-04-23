@@ -14,12 +14,9 @@
 	import { onMount } from 'svelte';
 	import { s } from './state.svelte';
 	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
-	import { getDefaultConfig, isValidConfig, type IConfig } from '$lib/config';
+	import { getDefaultConfig, isValidConfig } from '$lib/config';
 
-	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
-	import EditorWindow from './EditorWindow.svelte';
-	import UnsupportedWindow from './UnsupportedWindow.svelte';
-	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+    export const ssr = false;
 
 	import '@fontsource/inter/400';
 	import '@fontsource/inter/500';
@@ -43,6 +40,17 @@
 	import '@fontsource/roboto-mono/400';
 	import '@fontsource/roboto-mono/700';
 
+	import '@fontsource/iosevka/400';
+	import '@fontsource/iosevka/700';
+
+	import '@fontsource/jetbrains-mono/400';
+	import '@fontsource/jetbrains-mono/700';
+
+	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
+	import EditorWindow from './EditorWindow.svelte';
+	import UnsupportedWindow from './UnsupportedWindow.svelte';
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+
 	let hasSab = $state(true);
 	let windowCount = $state(1);
 	let errorDialog: ErrorDialog;
@@ -50,7 +58,7 @@
 	onMount(() => {
 		const cfg = window.localStorage.getItem('Config');
 		if (cfg !== null) {
-			const userConfig = JSON.parse(cfg) satisfies IConfig;
+			const userConfig = JSON.parse(cfg);
 			if (!isValidConfig(userConfig)) s.config = { ...getDefaultConfig(), ...userConfig };
 			else s.config = userConfig;
 		} else {

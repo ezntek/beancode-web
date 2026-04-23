@@ -45,6 +45,8 @@
 		"@fontsource/fira-code": "^5.2.7",
 		"@fontsource/ibm-plex-mono": "^5.2.7",
 		"@fontsource/inter": "^5.2.8",
+		"@fontsource/iosevka": "^5.2.5",
+		"@fontsource/jetbrains-mono": "^5.2.8",
 		"@fontsource/noto-mono": "^5.2.5",
 		"@fontsource/roboto-mono": "^5.2.8",
 		"@fontsource/ubuntu-mono": "^5.2.8",
