@@ -2,8 +2,10 @@
 	import SettingsDialog from '$lib/components/SettingsDialog.svelte';
 	import MessageDialog from '$lib/components/MessageDialog.svelte';
 	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 
 	let settingsDialog: SettingsDialog;
+	let confirmDialog: ConfirmDialog;
 	let messageDialog: MessageDialog;
 
 	function openDialog() {
@@ -16,6 +18,22 @@
 
 	function nukeLocalStorage() {
 		window.localStorage.clear();
+	}
+
+	function override() {
+		confirmDialog.open(
+			[
+				'You are running the risk of weird glitches and generally undefined behavior.',
+				'Beancode web may function normally to some extent, but this is not recommended. Are you sure?'
+			],
+			() => {
+				window.localStorage.setItem('WindowCount', '0');
+				const url = new URL(location.href);
+				url.searchParams.set('_', Date.now().toString());
+				location.replace(url.toString());
+			},
+			undefined
+		);
 	}
 </script>
 
@@ -31,12 +49,14 @@
 	<span>
 		<button onclick={() => openDialog()}>I'm confused!</button>
 		<button onclick={() => settingsDialog.open()}>About</button>
+		<button onclick={() => override()}>Override</button>
 		{#if BEANCODE_IS_DEV_BUILD}
 			<button onclick={() => nukeLocalStorage()}>Nuke localStorage</button>
 		{/if}
 	</span>
 </div>
 <MessageDialog bind:this={messageDialog} />
+<ConfirmDialog bind:this={confirmDialog} />
 <SettingsDialog bind:this={settingsDialog} aboutOnly={true} />
 
 <style>

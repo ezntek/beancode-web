@@ -13,6 +13,13 @@
 	import { applyTheme } from '$lib/themes/themes';
 	import { onMount } from 'svelte';
 	import { s } from './state.svelte';
+	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
+	import { getDefaultConfig, isValidConfig, type IConfig } from '$lib/config';
+
+	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
+	import EditorWindow from './EditorWindow.svelte';
+	import UnsupportedWindow from './UnsupportedWindow.svelte';
+	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
 	import '@fontsource/inter/400';
 	import '@fontsource/inter/500';
@@ -36,14 +43,6 @@
 	import '@fontsource/roboto-mono/400';
 	import '@fontsource/roboto-mono/700';
 
-	import AlreadyLoadedWindow from './AlreadyLoadedWindow.svelte';
-	import EditorWindow from './EditorWindow.svelte';
-	import UnsupportedWindow from './UnsupportedWindow.svelte';
-	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
-	import { getDefaultConfig, type IConfig } from '$lib/config';
-
-	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
-
 	let hasSab = $state(true);
 	let windowCount = $state(1);
 	let errorDialog: ErrorDialog;
@@ -51,7 +50,9 @@
 	onMount(() => {
 		const cfg = window.localStorage.getItem('Config');
 		if (cfg !== null) {
-			s.config = JSON.parse(cfg) satisfies IConfig;
+			const userConfig = JSON.parse(cfg) satisfies IConfig;
+			if (!isValidConfig(userConfig)) s.config = { ...getDefaultConfig(), ...userConfig };
+			else s.config = userConfig;
 		} else {
 			s.config = getDefaultConfig();
 		}
@@ -99,14 +100,12 @@
 		windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
 		window.localStorage.setItem('WindowCount', String(windowCount + 1));
 
-		window.addEventListener('beforeunload', (event) => {
+		window.addEventListener('beforeunload', () => {
 			windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
 			window.localStorage.setItem('WindowCount', String(windowCount - 1));
 
 			const cfg = JSON.stringify(s.config);
 			window.localStorage.setItem('Config', cfg);
-
-			event.returnValue = '';
 		});
 	});
 </script>
