@@ -20,7 +20,7 @@
 	import { catppuccinMacchiato, defaultDarkCodemirror } from '$lib/themes/themes';
 	import { python } from '@codemirror/lang-python';
 	import { beancode } from '$lib/highlighting/beancode';
-	import { s } from './state.svelte';
+	import { s, saveFile } from './state.svelte';
 
 	// custom extension setup
 	import {
@@ -190,6 +190,13 @@
 				default:
 					es.view!.dispatch({ effects: highlighter.reconfigure([]) });
 					break;
+			}
+		});
+
+		document.addEventListener('keydown', (e) => {
+			if ((e.ctrlKey || e.metaKey) && e.key == 's') {
+				e.preventDefault();
+				saveFile(true);
 			}
 		});
 

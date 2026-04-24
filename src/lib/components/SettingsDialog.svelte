@@ -212,15 +212,15 @@
 						</tr>
 						<tr>
 							<td><span class="label">Terminal Font</span></td>
-							<td
-								><input
+							<td>
+                                <input
 									type="text"
 									spellcheck="false"
 									class="input-box"
 									list="fontdata"
 									bind:value={ourCfg.terminalFont}
-								/></td
-							>
+								/>
+                            </td>
 						</tr>
 						<tr>
 							<td><span class="label">Terminal Font Size</span></td>
