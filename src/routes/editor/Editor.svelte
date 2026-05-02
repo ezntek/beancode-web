@@ -270,9 +270,9 @@
 		border-radius: 0.2em;
 		font-size: 0.8em;
 		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
+			background-color var(--bw-animation-delay) ease,
+			color var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
 	}
 
 	.zoomout {

@@ -142,6 +142,12 @@
 		s.config.fileBrowserShown = fileBrowserShown;
 	});
 
+	$effect(() => {
+		if (s.config.reduceFlair)
+			document.documentElement.style.setProperty('--bw-animation-delay', '0ms');
+		else document.documentElement.style.setProperty('--bw-animation-delay', '130ms');
+	});
+
 	function toggleTheme() {
 		// TODO: proper light/dark themes
 		if (isDark) s.themeName = s.config.preferredLightTheme;
@@ -752,9 +758,9 @@
 		aspect-ratio: 1 / 1;
 		margin: 0.2em;
 		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
+			background-color var(--bw-animation-delay) ease,
+			color var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
 		transition-delay: 0ms;
 	}
 
@@ -787,9 +793,9 @@
 		margin: 0.2em;
 		border-radius: 0.5em;
 		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
+			background-color var(--bw-animation-delay) ease,
+			color var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
 		transition-delay: 0ms;
 	}
 

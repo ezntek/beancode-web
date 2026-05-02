@@ -16,8 +16,6 @@
 	import { BEANCODE_IS_DEV_BUILD } from '$lib/constants';
 	import { getDefaultConfig, isValidConfig } from '$lib/config';
 
-    export const ssr = false;
-
 	import '@fontsource/inter/400';
 	import '@fontsource/inter/500';
 	import '@fontsource/inter/600';

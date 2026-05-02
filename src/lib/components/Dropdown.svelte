@@ -96,8 +96,8 @@
 		border-radius: 4px;
 		font-weight: normal;
 		transition:
-			background 130ms ease,
-			font-weight 130ms ease;
+			background var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
 	}
 
 	.dropdown :global(button:hover) {

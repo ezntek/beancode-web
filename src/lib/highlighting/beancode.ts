@@ -13,7 +13,6 @@ import { continuedIndent, foldInside, foldNodeProp, indentNodeProp, LanguageSupp
 import { parser } from "./parser";
 import { styleTags, tags as t } from "@lezer/highlight";
 import { beancodeCompletions } from "./completions";
-import { LTypeof } from "./parser.terms";
 
 const beancodeHighlighting = styleTags({
     // comments

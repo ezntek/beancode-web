@@ -57,9 +57,9 @@
 		border-radius: 0.3em;
 		padding: 0.3em;
 		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
+			background-color var(--bw-animation-delay) ease,
+			color var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
 	}
 	.wrapper button:hover {
 		background-color: var(--bw-blue);

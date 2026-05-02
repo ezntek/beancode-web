@@ -10,6 +10,8 @@
 -->
 
 <script lang="ts">
+	import { s } from '../../routes/editor/state.svelte';
+
 	let { children } = $props();
 
 	let dialog: HTMLDialogElement | null = $state(null);
@@ -33,7 +35,13 @@
 	}
 </script>
 
-<dialog class="dialog" tabindex="-1" bind:this={dialog} onclick={handleBackdropClick}>
+<dialog
+	class="dialog"
+	tabindex="-1"
+	bind:this={dialog}
+	onclick={handleBackdropClick}
+	data-noanimate={s.config.reduceFlair ? '' : undefined}
+>
 	<div class="dialog-content">
 		{@render children()}
 	</div>
@@ -41,13 +49,23 @@
 
 <style>
 	dialog::backdrop {
+		background: rgba(0, 0, 0, 0.85);
+	}
+	dialog:not([data-noanimate])::backdrop {
 		background: rgba(0, 0, 0, 0.6);
 		backdrop-filter: blur(2px);
 		animation: fadeIn 0.2s ease-out;
 	}
 
-	dialog[open] {
+	dialog[open]:not([data-noanimate]) {
 		animation: appear 180ms ease-out;
+	}
+
+	dialog[data-noanimate] {
+		animation: none;
+	}
+	dialog[data-noanimate]::backdrop {
+		animation: none;
 	}
 
 	@keyframes fadeIn {

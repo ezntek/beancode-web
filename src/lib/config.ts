@@ -7,6 +7,7 @@ export interface IConfig {
     terminalFontSize: number,
     fileBrowserShown: boolean,
     terminalShown: boolean,
+    reduceFlair: boolean,
 };
 
 export function getDefaultConfig(): IConfig {
@@ -19,6 +20,7 @@ export function getDefaultConfig(): IConfig {
         terminalFontSize: 22,
         fileBrowserShown: true,
         terminalShown: true,
+        reduceFlair: false,
     };
 }
 
@@ -34,7 +36,8 @@ export function isValidConfig(obj: any): obj is IConfig {
         typeof obj.editorFontSize === 'number' &&
         typeof obj.terminalFontSize === 'number' &&
         typeof obj.fileBrowserShown === 'boolean' &&
-        typeof obj.terminalShown === 'boolean'
+        typeof obj.terminalShown === 'boolean' && 
+        typeof obj.reduceFlair === 'boolean' 
     );
 }
 

@@ -213,25 +213,36 @@
 						<tr>
 							<td><span class="label">Terminal Font</span></td>
 							<td>
-                                <input
+								<input
 									type="text"
 									spellcheck="false"
 									class="input-box"
 									list="fontdata"
 									bind:value={ourCfg.terminalFont}
 								/>
-                            </td>
+							</td>
 						</tr>
 						<tr>
 							<td><span class="label">Terminal Font Size</span></td>
-							<td
-								><input
+							<td>
+								<input
 									type="number"
 									spellcheck="false"
 									class="input-box"
 									bind:value={ourCfg.terminalFontSize}
-								/></td
-							>
+								/>
+							</td>
+						</tr>
+						<tr>
+							<td><span class="label">Reduce Visual Flair</span></td>
+							<td>
+								<button
+									class="button {ourCfg.reduceFlair ? 'toggle-on' : 'toggle-off'}"
+									onclick={() => (ourCfg.reduceFlair = !ourCfg.reduceFlair)}
+								>
+									{ourCfg.reduceFlair ? 'On' : 'Off'}
+								</button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -412,9 +423,9 @@
 		font-weight: bold;
 		font-size: 0.8em;
 		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
+			background-color var(--bw-animation-delay) ease,
+			color var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
 	}
 
 	.destructive-button {
@@ -446,6 +457,26 @@
 		color: var(--bw-green);
 	}
 
+	.toggle-on {
+		background-color: var(--bw-green);
+		color: var(--bw-base1);
+	}
+
+	.toggle-on:hover {
+		background-color: var(--bw-base3);
+		color: var(--bw-green);
+	}
+
+	.toggle-off {
+		background-color: var(--bw-red);
+		color: var(--bw-base1);
+	}
+
+	.toggle-off:hover {
+		background-color: var(--bw-base3);
+		color: var(--bw-red);
+	}
+
 	.selector {
 		display: flex;
 		min-height: 0;
@@ -462,9 +493,9 @@
 		background-color: var(--bw-base1);
 		color: var(--bw-text);
 		transition:
-			background-color 130ms ease,
-			color 130ms ease,
-			font-weight 130ms ease;
+			background-color var(--bw-animation-delay) ease,
+			color var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
 	}
 
 	.selector > button:hover {
