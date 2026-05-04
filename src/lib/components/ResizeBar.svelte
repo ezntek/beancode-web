@@ -13,7 +13,13 @@
 	let { resize } = $props();
 </script>
 
-<div class="resize-handle-outer" onpointerdown={resize}>
+<div
+	class="resize-handle-outer"
+	aria-label="resizing bar"
+	role="separator"
+	aria-roledescription="resizing bar"
+	onpointerdown={resize}
+>
 	<div class="resize-handle-line">
 		<div class="resize-handle-handle"></div>
 	</div>

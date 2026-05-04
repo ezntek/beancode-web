@@ -63,6 +63,11 @@
 			s.config = getDefaultConfig();
 		}
 
+		if (window.innerWidth <= 1400 || window.innerWidth <= 800) {
+			s.config.terminalFontSize = 17;
+			s.config.editorFontSize = 17;
+		}
+
 		const theme = window.localStorage.getItem('EditorTheme');
 		if (theme && (theme == s.config.preferredDarkTheme || theme == s.config.preferredLightTheme)) {
 			s.themeName = theme;
@@ -81,11 +86,6 @@
 
 		function noPersistErr() {
 			if (window.localStorage.getItem('IsFirstLaunch') !== 'no') {
-				if (window.innerWidth <= 1400 || window.innerWidth <= 800) {
-					s.config.terminalFontSize = 19;
-					s.config.editorFontSize = 18;
-				}
-
 				errorDialog.open(
 					[
 						'Could not request for persistent storage! Your data and settings could mysteriously vanish, especially if your computer ' +
