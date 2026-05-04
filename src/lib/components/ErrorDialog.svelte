@@ -48,7 +48,7 @@
 		<div class="middle">
 			{#each messages as msg, i}
 				<p class="label">{msg}</p>
-				{#if i !== messages.length}
+				{#if i === messages.length - 1}
 					<br />
 				{/if}
 			{/each}

@@ -129,7 +129,7 @@ export function createCodemirrorTheme(ts: ThemeSpec, isDark: boolean = false) {
       tag: [t.typeName, t.className, t.changed, t.annotation, t.namespace],
       color: ts.yellow,
     },
-    { tag: [t.operator], color: ts.blue },
+    { tag: [t.operator], color: ts.cyan },
     { tag: [t.url, t.link], color: ts.cyan },
     { tag: [t.escape, t.regexp], color: ts.magenta },
     {

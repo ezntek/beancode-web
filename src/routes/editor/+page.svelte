@@ -80,14 +80,22 @@
 		}
 
 		function noPersistErr() {
-			if (window.localStorage.getItem('ShownPersistError') !== 'yes') {
+			if (window.localStorage.getItem('IsFirstLaunch') !== 'no') {
+				if (window.innerWidth <= 1400 || window.innerWidth <= 800) {
+					s.config.terminalFontSize = 19;
+					s.config.editorFontSize = 18;
+				}
+
 				errorDialog.open(
 					[
-						'Could not request for persistent storage! Your data and settings could mysteriously vanish.',
+						'Could not request for persistent storage! Your data and settings could mysteriously vanish, especially if your computer ' +
+							'is low on storage.',
 						"Either bookmark this site, manually allow persistent storage in the browser's settings, or run the risk of your data vanishing!",
 						'This error will not appear again.'
 					],
-					() => window.localStorage.setItem('ShownPersistError', 'yes')
+					() => {
+						/* isfirstlaunch will be set after beancode loads for the first time */
+					}
 				);
 			}
 		}

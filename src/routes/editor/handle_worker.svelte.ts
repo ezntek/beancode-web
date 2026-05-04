@@ -44,6 +44,11 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             ts.canInput = false;
             s.replRunning = false;
+            if (s.replRunning) {
+                s.replRunning = false;
+                ts.termFitAddon!.fit();
+                ts.terminal!.write('\x1b[2J\x1b[H');
+            }
             ter.write('\x1b[2J\x1b[H');
             break;
         case 'ready':
@@ -54,7 +59,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.pyVersion = msg.pyversion;
             if (!window.localStorage.getItem('IsFirstLaunch')) {
                 newDefaultFile();
-                window.localStorage.setItem('IsFirstLaunch', 'no');
+                window.localStorage.setItem('IsFirstLaunch', 'no')
             }
             break;
         case 'clear':
@@ -85,11 +90,15 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             ts.canInput = false;
             s.exitCode = msg.code;
+            if (msg.code !== 0)
+                ts.terminal!.write(`\r\n\x1b[2m[process exited with code ${msg.code}]\x1b[0m`);
+            else
+                ts.terminal!.writeln('');
             post({ kind: 'listdir', path: s.cwd });
             break;
         case 'listdir-response':
             const newmap = new Map([...msg.data.entries()].sort(([keyA], [keyB]) =>
-              keyA.localeCompare(keyB)
+                keyA.localeCompare(keyB)
             ));
             s.curdir = newmap;
             // XXX: jank-3000

@@ -11,13 +11,16 @@ export interface IConfig {
 };
 
 export function getDefaultConfig(): IConfig {
+    let esz = 20;
+    let tsz = 22;
+
     return {
-        preferredDarkTheme: "catppuccin_macchiato",
-        preferredLightTheme: "catppuccin_latte",
+        preferredDarkTheme: "default_dark",
+        preferredLightTheme: "default_light",
         editorFont: 'IBM Plex Mono',
         terminalFont: 'IBM Plex Mono',
-        editorFontSize: 20,
-        terminalFontSize: 22,
+        editorFontSize: esz,
+        terminalFontSize: tsz,
         fileBrowserShown: true,
         terminalShown: true,
         reduceFlair: false,

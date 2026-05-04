@@ -350,14 +350,7 @@
 		const flag = new Int32Array(s.inputBuf!, 0, 1);
 		Atomics.store(flag, 0, 0);
 		Atomics.notify(flag, 0);
-		s.running = false;
-		ts.canInput = false;
-		ts.terminal!.writeln('');
-		if (s.replRunning) {
-			s.replRunning = false;
-			ts.termFitAddon!.fit();
-			ts.terminal!.write('\x1b[2J\x1b[H');
-		}
+		// let handle_worker do it
 	}
 
 	function runStopTooltip() {
