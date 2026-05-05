@@ -210,7 +210,7 @@
 	:global([data-theme='Dark']) {
 		/* TODO: actually implment dark mode */
 		--bg-base: #2a2b2b;
-		--base: #353a38;
+		--base: #353836;
 		--subsubtext: #dcf1c8;
 		--subtext: #618446;
 		--text: #f0f9e8;

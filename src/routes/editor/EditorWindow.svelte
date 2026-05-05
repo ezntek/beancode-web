@@ -616,8 +616,9 @@
 					<span class="fa-solid fa-bug"></span>
 				</button>
 				<button
-					aria-label="setttings"
+					aria-label="settings"
 					class="toolbar-aux-button"
+					title="Open Settings"
 					onclick={() => settingsDialog.open()}
 				>
 					<span class="fa-solid fa-gear"></span>

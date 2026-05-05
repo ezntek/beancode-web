@@ -16,9 +16,9 @@ from beancode.error import *
 from beancode.formatter import Formatter
 from beancode.tracer import *
 from beancode.runner import *
-from beancode.repl import Repl
+from beancode.repl import Repl # for repl button
 from beancode import __version__
-import black, ast, sys, shutil
+import black, ast, sys, shutil # we need shutil
 
 __py_version__ = sys.version.split(" ")[0]
 
@@ -89,6 +89,8 @@ def format_bean(src, name):
     except BCError as err:
         err.print(name, src, compact=True)
         return (None, err.to_dict())
+    except KeyboardInterrupt:
+        return (None, {})
 
 
 def trace_bean(s, n, v, cfg):
@@ -98,7 +100,11 @@ def trace_bean(s, n, v, cfg):
         if hasattr(tc, key):
             setattr(tc, key, val)
     t = Tracer(v.to_py(), tc)
-    (_, edic) = exec_user_bean(s, n, tracer=t)
+    try:
+        (_, edic) = exec_user_bean(s, n, tracer=t)
+    except KeyboardInterrupt:
+        edic = None
+        pass
     if edic is not None:
         return (None, edic)
     else:
@@ -117,6 +123,7 @@ def format_py(src, name):
          pass
 
     try:
+        # parse to extract error
         ast.parse(src, filename=name)
     except SyntaxError as e:
         print(f"\x1b[1m{e.filename}: \x1b[31merror\x1b[0m at line {e.lineno} column {e.offset}:")

@@ -103,6 +103,7 @@
 	.dropdown :global(button:hover) {
 		background: var(--bw-surface1);
 		font-weight: bold;
+		font-family: 'Inter', sans-serif;
 	}
 
 	.dropdown :global(button span) {
