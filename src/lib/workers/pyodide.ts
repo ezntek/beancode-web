@@ -285,11 +285,33 @@ async function loadBeancode() {
 
         await py.loadPackage("micropip");
 
-        const BEANCODE_WHEEL_PATH = `/bcdata/beancode-${WANTED_BEANCODE_VERSION}-py3-none-any.whl`
-        const BLACK_WHEEL_PATH = "/bcdata/black-26.3.1-py3-none-any.whl";
-        const SCRIPT = `import micropip,os;await micropip.install(\"${BEANCODE_WHEEL_PATH}\");await micropip.install("${BLACK_WHEEL_PATH}")`;
+        // XXX: insanely janky.
+        // This is to work around CORS errors where pypi just refuses to send
+        // us black's dependencies on first load, and only on the second
+        // reload the resources are fetched correctly. Might be due to a
+        // service worker thing.
+        // This means that these deps MUST be synced every time black is 
+        // updated.
+        const WHEELS = [
+            // black dependencies
+            "click-8.3.1-py3-none-any.whl",
+            "mypy_extensions-1.1.0-py3-none-any.whl",
+            "packaging-24.2-py3-none-any.whl",
+            "pathspec-1.1.1-py3-none-any.whl",
+            "platformdirs-4.3.6-py3-none-any.whl",
+            "pytokens-0.4.1-py3-none-any.whl",
+            // useful wheels
+            `beancode-${WANTED_BEANCODE_VERSION}-py3-none-any.whl`,
+            "black-26.3.1-py3-none-any.whl",
+        ];
+
+        let script = `import micropip,os\n`;
+        WHEELS.forEach((whl) => {
+            script += `await micropip.install("/bcdata/${whl}")\n`;
+        });
+
         try {
-            await py.runPythonAsync(SCRIPT)
+            await py.runPythonAsync(script);
         } catch (e) {
             post({ kind: 'error', data: String(e), fromBeancode: true });
             pyOK = false; 
