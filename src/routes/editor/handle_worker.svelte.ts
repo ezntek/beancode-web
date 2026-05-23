@@ -90,16 +90,6 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             ts.canInput = false;
             s.exitCode = msg.code;
-            switch (msg.code) {
-                case 0:
-                    break;
-                case 1:
-                    ts.terminal!.write(`\r\n\x1b[2m[terminated with error]\x1b[0m`);
-                    break;
-                default:
-                    ts.terminal!.write(`\r\n\x1b[2m[terminated with code ${msg.code}]\x1b[0m`);
-                    break;
-            }
             post({ kind: 'listdir', path: s.cwd });
             break;
         case 'listdir-response':
