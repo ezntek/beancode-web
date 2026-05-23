@@ -94,10 +94,10 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 case 0:
                     break;
                 case 1:
-                    ts.terminal!.write(`\r\n\x1b[2m[interrupted]\x1b[0m`);
+                    ts.terminal!.write(`\r\n\x1b[2m[terminated with error]\x1b[0m`);
                     break;
                 default:
-                    ts.terminal!.write(`\r\n\x1b[2m[process exited with code ${msg.code}]\x1b[0m`);
+                    ts.terminal!.write(`\r\n\x1b[2m[terminated with code ${msg.code}]\x1b[0m`);
                     break;
             }
             post({ kind: 'listdir', path: s.cwd });
