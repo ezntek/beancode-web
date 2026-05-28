@@ -115,6 +115,7 @@
 				crosshairCursor(),
 				highlightActiveLine(),
 				highlightSelectionMatches(),
+				es.editable.of(EditorState.readOnly.of(true)),
 				keymap.of([
 					...closeBracketsKeymap,
 					...defaultKeymap,

@@ -147,10 +147,12 @@
 	</div>
 </noscript>
 <div id="editor-window-wrapper">
-	{#if windowCount >= 1 && !BEANCODE_IS_DEV_BUILD}
-		<AlreadyLoadedWindow />
-	{:else if hasSab}
-		<EditorWindow />
+	{#if hasSab}
+		{#if windowCount < 1 || BEANCODE_IS_DEV_BUILD}
+			<EditorWindow />
+		{:else}
+			<AlreadyLoadedWindow />
+		{/if}
 	{:else}
 		<UnsupportedWindow />
 	{/if}

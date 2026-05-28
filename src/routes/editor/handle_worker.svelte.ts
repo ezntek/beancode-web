@@ -9,9 +9,10 @@
  * information.
  */
 
+import { EditorState } from '@codemirror/state';
+
 import type { EditorMessage, PyMessage } from '$lib/workers/pyodide_state.svelte';
 import { post, ps as ps } from '$lib/workers/pyodide_state.svelte';
-
 import { termState as ts } from './terminal_state.svelte';
 
 import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback, saveFile } from './state.svelte';
@@ -61,6 +62,10 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 newDefaultFile();
                 window.localStorage.setItem('IsFirstLaunch', 'no')
             }
+            es.view!.dispatch({
+                effects: es.editable.reconfigure(EditorState.readOnly.of(false)),
+            });
+            es.src = "";
             break;
         case 'clear':
             ter.write('\x1b[2J\x1b[H')

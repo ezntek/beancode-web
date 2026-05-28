@@ -25,17 +25,19 @@ interface IEditorState {
     view: EditorView | null,
     history: Compartment,
     diag: Compartment,
+    editable: Compartment,
     fileHistories: Map<string, string>,
 }
 
 export const es: IEditorState = $state({
     curFilePath: "",
     saved: true,
-    src: "",
+    src: "The Python backend, including beancode, is still loading.\nYou may not edit text right now.",
     canDisplay: true,
     view: null, 
     history: new Compartment(),
     diag: new Compartment(),
+    editable: new Compartment(),
     fileHistories: new Map(),
 });
 
