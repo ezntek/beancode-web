@@ -113,7 +113,6 @@ def trace_bean(s, n, v, cfg):
 def nuke(d):
     for itm in os.listdir(d):
         if itm not in {'..', '.'}:
-            print(f"removing: {itm}")
             os.remove(itm)
 
 def format_py(src, name):

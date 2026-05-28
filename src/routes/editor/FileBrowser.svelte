@@ -169,7 +169,7 @@
 				'Are you VERY SURE? This action is NOT reversible.'
 			],
 			() => {
-				post({ kind: 'nuke' });
+				post({ kind: 'nuke', filesOnly: true });
 			},
 			() => {}
 		);

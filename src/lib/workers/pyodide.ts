@@ -503,7 +503,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
             case 'nuke':
                 nuke();
-                post({ kind: 'nuke-done' });
+                post({ kind: 'nuke-done', filesOnly: msg.filesOnly });
                 break;
             case "repl":
                 repl();

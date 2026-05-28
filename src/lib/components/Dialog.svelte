@@ -53,7 +53,7 @@
 	}
 	dialog:not([data-noanimate])::backdrop {
 		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(2px);
+		backdrop-filter: blur(3px);
 		animation: fadeIn 0.2s ease-out;
 	}
 

@@ -74,7 +74,7 @@
 	function clearData() {
 		const nuke = () => {
 			editorNewFile();
-			post({ kind: 'nuke' });
+			post({ kind: 'nuke', filesOnly: false });
 		};
 		confirmDialog.open(
 			[

@@ -167,6 +167,11 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             break;
         case 'nuke-done':
             post({ kind: 'listdir', path: s.cwd });
+            if (msg.filesOnly) {
+                es.src = '';
+                es.curFilePath = '';
+                return;
+            }
             // our magic $effect hooks will retain our current config, so we manually set it
             s.config = getDefaultConfig();
             s.themeName = s.config.preferredDarkTheme;

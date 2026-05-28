@@ -24,7 +24,7 @@ export type PyMessage =
     | { kind: 'formatpy-response', data: string | null }
     | { kind: 'trace-response', data: string | null | undefined }
     | { kind: 'compressdir-response', path: string, data: FileResponse<Blob> }
-    | { kind: 'nuke-done' }
+    | { kind: 'nuke-done', filesOnly: boolean }
     | { kind: 'repl-done' }
     | { kind: 'unpack-response' }
 
@@ -42,7 +42,7 @@ export type EditorMessage =
     | { kind: 'formatpy', data: string, name: string }
     | { kind: 'trace', data: string, path: string, vars: string[], config: TracerConfig }
     | { kind: 'compressdir', path: string }
-    | { kind: 'nuke' }
+    | { kind: 'nuke', filesOnly: boolean }
     | { kind: 'repl' }
     | { kind: 'unpack', dir: string, data: Uint8Array<ArrayBuffer> }
 
