@@ -49,7 +49,7 @@
 	import UnsupportedWindow from './UnsupportedWindow.svelte';
 	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
 
-	let hasSab = $state(true);
+	let compatible = $state(true);
 	let windowCount = $state(1);
 	let errorDialog: ErrorDialog;
 
@@ -78,10 +78,11 @@
 		applyTheme(s.themeName, s.loadedTheme);
 
 		try {
+			WebAssembly;
 			SharedArrayBuffer;
 			Atomics;
 		} catch (err) {
-			hasSab = false;
+			compatible = false;
 		}
 
 		function noPersistErr() {
@@ -147,7 +148,7 @@
 	</div>
 </noscript>
 <div id="editor-window-wrapper">
-	{#if hasSab}
+	{#if compatible}
 		{#if windowCount < 1 || BEANCODE_IS_DEV_BUILD}
 			<EditorWindow />
 		{:else}
