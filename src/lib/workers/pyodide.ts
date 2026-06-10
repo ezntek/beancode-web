@@ -274,9 +274,9 @@ async function loadBeancode() {
         // XXX: ignore the cursed concatenation. its needed.
 
         // @ts-ignore
-        const PyodideModule = await import(/* @vite-ignore */ "https://cdn.jsdelivr.net/pyodide/v" + WANTED_PYODIDE_VERSION + "/full/pyodide.mjs?url");
+        const PyodideModule = await import(/* @vite-ignore */ `https://cdn.jsdelivr.net/pyodide/v${WANTED_PYODIDE_VERSION}/full/pyodide.mjs?url`);
         // @ts-ignore
-        py = await PyodideModule.loadPyodide({ /* @vite-ignore */ indexURL: "https://cdn.jsdelivr.net/pyodide/v" + WANTED_PYODIDE_VERSION + "/full/" });
+        py = await PyodideModule.loadPyodide({ /* @vite-ignore */ indexURL: `https://cdn.jsdelivr.net/pyodide/v${WANTED_PYODIDE_VERSION}/full/` });
         FS = py.FS;
 
         FS.mkdirTree("/data");

@@ -35,9 +35,9 @@
 	</ul>
 	<p>Confirmed working browsers include:</p>
 	<ul>
-		<li>All Google Chrome/Microsoft Edge browsers released after mid-2021,</li>
-		<li>All Mozilla Firefox browsers released after mid-2021,</li>
-		<li>All Safari browsers on macOS Ventura (13) and above.</li>
+		<li>All Google Chrome/Microsoft Edge browsers released after March 2023,</li>
+		<li>All Mozilla Firefox browsers released after March 2023,</li>
+		<li>All Safari browsers (16.4+) on macOS Ventura (13) and above.</li>
 	</ul>
 	<p>Click <a href="https://caniuse.com/?search=SharedArrayBuffer">here</a> for more details.</p>
 	<p class="ualabel">
