@@ -28,7 +28,8 @@
 		setDownloadCallback,
 		setDownloadCwdCallback,
 		saveFile,
-		INPUT_MAX
+		INPUT_MAX,
+		markEditorReadWrite
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';

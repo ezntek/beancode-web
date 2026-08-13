@@ -9,13 +9,11 @@
  * information.
  */
 
-import { EditorState } from '@codemirror/state';
-
 import type { EditorMessage, PyMessage } from '$lib/workers/pyodide_state.svelte';
 import { post, ps as ps } from '$lib/workers/pyodide_state.svelte';
 import { termState as ts } from './terminal_state.svelte';
 
-import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback, saveFile } from './state.svelte';
+import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback, saveFile, markEditorReadWrite } from './state.svelte';
 import { FileResponseKind, pathJoin } from '$lib/fstypes';
 import { es } from './editor_state.svelte';
 import { getDefaultConfig } from '$lib/config';
@@ -51,6 +49,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 ts.terminal!.write('\x1b[2J\x1b[H');
             }
             ter.write('\x1b[2J\x1b[H');
+            markEditorReadWrite();
             break;
         case 'ready':
             ps.ready = true;
@@ -62,9 +61,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 newDefaultFile();
                 window.localStorage.setItem('IsFirstLaunch', 'no')
             }
-            es.view!.dispatch({
-                effects: es.editable.reconfigure(EditorState.readOnly.of(false)),
-            });
+            markEditorReadWrite();
             es.src = "";
             break;
         case 'clear':

@@ -9,6 +9,7 @@
  * information.
  */
 
+import { EditorState } from '@codemirror/state';
 import { type FileResponse, type Dir } from '$lib/fstypes';
 import { post } from '$lib/workers/pyodide_state.svelte';
 import { getDefaultConfig, type IConfig } from '$lib/config';
@@ -56,6 +57,24 @@ export function saveFile(overwrite: boolean, path?: string) {
         contents: es.src,
         overwrite: overwrite
     });
+}
+
+export function markEditorReadOnly() {
+    requestAnimationFrame(()=>{
+    es.view!.dispatch({
+        effects: es.editable.reconfigure(EditorState.readOnly.of(true)),
+    });
+    });
+    console.log("editor marked read only");
+}
+
+export function markEditorReadWrite() {
+    requestAnimationFrame(()=>{
+    es.view!.dispatch({
+        effects: es.editable.reconfigure(EditorState.readOnly.of(false)),
+    });
+    });
+    console.log("editor marked read/write");
 }
 
 export type DoneFormattingCallback = (data: string, path: string) => void;

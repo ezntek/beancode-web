@@ -20,7 +20,7 @@
 	import { catppuccinMacchiato, defaultDarkCodemirror } from '$lib/themes/themes';
 	import { python } from '@codemirror/lang-python';
 	import { beancode } from '$lib/highlighting/beancode';
-	import { s, saveFile } from './state.svelte';
+	import { markEditorReadOnly, s, saveFile } from './state.svelte';
 
 	// custom extension setup
 	import {
@@ -115,7 +115,6 @@
 				crosshairCursor(),
 				highlightActiveLine(),
 				highlightSelectionMatches(),
-				es.editable.of(EditorState.readOnly.of(true)),
 				keymap.of([
 					...closeBracketsKeymap,
 					...defaultKeymap,
@@ -150,6 +149,7 @@
 				highlighter.of(python()),
 				es.diag.of(beanDiagnostics),
 				fontTheme.of(fontThemeStyle),
+				es.editable.of(EditorState.readOnly.of(true)),
 				errField
 			]
 		});
