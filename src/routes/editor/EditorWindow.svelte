@@ -56,6 +56,7 @@
 	import prettierPostcss from 'prettier/plugins/postcss';
 	import prettierBabel from 'prettier/plugins/babel';
 	import prettierEstree from 'prettier/plugins/estree';
+	import { ArgList } from '$lib/highlighting/parser.terms';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -174,7 +175,7 @@
 
 	function doneTracingCallback(data: string) {
 		tracerOutput = data;
-		traceDoneDialog.open(undefined, 'trace_table.tracer.html');
+		traceDoneDialog.open(undefined, 'trace_table.thtml');
 	}
 
 	function fileResponseCallback(msgKind: string, path: string, response: FileResponse<any>) {
@@ -212,7 +213,7 @@
 					downloadCallback(pathBasename(path), dat);
 					return;
 				}
-				if (path.endsWith('.tracer.html')) {
+				if (path.endsWith('.thtml')) {
 					openStringAsHtml(dat);
 					return;
 				}
@@ -517,6 +518,7 @@
 		if (s.running) return;
 		ps.curError = null;
 		traceDialog.open(es.src);
+		ts.terminal!.writeln('\x1b[2J\x1b[H');
 	}
 
 	function traceOk(vars: string[], config: TracerConfig) {

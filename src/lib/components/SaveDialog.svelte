@@ -83,9 +83,9 @@
 	) => {
 		if (t) title = t;
 		if (defaultContents) {
-			const parts = defaultContents!.split('.');
-			fileName = parts[0];
-			const ext = parts[parts.length - 1];
+			const dotidx = defaultContents.indexOf('.');
+			fileName = defaultContents.substring(0, dotidx);
+			const ext = defaultContents.substring(dotidx + 1, defaultContents.length);
 			if (ext) fileType = ext;
 		}
 
@@ -124,6 +124,7 @@
 						<option value="bean" selected>Pseudocode (.bean)</option>
 						<option value="py">Python (.py)</option>
 						<option value="html">HTML (.html)</option>
+						<option value="thtml">Tracer HTML (.thtml)</option>
 						<option value="txt">Text (.txt)</option>
 						{#if !['bean', 'py', 'html', 'txt'].includes(fileType) && fileType !== ''}
 							{#if fileType === 'zip'}
