@@ -12,34 +12,42 @@
 
 // Only necessary if you have an import from `$env/static/public`
 /// <reference types="../.svelte-kit/ambient.d.ts" />
+//
+/// NOTE: A portion of this code is also LLM-assisted; it is therefore
+// licensed under the public domain, as part of this code is not mine.
 
 import { WANTED_PYODIDE_VERSION } from './lib/version';
 import { build, files, version } from '$service-worker';
+
 const self = globalThis.self as unknown as ServiceWorkerGlobalScope;
 
-const CACHE = `beancode-web-${version}-py${WANTED_PYODIDE_VERSION}`
-const ASSETS = [
-    ...build, ...files
-];
-const PYODIDE_ASSETS = [
+const CACHE = `beancode-web-${version}-py${WANTED_PYODIDE_VERSION}`;
+
+// 1. Clean paths without query parameters
+const STATIC_ASSETS = new Set([...build, ...files]);
+const PYODIDE_ASSETS = new Set([
     '/pyodide_stdlib.zip',
     '/pyodide.asm.wasm',
     '/pyodide.asm.js',
-    '/pyodide.mjs?url',
-];
+    '/pyodide.mjs',
+]);
 
 self.addEventListener('install', (event) => {
     async function add() {
         const cache = await caches.open(CACHE);
-        await cache.addAll(ASSETS);
+        
+        // Cache built SvelteKit assets
+        await cache.addAll(Array.from(STATIC_ASSETS));
 
-        // just in case
-        const pyodideAssets = PYODIDE_ASSETS.filter((f) => !ASSETS.includes(f));
+        // Cache Pyodide assets that aren't already in STATIC_ASSETS
+        const pyodideToFetch = Array.from(PYODIDE_ASSETS).filter((path) => !STATIC_ASSETS.has(path));
+        
         await Promise.allSettled(
-            pyodideAssets.map(async (path) => {
+            pyodideToFetch.map(async (path) => {
                 const response = await fetch(path);
-                if (response.ok)
+                if (response.ok || response.type === 'opaque') {
                     await cache.put(path, response);
+                }
             })
         );
     }
@@ -49,72 +57,52 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-	// Remove previous cached data from disk
-	async function removeOld() {
-		for (const key of await caches.keys()) {
-			if (key !== CACHE) await caches.delete(key);
-		}
-	}
+    async function removeOld() {
+        for (const key of await caches.keys()) {
+            if (key !== CACHE) await caches.delete(key);
+        }
+    }
 
-	event.waitUntil(removeOld());
+    event.waitUntil(removeOld());
     self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
-    if (e.request.method !== 'GET')
-        return;
+    if (e.request.method !== 'GET') return;
 
-    async function respond() {
+    async function respond(): Promise<Response> {
         const url = new URL(e.request.url);
         const cache = await caches.open(CACHE);
+        const pathname = url.pathname;
 
-       if (ASSETS.includes(url.pathname)) {
-            const response = await cache.match(url.pathname);
-            if (response)
-                return response;
-        }
+        // api logic just in case
+        if (STATIC_ASSETS.has(pathname) || PYODIDE_ASSETS.has(pathname)) {
+            const cached = await cache.match(e.request);
+            if (cached) return cached;
 
-        if (PYODIDE_ASSETS.includes(url.pathname)) {
-            const cached = await cache.match(url.pathname);
-            if (cached)
-                return cached;
-
-            const response = await fetch(e.request) 
-
-			if (!(response instanceof Response))
-				throw new Error('invalid response from fetch');
-
-            if (response.status === 200)
-                await cache.put(url.pathname, response.clone());
-
+            const response = await fetch(e.request);
+            if (response.status === 200 || response.type === 'opaque') {
+                cache.put(e.request, response.clone());
+            }
             return response;
         }
 
-        let response;
         try {
-			response = await fetch(e.request);
+            const response = await fetch(e.request);
+            
+            // api logic just in case
+            const isApiRoute = pathname.startsWith('/api/');
+            if ((response.status === 200 || response.type === 'opaque') && !isApiRoute) {
+                cache.put(e.request, response.clone());
+            }
 
-		} catch (err) {
-			const response = await cache.match(e.request);
-
-			if (response) 
-				return response;
-
-			// if there's no cache, then just error out
-			// as there is nothing we can do to respond to this request
-			throw err;
-		}
-
-        // if we're offline, fetch can return a value that is not a Response
-        // instead of throwing - and we can't pass this non-Response to respondWith
-        if (!(response instanceof Response))
-            throw new Error('invalid response ' + response + ' from fetch');
-
-        if (response.status === 200)
-            cache.put(e.request, response.clone());
-
-        return response;
-	}
+            return response;
+        } catch (err) {
+            const cached = await cache.match(e.request);
+            if (cached) return cached;
+            throw err;
+        }
+    }
 
     e.respondWith(respond());
 });

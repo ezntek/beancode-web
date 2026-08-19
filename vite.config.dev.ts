@@ -55,7 +55,8 @@ export default defineConfig({
             //'@lezer/lr',
         ],
         exclude: [
-            '@battlefieldduck/xterm-svelte'
+            '@battlefieldduck/xterm-svelte',
+            'prettier',
         ]
     },
 });

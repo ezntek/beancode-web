@@ -60,21 +60,19 @@ export function saveFile(overwrite: boolean, path?: string) {
 }
 
 export function markEditorReadOnly() {
-    requestAnimationFrame(()=>{
-    es.view!.dispatch({
-        effects: es.editable.reconfigure(EditorState.readOnly.of(true)),
+    requestAnimationFrame(() => {
+        es.view!.dispatch({
+            effects: es.editable.reconfigure(EditorState.readOnly.of(true)),
+        });
     });
-    });
-    console.log("editor marked read only");
 }
 
 export function markEditorReadWrite() {
-    requestAnimationFrame(()=>{
-    es.view!.dispatch({
-        effects: es.editable.reconfigure(EditorState.readOnly.of(false)),
+    requestAnimationFrame(() => {
+        es.view!.dispatch({
+            effects: es.editable.reconfigure(EditorState.readOnly.of(false)),
+        });
     });
-    });
-    console.log("editor marked read/write");
 }
 
 export type DoneFormattingCallback = (data: string, path: string) => void;

@@ -51,6 +51,11 @@
 	import type { TracerConfig } from '$lib/tracer';
 	import { applyTheme } from '$lib/themes/themes';
 	import { saveConfig, type IConfig } from '$lib/config';
+	import prettier from 'prettier/standalone';
+	import prettierHtml from 'prettier/plugins/html';
+	import prettierPostcss from 'prettier/plugins/postcss';
+	import prettierBabel from 'prettier/plugins/babel';
+	import prettierEstree from 'prettier/plugins/estree';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -69,11 +74,7 @@
 	let messageDialog: MessageDialog;
 	let traceDialog: TraceDialog;
 
-	function isTracerOutput(src: string): boolean {
-		return src.startsWith('<!DOCTYPE html>\n<!-- Generated HTML by beancode');
-	}
-
-	function handleTracerOutput(src: string) {
+	function openStringAsHtml(src: string) {
 		const blob = new Blob([src], { type: 'text/html' });
 		const url = URL.createObjectURL(blob);
 		window.open(url, '_blank', 'noopener');
@@ -173,7 +174,7 @@
 
 	function doneTracingCallback(data: string) {
 		tracerOutput = data;
-		traceDoneDialog.open(undefined, 'tracer_output.html');
+		traceDoneDialog.open(undefined, 'trace_table.tracer.html');
 	}
 
 	function fileResponseCallback(msgKind: string, path: string, response: FileResponse<any>) {
@@ -211,8 +212,8 @@
 					downloadCallback(pathBasename(path), dat);
 					return;
 				}
-				if (isTracerOutput(response.data)) {
-					handleTracerOutput(dat);
+				if (path.endsWith('.tracer.html')) {
+					openStringAsHtml(dat);
 					return;
 				}
 				changeFile(dat, path);
@@ -354,7 +355,7 @@
 		// let handle_worker do it
 	}
 
-	function runStopTooltip() {
+	function getRunStopTooltip() {
 		if (s.running) {
 			return 'Stop execution';
 		}
@@ -369,6 +370,26 @@
 		}
 	}
 
+	function getRunStopIcon() {
+		switch (curExtension()) {
+			case 'py':
+				return 'icon fa-brands fa-python';
+			case 'html':
+				return 'icon fa-brands fa-html5';
+			default:
+				return 'icon fa-solid fa-play';
+		}
+	}
+
+	function getRunStopText() {
+		switch (curExtension()) {
+			case 'html':
+				return 'Open';
+			default:
+				return 'Run';
+		}
+	}
+
 	function runStop() {
 		if (!ps.ready) return;
 
@@ -379,7 +400,8 @@
 			return;
 		}
 
-		if (curExtension() !== 'py' && curExtension() !== 'bean') return;
+		const SUPPORTED_EXTS = ['py', 'bean', 'html'];
+		if (!SUPPORTED_EXTS.includes(curExtension())) return;
 
 		if (es.curFilePath !== '') {
 			saveFile(true);
@@ -387,14 +409,21 @@
 		s.running = true;
 		ts.terminal!.clear();
 		ts.terminal!.write('\x1b[2J\x1b[H');
-		if (curExtension() === 'py') {
-			post({ kind: 'runpy', data: es.src, path: es.curFilePath });
-		} else {
-			post({ kind: 'run', data: es.src, path: es.curFilePath });
+		switch (curExtension()) {
+			case 'py':
+				post({ kind: 'runpy', data: es.src, path: es.curFilePath });
+				break;
+			case 'bean':
+				post({ kind: 'run', data: es.src, path: es.curFilePath });
+				break;
+			case 'html':
+				openStringAsHtml(es.src);
+				s.running = false;
+				break;
 		}
 	}
 
-	function buttonStyle(name: string): string {
+	function getButtonStyle(name: string): string {
 		if (!ps.ready) return 'editor-button-grayed';
 		if (name != 'runstop' && s.running) return 'editor-button-grayed';
 
@@ -408,6 +437,8 @@
 							return 'editor-button-runpy';
 						case 'bean':
 							return 'editor-button-run';
+						case 'html':
+							return 'editor-button-openhtml';
 						default:
 							return 'editor-button-grayed';
 					}
@@ -417,7 +448,7 @@
 			case 'new':
 				return 'editor-button-new';
 			case 'format':
-				if (curExtension() === 'bean' || curExtension() === 'py') return 'editor-button-format';
+				if (['bean', 'html', 'py'].includes(curExtension())) return 'editor-button-format';
 				else return 'editor-button-grayed';
 			case 'trace':
 				if (curExtension() === 'bean') return 'editor-button-trace';
@@ -442,30 +473,42 @@
 		saveFile(overwrite, pathJoin(s.cwd, fileName));
 	}
 
-	function formatTooltip() {
+	function getFormatTooltip() {
 		if (curExtension() !== 'bean' && curExtension() !== 'py')
 			return 'You can only format Beancode (Pseudocode) and Python files right now.';
 		return 'Format (prettify) your current source code file.';
 	}
 
-	function traceTooltip() {
+	function getTraceTooltip() {
 		if (curExtension() !== 'bean')
 			return 'You can only trace Beancode (Pseudocode) files right now.';
 		return 'Generate a trace table for the current file';
 	}
 
-	function formatFile() {
+	async function formatFile() {
 		if (s.running) return;
-		if (curExtension() === 'py') {
-			ts.terminal!.write('\x1b[2J\x1b[H');
-			ps.curError = null;
-			s.running = true;
-			post({ kind: 'formatpy', data: es.src, name: pathBasename(es.curFilePath) });
-		} else if (curExtension() === 'bean') {
-			ts.terminal!.write('\x1b[2J\x1b[H');
-			ps.curError = null;
-			s.running = true;
-			post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
+		switch (curExtension()) {
+			case 'py':
+				ts.terminal!.write('\x1b[2J\x1b[H');
+				ps.curError = null;
+				s.running = true;
+				post({ kind: 'formatpy', data: es.src, name: pathBasename(es.curFilePath) });
+				break;
+			case 'bean':
+				ts.terminal!.write('\x1b[2J\x1b[H');
+				ps.curError = null;
+				s.running = true;
+				post({ kind: 'format', data: es.src, path: es.curFilePath ?? '(beanweb)' });
+				break;
+			case 'html':
+				es.src = await prettier.format(es.src, {
+					parser: 'html',
+					plugins: [prettierHtml, prettierPostcss, prettierBabel, prettierEstree],
+					tabWidth: 4,
+					htmlWhitespaceSensitivity: 'ignore'
+				});
+				saveFile(true);
+				break;
 		}
 	}
 
@@ -525,21 +568,19 @@
 			<div class="toolbar">
 				<button
 					aria-label="run"
-					class="toolbar-button {buttonStyle('runstop')}"
-					title={runStopTooltip()}
+					class="toolbar-button {getButtonStyle('runstop')}"
+					title={getRunStopTooltip()}
 					onclick={runStop}
 				>
 					{#if !s.running}
-						<span
-							class="icon {curExtension() === 'py' ? 'fa-brands fa-python' : 'fa-solid fa-play'}"
-						></span> Run
+						<span class={getRunStopIcon()}></span> {getRunStopText()}
 					{:else}
 						<span class="icon fa-solid fa-stop"></span> Stop
 					{/if}
 				</button>
 				<button
 					aria-label="save"
-					class="toolbar-button {buttonStyle('save')}"
+					class="toolbar-button {getButtonStyle('save')}"
 					onclick={openSaveDialog}
 					title="Save the current file"
 				>
@@ -547,16 +588,16 @@
 				</button>
 				<button
 					aria-label="format"
-					class="toolbar-button {buttonStyle('format')}"
-					title={formatTooltip()}
+					class="toolbar-button {getButtonStyle('format')}"
+					title={getFormatTooltip()}
 					onclick={formatFile}
 				>
 					<span class="icon fa-solid fa-wand-magic-sparkles"></span> Format
 				</button>
 				<button
 					aria-label="trace"
-					class="toolbar-button {buttonStyle('trace')}"
-					title={traceTooltip()}
+					class="toolbar-button {getButtonStyle('trace')}"
+					title={getTraceTooltip()}
 					onclick={traceFile}
 				>
 					<span class="icon fa-solid fa-magnifying-glass"></span> Trace
@@ -796,6 +837,16 @@
 
 	.toolbar-button:hover {
 		transition-delay: 15ms;
+	}
+
+	.editor-button-openhtml {
+		background-color: var(--bw-orange);
+		color: var(--bw-base1);
+	}
+
+	.editor-button-openhtml:hover {
+		background-color: var(--bw-base1);
+		color: var(--bw-orange);
 	}
 
 	.editor-button-run {

@@ -60,9 +60,12 @@ export default defineConfig({
             '@codemirror/lang-python',
             '@codemirror/theme-one-dark',
             //'@lezer/highlight',
+            'prettier',
             //'@lezer/lr',
         ],
         exclude: [
+            '@battlefieldduck/xterm-svelte',
+            'prettier',
         ]
     },
 });

@@ -72,6 +72,8 @@
 				return 'fa-brands fa-python';
 			case 'txt':
 				return 'fa-regular fa-file-lines';
+			case 'html':
+				return 'fa-brands fa-html5';
 			default:
 				return 'fa-regular fa-file';
 		}
