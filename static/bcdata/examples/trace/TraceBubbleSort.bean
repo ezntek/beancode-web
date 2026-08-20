@@ -1,0 +1,23 @@
+// ======== Trace Me! ========
+//  * Array
+//  * Temp
+//  * i
+//  * j
+// ===========================
+
+DECLARE Array: ARRAY[1:10] OF INTEGER
+DECLARE End, Temp: INTEGER
+
+Array <- {10, 9, 8, 7, 6, 5, 4, 3, 2, 1}
+End <- 10 
+
+FOR i <- 1 TO End - 1
+    FOR j <- 1 TO End - i
+        IF Array[j] > Array[j + 1]
+          THEN
+            Temp <- Array[j]
+            Array[j] <- Array[j + 1]
+            Array[j + 1] <- Temp
+        ENDIF
+    NEXT j
+NEXT i

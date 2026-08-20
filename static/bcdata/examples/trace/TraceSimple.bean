@@ -1,0 +1,32 @@
+// ============== RUN ME! ===============
+// !! you do not need to press trace.  !!
+// !! check the bottom of the file for !!
+// !! the TRACE statement.             !!
+// ======================================
+
+PROCEDURE Simple
+    // XXX: This algorithm is exceptionally useless.
+    //      This was made back in the day to test the tracer.
+    DECLARE Num: INTEGER
+    DECLARE Done: BOOLEAN
+
+    Done <- FALSE
+
+    Num <- 5
+    Num <- 5 + Num
+
+    WHILE Num > 0 DO
+        Num <- Num - 1
+        OUTPUT Num * 2
+    ENDWHILE
+
+    Done <- TRUE
+
+    OUTPUT Done
+ENDPROCEDURE
+
+// NOTE: Simple tracing example.
+// Trace the variables Num, Done to "simple.html"
+TRACE(Num, Done) TO "simple.thtml"
+    CALL Simple
+ENDTRACE

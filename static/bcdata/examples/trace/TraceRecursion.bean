@@ -1,0 +1,25 @@
+// ============== RUN ME! ===============
+// !! you do not need to press trace.  !!
+// !! check the bottom of the file for !!
+// !! the TRACE statement.             !!
+// ======================================
+
+FUNCTION Factorial(Num: INTEGER) RETURNS INTEGER
+    DECLARE BaseCase: BOOLEAN
+    DECLARE Result: INTEGER
+
+    BaseCase <- (Num = 1)
+    IF BaseCase
+      THEN
+        Result <- 1
+        RETURN Result
+      ELSE
+        Result <- Num * Factorial(Num - 1)
+        RETURN Result
+    ENDIF
+ENDFUNCTION
+
+// Trace Num, BaseCase, Result to "recursion.thtml"
+TRACE(Num, BaseCase, Result) TO "recursion.thtml"
+    OUTPUT Factorial(6)
+ENDTRACE

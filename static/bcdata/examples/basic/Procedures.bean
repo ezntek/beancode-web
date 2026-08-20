@@ -1,0 +1,27 @@
+CONSTANT Default <- 60
+
+// Repeatable section of code that can be invoked (subprograms,
+// subroutines).
+PROCEDURE Line(Size: INTEGER)
+    DECLARE Length: INTEGER
+    FOR Length <- 1 TO Size
+        PRINT '-'
+    NEXT Length
+
+    OUTPUT ""
+ENDPROCEDURE
+
+// Procedures may call into other procedures.
+PROCEDURE DefaultLine
+    CALL Line(Default)
+ENDPROCEDURE
+
+
+OUTPUT "My Size: "
+INPUT MySize
+IF MySize = Default
+  THEN
+    CALL DefaultLine
+  ELSE
+    CALL Line(MySize)
+ENDIF

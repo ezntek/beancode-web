@@ -1,0 +1,6 @@
+TraceArray.bean
+TraceBubbleSort.bean
+TraceFib.bean
+TraceLinearSearch.bean
+TraceRecursion.bean
+TraceSimple.bean

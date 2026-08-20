@@ -17,7 +17,7 @@
 
 	let innerDialog: Dialog;
 	let submitButton: HTMLButtonElement;
-	const possibleViews = ['basic', 'algorithms', 'benchmarks'] as const;
+	const possibleViews = ['basic', 'algorithms', 'trace', 'benchmarks'] as const;
 	type TView = (typeof possibleViews)[number];
 	let view: TView = $state('basic');
 
