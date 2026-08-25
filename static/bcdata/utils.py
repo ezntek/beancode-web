@@ -51,7 +51,9 @@ def exec_user_py(src, name):
 def exec_user_bean(src, name, tracer=None):
     errdict = None
     try:
-        i = Interpreter(Parser(Lexer(src).tokenize()).program().stmts, tracer=tracer)
+        tokens = Lexer(src).tokenize()
+        ast = Parser(tokens,compact_warnings=True,file_content=src).program()
+        i = Interpreter(ast.stmts, tracer=tracer)
         i.toplevel = True
         i.visit_block(None)
         c = 0
@@ -82,7 +84,7 @@ def format_bean(src, name):
     lexer = Lexer(src, preserve_comments=True)
     try:
         toks = lexer.tokenize()
-        parser = Parser(toks, preserve_trivia=True)
+        parser = Parser(toks, preserve_trivia=True,compact_warnings=True)
         blk = parser.program().stmts
         f = Formatter(blk)
         res = "".join(f.visit_block())
@@ -137,7 +139,7 @@ def format_py(src, name):
 
 def run_repl():
     try:
-        r = Repl()
+        r = Repl(compact=True)
         r.repl(handle_ctrlc=False)
     except BCError as err:
         err.print(name, src, compact=True)
