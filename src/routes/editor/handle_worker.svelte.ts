@@ -92,6 +92,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             ts.canInput = false;
             s.exitCode = msg.code;
+            saveFile(true);
             post({ kind: 'listdir', path: s.cwd });
             break;
         case 'listdir-response':

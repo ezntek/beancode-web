@@ -354,7 +354,12 @@ async function handleRun(src: string, path: string) {
         py.globals.set("n", pathBasename(path) || "(beanweb)");
         py.globals.set("s", src);
         py.globals.set("c", 0);
-        py.runPython("(c,edic)=exec_user_bean(s,n)");
+        py.runPython(`
+try:
+    (c,edic)=exec_user_bean(s,n)
+except KeyboardInterrupt:
+    c=1
+`);
         const exit_code = py.globals.get("c");
         handleBeanErr("edic");
 
@@ -371,7 +376,12 @@ async function handleRunPy(src: string, name: string){
     try {
         py.globals.set("s", src);
         py.globals.set("n", name);
-        py.runPython("c=exec_user_py(s,n)");
+        py.runPython(`
+try:
+    c=exec_user_py(s,n)
+except KeyboardInterrupt:
+    c=1
+`);
         const exit_code = py.globals.get("c");
         
         // clear the stdin buffer
