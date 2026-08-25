@@ -17,6 +17,7 @@ from beancode.formatter import Formatter
 from beancode.tracer import *
 from beancode.runner import *
 from beancode.repl import Repl # for repl button
+from time import sleep
 from beancode import __version__
 import black, ast, sys, shutil # we need shutil
 
@@ -133,3 +134,24 @@ def format_py(src, name):
         if e.offset:
             spaces = '' * padding
             print(f"{spaces}\x1b[33m{' ' * (e.offset - 1 + padding)}^{'~' * (e.end_offset - e.offset - 1)}\x1b[0m")
+
+def run_repl():
+    try:
+        r = Repl()
+        r.repl(handle_ctrlc=False)
+    except BCError as err:
+        err.print(name, src, compact=True)
+    except SystemExit as e:
+        print(f"[exited with code {e.code}]")
+        pass
+    except KeyboardInterrupt:
+        pass
+    except EOFError:
+        warn("Caught EOF")
+    except RecursionError as e:
+        warn("Recursion depth exceeded! Did you forget your base case?")
+    except Exception as e:
+        error(
+            f'Python exception caught ({type(e)}: "{e}") while running beancode! Please report this to the developers.'
+        )
+        raise e

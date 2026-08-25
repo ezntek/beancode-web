@@ -438,8 +438,24 @@ function nuke() {
     sync();
 }
 
-function repl() {
-    py.runPython("Repl().repl(handle_ctrlc=False)");
+async function repl() {
+    try {
+        await py.runPythonAsync("run_repl()");
+        
+        // clear the stdin buffer
+        const flag = new Int32Array(inputBuf, 0, 1);
+        const buf = new Uint8Array(inputBuf, 4); 
+        if (flag[0] == 0) {
+            flag.fill(0);
+            buf.fill(0);
+        }
+
+        post({ kind: 'repl-done' });
+    } catch (e: any) {
+        post({ kind: 'error', data: String(e), fromBeancode: false });
+
+        post({ kind: 'repl-done' });
+    }
     sync();
 }
 
@@ -506,8 +522,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 post({ kind: 'nuke-done', filesOnly: msg.filesOnly });
                 break;
             case "repl":
-                repl();
-                post({ kind: 'repl-done' });
+                (new Uint8Array(interruptBuf))[0] = 0;
+                post({ kind: 'clear' });
+                await repl();
                 break;
         }
     } catch (exc: any) {

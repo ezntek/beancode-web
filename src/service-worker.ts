@@ -13,8 +13,6 @@
 // Only necessary if you have an import from `$env/static/public`
 /// <reference types="../.svelte-kit/ambient.d.ts" />
 //
-/// NOTE: A portion of this code is also LLM-assisted; it is therefore
-// licensed under the public domain, as part of this code is not mine.
 
 import { WANTED_PYODIDE_VERSION } from './lib/version';
 import { build, files, version } from '$service-worker';
@@ -25,7 +23,7 @@ const CACHE = `beancode-web-${version}-py${WANTED_PYODIDE_VERSION}`;
 
 // 1. Clean paths without query parameters
 const STATIC_ASSETS = new Set([...build, ...files]);
-const PYODIDE_ASSETS = new Set([
+const REQUIRED_PYODIDE_ASSETS = new Set([
     '/pyodide_stdlib.zip',
     '/pyodide.asm.wasm',
     '/pyodide.asm.js',
@@ -35,16 +33,14 @@ const PYODIDE_ASSETS = new Set([
 self.addEventListener('install', (event) => {
     async function add() {
         const cache = await caches.open(CACHE);
-        
-        // Cache built SvelteKit assets
         await cache.addAll(Array.from(STATIC_ASSETS));
 
-        // Cache Pyodide assets that aren't already in STATIC_ASSETS
-        const pyodideToFetch = Array.from(PYODIDE_ASSETS).filter((path) => !STATIC_ASSETS.has(path));
+        // cache pyodide stuff
+        const pyodideToFetch = Array.from(REQUIRED_PYODIDE_ASSETS).filter((path) => !STATIC_ASSETS.has(path));
         
         await Promise.allSettled(
             pyodideToFetch.map(async (path) => {
-                const response = await fetch(path);
+                const response = await fetch(path, { cache: 'reload' });
                 if (response.ok || response.type === 'opaque') {
                     await cache.put(path, response);
                 }
@@ -75,16 +71,9 @@ self.addEventListener('fetch', (e) => {
         const cache = await caches.open(CACHE);
         const pathname = url.pathname;
 
-        // api logic just in case
-        if (STATIC_ASSETS.has(pathname) || PYODIDE_ASSETS.has(pathname)) {
-            const cached = await cache.match(e.request);
+        if (REQUIRED_PYODIDE_ASSETS.has(pathname)) {
+            const cached = await cache.match(pathname);
             if (cached) return cached;
-
-            const response = await fetch(e.request);
-            if (response.status === 200 || response.type === 'opaque') {
-                cache.put(e.request, response.clone());
-            }
-            return response;
         }
 
         try {
