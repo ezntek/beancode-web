@@ -394,8 +394,7 @@ except KeyboardInterrupt:
 
         post({ kind: 'pyexit', code: exit_code });
     } catch (e: any) {
-        post({ kind: 'error', data: String(e), fromBeancode: false });
-
+        post({ kind: 'error', data: String(e), fromBeancode: true });
         post({ kind: 'pyexit', code: 1 });
     }
     sync();
@@ -542,6 +541,9 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
         let data = String(exc);
         if (exc.name === "ErrnoError") {
             data = `Errno ${exc.errno}`;
+        } else if (exc.name === "PythonError" && data.includes("KeyboardInterrupt")) {
+            // All unhandled KeyboardInterrupts have to be freak accidents that come from pyodide
+            return;
         }
 
         post({ kind: 'error', data: data, fromBeancode: true });

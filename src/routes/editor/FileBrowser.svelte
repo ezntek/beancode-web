@@ -107,7 +107,13 @@
 	}
 
 	function clickItem(name: string) {
-		if (s.running) return;
+		if (s.running) {
+			errorDialog.open([
+				'You cannot open files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
 
 		if (name === '..') {
 			return; // TODO: re-add multi project support
@@ -152,6 +158,14 @@
 		// eventually
 		if (name === '..') return;
 
+		if (s.running) {
+			errorDialog.open([
+				'You cannot modify files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		lastClicked = name;
 		confirmDialog.open(
 			[`Are you sure you want to delete ${name}?`],
@@ -165,6 +179,14 @@
 	}
 
 	function handleDeleteAll() {
+		if (s.running) {
+			errorDialog.open([
+				'You cannot modify files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		confirmDialog.open(
 			[
 				'This will delete ALL FILES that you have in this project.',
@@ -183,6 +205,14 @@
 	}
 
 	function handleRename(name: string) {
+		if (s.running) {
+			errorDialog.open([
+				'You cannot modify files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		if (name === '..') {
 			return;
 		}
@@ -193,6 +223,14 @@
 	}
 
 	function handleDownload(name: string) {
+		if (s.running) {
+			errorDialog.open([
+				'You cannot download files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		if (name == '..') downloadCwdCallback!();
 		else downloadCallback!(name);
 	}
@@ -237,6 +275,14 @@
 	}
 
 	function newItem() {
+		if (s.running) {
+			errorDialog.open([
+				'You cannot create files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		if (atProjects) {
 			saveDialog.open('New Project (Folder)', undefined, false, newDirOk, true);
 		} else {
@@ -245,6 +291,14 @@
 	}
 
 	function handleUploadZip(content: Uint8Array<ArrayBuffer>) {
+		if (s.running) {
+			errorDialog.open([
+				'You cannot create files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		confirmDialog.open(
 			[
 				'Uploading a zip file will unpack everything inside into the current project.',
@@ -310,6 +364,14 @@
 	}
 
 	function upload(name: string, content: string) {
+		if (s.running) {
+			errorDialog.open([
+				'You cannot create files when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		post({
 			kind: 'newfile',
 			path: pathJoin(s.cwd, name),
@@ -319,6 +381,14 @@
 	}
 
 	function loadExample() {
+		if (s.running) {
+			errorDialog.open([
+				'You cannot add examples when code is running.',
+				'Please stop your program first.'
+			]);
+			return;
+		}
+
 		loadExampleDialog.open();
 	}
 
