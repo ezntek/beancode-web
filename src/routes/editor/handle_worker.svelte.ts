@@ -92,8 +92,8 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             ts.canInput = false;
             s.exitCode = msg.code;
-            saveFile(true);
             post({ kind: 'listdir', path: s.cwd });
+            saveFile(true);
             break;
         case 'listdir-response':
             const newmap = new Map([...msg.data.entries()].sort(([keyA], [keyB]) =>

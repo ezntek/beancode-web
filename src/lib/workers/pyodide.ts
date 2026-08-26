@@ -16,6 +16,9 @@ import JSZip from "jszip";
 import { WANTED_PYODIDE_VERSION, WANTED_BEANCODE_VERSION } from "$lib/version";
 
 function post(msg: PyMessage) {
+    if (__DEV__) {
+        console.log("TO EDITOR: ", msg);
+    }
     postMessage(msg satisfies PyMessage);
 }
 
@@ -537,7 +540,6 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 break;
         }
     } catch (exc: any) {
-        console.error("worker error: ", exc);
         let data = String(exc);
         if (exc.name === "ErrnoError") {
             data = `Errno ${exc.errno}`;
@@ -546,6 +548,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
             return;
         }
 
+        console.error("worker error: ", exc);
         post({ kind: 'error', data: data, fromBeancode: true });
     }
 }

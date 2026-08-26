@@ -65,5 +65,8 @@ export const ps: IPyState = $state({
 })
 
 export function post(msg: EditorMessage) {
+    if (__DEV__) {
+        console.log("TO PYTHON: ", msg);
+    }
     ps.worker!.postMessage(msg);
 }

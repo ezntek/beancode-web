@@ -231,15 +231,20 @@
 						es.saved = true;
 					});
 					newAfterSave = false;
-				} else {
-					tick().then(() => {
-						es.saved = true;
-						if (s.cwd !== '/data/projects') {
-							es.curFilePath = path;
-							post({ kind: 'readfile', path: path });
-						}
-					});
+					return;
 				}
+
+				tick().then(() => {
+					es.saved = true;
+					// NOTE: remnant of attempted multi-project support
+					if (s.cwd !== '/data/projects') {
+						es.curFilePath = path;
+						// NOTE: this was commented out, as after a file's unsaved changes is saved, it is
+						// guaranteed that Pyodide and the editor store the same file.
+
+						//post({ kind: 'readfile', path: path });
+					}
+				});
 				break;
 			case 'renamefile-response':
 				const newPath: string = response.data;
