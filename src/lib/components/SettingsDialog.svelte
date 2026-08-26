@@ -244,6 +244,17 @@
 								</button>
 							</td>
 						</tr>
+						<tr>
+							<td><span class="label">Word Wrapping</span></td>
+							<td>
+								<button
+									class="button {ourCfg.wordWrap ? 'toggle-on' : 'toggle-off'}"
+									onclick={() => (ourCfg.wordWrap = !ourCfg.wordWrap)}
+								>
+									{ourCfg.wordWrap ? 'On' : 'Off'}
+								</button>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			{:else if view === 'advanced'}

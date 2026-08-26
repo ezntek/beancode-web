@@ -58,11 +58,13 @@
 	let fontTheme: Compartment;
 	let highlighter: Compartment;
 	let themeCompartment: Compartment;
+	let wordWrap: Compartment;
 
 	onMount(() => {
 		fontTheme = new Compartment();
 		highlighter = new Compartment();
 		themeCompartment = new Compartment();
+		wordWrap = new Compartment();
 
 		const updateListener = EditorView.updateListener.of((update) => {
 			if (update.docChanged) {
@@ -95,6 +97,14 @@
 				}
 			});
 			es.view!.dispatch({ effects: fontTheme.reconfigure(newTheme) });
+		});
+
+		$effect(() => {
+			if (s.config.wordWrap) {
+				es.view!.dispatch({ effects: wordWrap.reconfigure(EditorView.lineWrapping) });
+			} else {
+				es.view!.dispatch({ effects: wordWrap.reconfigure([]) });
+			}
 		});
 
 		function exts() {
@@ -145,6 +155,7 @@
 				themeCompartment.of(CM_THEMES[s.themeName] ?? CM_THEMES['default_dark']),
 				updateListener,
 				style,
+				wordWrap.of(EditorView.lineWrapping),
 				es.history.of(history()),
 				highlighter.of(python()),
 				es.diag.of(beanDiagnostics),

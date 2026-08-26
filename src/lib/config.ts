@@ -8,6 +8,7 @@ export interface IConfig {
     fileBrowserShown: boolean,
     terminalShown: boolean,
     reduceFlair: boolean,
+    wordWrap: boolean,
 };
 
 export function getDefaultConfig(): IConfig {
@@ -24,6 +25,7 @@ export function getDefaultConfig(): IConfig {
         fileBrowserShown: true,
         terminalShown: true,
         reduceFlair: false,
+        wordWrap: false,
     };
 }
 
