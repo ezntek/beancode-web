@@ -19,7 +19,7 @@
 
 	import { setupWorker } from './handle_worker.svelte';
 	import Terminal from './Terminal.svelte';
-	import { post, ps } from '$lib/workers/pyodide_state.svelte';
+	import { post, ps, type EditorMessage } from '$lib/workers/pyodide_state.svelte';
 	import {
 		s,
 		setFileResponseCallback,
@@ -178,7 +178,7 @@
 		traceDoneDialog.open(undefined, 'trace_table.thtml');
 	}
 
-	function fileResponseCallback(msgKind: string, path: string, response: FileResponse<any>) {
+	function fileResponseCallback(msgKind: string, path: string, response: FileResponse<any>, then?: EditorMessage) {
 		if (response.kind != FileResponseKind.Ok) {
 			errorDialog.open(
 				[
@@ -231,20 +231,17 @@
 						es.saved = true;
 					});
 					newAfterSave = false;
-					return;
+				} else {
+					tick().then(() => {
+						es.saved = true;
+						//if (s.cwd !== '/data/projects') {
+						//	es.curFilePath = path;
+						//	post({ kind: 'readfile', path: path });
+						//}
+                        if (then !== undefined)
+                            post(then); 
+					});
 				}
-
-				tick().then(() => {
-					es.saved = true;
-					// NOTE: remnant of attempted multi-project support
-					if (s.cwd !== '/data/projects') {
-						es.curFilePath = path;
-						// NOTE: this was commented out, as after a file's unsaved changes is saved, it is
-						// guaranteed that Pyodide and the editor store the same file.
-
-						//post({ kind: 'readfile', path: path });
-					}
-				});
 				break;
 			case 'renamefile-response':
 				const newPath: string = response.data;

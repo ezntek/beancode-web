@@ -502,7 +502,7 @@ onmessage = async (event: MessageEvent<EditorMessage>) => {
                 post({ kind: 'readfile-response', path: msg.path, data: readFile(msg.path) });
                 break;
             case 'newfile':
-                post({ kind: 'newfile-response', path: msg.path, data: newFile(msg.path, msg.contents, msg.overwrite) });
+                post({ kind: 'newfile-response', path: msg.path, data: newFile(msg.path, msg.contents, msg.overwrite), then: msg.then });
                 break;
             case 'newdir':
                 post({ kind: 'newdir-response', path: msg.path, data: newDir(msg.path, msg.overwrite) });

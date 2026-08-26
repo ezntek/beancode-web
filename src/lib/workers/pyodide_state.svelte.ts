@@ -14,7 +14,7 @@ export type PyMessage =
     | { kind: 'listdir-response', data: Dir }
     // path that file was read from
     | { kind: 'readfile-response', path: string, data: FileResponse<string> }
-    | { kind: 'newfile-response', path: string, data: FileResponse<null> }
+    | { kind: 'newfile-response', path: string, data: FileResponse<null>, then?: EditorMessage }
     | { kind: 'newdir-response', path: string, data: FileResponse<null> }
     | { kind: 'delfile-response', path: string, data: FileResponse<null> }
     // fileresponse ok data contains new path, path contains old path
@@ -34,7 +34,7 @@ export type EditorMessage =
     | { kind: 'setup', inputBuf: SharedArrayBuffer, interruptBuf: SharedArrayBuffer }
     | { kind: 'listdir', path: string }
     | { kind: 'readfile', path: string }
-    | { kind: 'newfile', path: string, contents: string, overwrite: boolean }
+    | { kind: 'newfile', path: string, contents: string, overwrite: boolean, then?: EditorMessage }
     | { kind: 'newdir', path: string, overwrite: boolean }
     | { kind: 'delfile', path: string }
     | { kind: 'renamefile', oldpath: string, newpath: string }

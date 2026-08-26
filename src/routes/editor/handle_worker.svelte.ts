@@ -101,8 +101,8 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             s.running = false;
             ts.canInput = false;
             s.exitCode = msg.code;
-            post({ kind: 'listdir', path: s.cwd });
             saveFile(true);
+            post({ kind: 'listdir', path: s.cwd });
             break;
         case 'listdir-response':
             const newmap = new Map([...msg.data.entries()].sort(([keyA], [keyB]) =>
@@ -130,7 +130,7 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
                 // gotta update the FS listing on the frontend!
                 post({ kind: 'listdir', path: s.cwd });
             }
-            fileResponseCallback!(msg.kind, msg.path, msg.data);
+            fileResponseCallback!(msg.kind, msg.path, msg.data, msg.then);
             break;
         case 'newdir-response':
             rkind = msg.data.kind;

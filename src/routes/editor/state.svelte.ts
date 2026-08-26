@@ -11,7 +11,7 @@
 
 import { EditorState } from '@codemirror/state';
 import { type FileResponse, type Dir } from '$lib/fstypes';
-import { post } from '$lib/workers/pyodide_state.svelte';
+import { post, type EditorMessage } from '$lib/workers/pyodide_state.svelte';
 import { getDefaultConfig, type IConfig } from '$lib/config';
 import { es } from './editor_state.svelte';
 
@@ -77,7 +77,7 @@ export function markEditorReadWrite() {
 
 export type DoneFormattingCallback = (data: string, path: string) => void;
 export type DoneTracingCallback = (data: string) => void;
-export type FileResponseCallback = (msgKind: string, path: string, response: FileResponse<any>) => void;
+export type FileResponseCallback = (msgKind: string, path: string, response: FileResponse<any>, then?: EditorMessage) => void;
 export type DownloadCallback = (name: string) => void;
 export type DownloadCwdCallback = (blob?: Blob) => void;
 

@@ -11,7 +11,7 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { post, ps } from '$lib/workers/pyodide_state.svelte';
+	import { post, ps, type EditorMessage } from '$lib/workers/pyodide_state.svelte';
 	import {
 		pathBasename,
 		pathBeginsWith,
@@ -47,13 +47,12 @@
 	}
 
 	function save() {
-		post({ kind: 'newfile', path: es.curFilePath, contents: es.src, overwrite: true });
-		es.saved = true;
-		read(lastClicked);
+		const then = { kind: 'readfile', path: pathJoin(s.cwd, String(lastClicked)) } as EditorMessage;
+		post({ kind: 'newfile', path: es.curFilePath, contents: es.src, overwrite: true, then: then });
 	}
 
 	function read(name: string) {
-		post({ kind: 'readfile', path: pathJoin(s.cwd, name) });
+		post({ kind: 'readfile', path: pathJoin(s.cwd, String(lastClicked)) });
 	}
 
 	onMount(() => {});
@@ -107,13 +106,7 @@
 	}
 
 	function clickItem(name: string) {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot open files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
+		if (s.running) return;
 
 		if (name === '..') {
 			return; // TODO: re-add multi project support
@@ -158,14 +151,6 @@
 		// eventually
 		if (name === '..') return;
 
-		if (s.running) {
-			errorDialog.open([
-				'You cannot modify files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
 		lastClicked = name;
 		confirmDialog.open(
 			[`Are you sure you want to delete ${name}?`],
@@ -179,14 +164,6 @@
 	}
 
 	function handleDeleteAll() {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot modify files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
 		confirmDialog.open(
 			[
 				'This will delete ALL FILES that you have in this project.',
@@ -205,14 +182,6 @@
 	}
 
 	function handleRename(name: string) {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot modify files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
 		if (name === '..') {
 			return;
 		}
@@ -223,14 +192,6 @@
 	}
 
 	function handleDownload(name: string) {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot download files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
 		if (name == '..') downloadCwdCallback!();
 		else downloadCallback!(name);
 	}
@@ -260,7 +221,13 @@
 		editorNewFile();
 		// overwrite must be true as we already did the checks
 		const newPath = pathJoin(s.cwd, fileName);
-		post({ kind: 'newfile', path: newPath, contents: '', overwrite: true });
+		post({
+			kind: 'newfile',
+			path: newPath,
+			contents: '',
+			overwrite: true,
+			then: { kind: 'readfile', path: newPath }
+		});
 	}
 
 	function newDirOk(dirName: string, overwrite: boolean) {
@@ -275,14 +242,6 @@
 	}
 
 	function newItem() {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot create files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
 		if (atProjects) {
 			saveDialog.open('New Project (Folder)', undefined, false, newDirOk, true);
 		} else {
@@ -291,14 +250,6 @@
 	}
 
 	function handleUploadZip(content: Uint8Array<ArrayBuffer>) {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot create files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
 		confirmDialog.open(
 			[
 				'Uploading a zip file will unpack everything inside into the current project.',
@@ -364,31 +315,30 @@
 	}
 
 	function upload(name: string, content: string) {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot create files when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
-		post({
+		const newFilePath = pathJoin(s.cwd, name);
+		const openCmd = {
+			kind: 'readfile',
+			path: newFilePath
+		} satisfies EditorMessage;
+		const uploadCmd = {
 			kind: 'newfile',
-			path: pathJoin(s.cwd, name),
+			path: newFilePath,
 			contents: content,
-			overwrite: true
-		});
+			overwrite: true,
+			then: openCmd
+		} satisfies EditorMessage;
+		if (!es.saved)
+			post({
+				kind: 'newfile',
+				path: es.curFilePath,
+				contents: es.src,
+				overwrite: true,
+				then: uploadCmd
+			});
+		else post(uploadCmd);
 	}
 
 	function loadExample() {
-		if (s.running) {
-			errorDialog.open([
-				'You cannot add examples when code is running.',
-				'Please stop your program first.'
-			]);
-			return;
-		}
-
 		loadExampleDialog.open();
 	}
 
