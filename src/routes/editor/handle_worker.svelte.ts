@@ -15,9 +15,10 @@ import { termState as ts } from './terminal_state.svelte';
 
 import { s, fileResponseCallback, doneTracingCallback, doneFormattingCallback, saveFile, markEditorReadWrite } from './state.svelte';
 import { FileResponseKind, pathJoin } from '$lib/fstypes';
-import { es } from './editor_state.svelte';
+import { es, setErrEffect } from './editor_state.svelte';
 import { getDefaultConfig } from '$lib/config';
 import { BEANCODE_WEB_VERSION } from '$lib/version';
+import { tick } from 'svelte';
 
 let loadedLastOpened = false;
 
@@ -80,7 +81,15 @@ function handleWorkerEvent(event: MessageEvent<PyMessage>) {
             ter.writeln(String(msg.data).replaceAll("\n", "\r\n"));
             break;
         case 'beanerror':
-            ps.curError = msg.data;
+            tick().then(() => {
+                let e = msg.data;
+                if (e.from === undefined) e.from = 0;
+                if (e.to === undefined) e.to = 1;
+                if (e.msg === undefined) e.msg = "Beancode Error";
+                if (__DEV__) console.log("Tidied Error: ", e);
+                ps.curError = e;
+                es.view!.dispatch({ effects: setErrEffect.of(e) });
+            });
             break;
         case 'pyout':
             ter.write(msg.data);
