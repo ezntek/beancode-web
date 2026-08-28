@@ -1,0 +1,44 @@
+// This algorithm is to find the smallest,
+// largest number, and average of a set of
+// numbers input; zero stops the input of numbers.
+DECLARE Number, Smallest, Largest, Total, Counter: INTEGER
+DECLARE Average: REAL
+
+OUTPUT "Enter first number"
+INPUT Number
+Counter <- 1
+Smallest <- Number
+Largest <- Number
+Total <- Number
+
+REPEAT
+    OUTPUT "Enter another number (0 to stop)"
+    INPUT Number
+    // If the current number is not equal to 0, do checks.
+    // If we do checks and output, it makes no sense, as 0
+    // means stop.
+    IF Number <> 0
+      THEN
+        Total <- Total + Number
+        Counter <- Counter + 1
+        IF Number < Smallest
+          THEN
+            // If the current number is smaller than the smallest we have
+            // seen so far, it is now the smallest
+            Smallest <- Number
+          ELSE
+            IF Number > Largest
+              THEN
+                // Similar Logic
+                Largest <- Number
+            ENDIF
+        ENDIF
+    ENDIF
+
+    // Keep going until the current number is 0
+UNTIL Number = 0
+Average <- Total / Counter
+OUTPUT "Smallest: ", Smallest, ", Largest: ", Largest
+OUTPUT "You input ", Counter, " numbers."
+OUTPUT "Sum of all numbers input = ", Total
+OUTPUT "Average of all numbers input = ", Average

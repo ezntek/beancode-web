@@ -1,0 +1,16 @@
+// Totalling example in pseudocode
+DECLARE Number: INTEGER
+DECLARE Total : INTEGER
+DECLARE HowMany: INTEGER
+Total <- 0
+OUTPUT "How many integers to add?"
+INPUT HowMany
+// ITERATION: Count-controlled (FOR) loop:
+FOR Counter <- 1 TO HowMany
+    OUTPUT "Number #", Counter
+    INPUT Number
+    // TOTALLING/adding the input number to a total variable
+    Total <- Total + Number
+NEXT Counter
+
+OUTPUT "Total = ", Total

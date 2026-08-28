@@ -1,0 +1,19 @@
+// This algorithm counts how many odd numbers
+// are input. Zero stops the input.
+DECLARE Number, OddsCounter: INTEGER
+OddsCounter <- 0
+// Keep going until the current number is 0
+// ITERATION using a POST-CHECK LOOP (REPEAT-UNTIL)
+REPEAT
+    OUTPUT "Enter another number (0 to stop)"
+    INPUT Number
+    // SIMPLE SELECTION (with IF)
+    IF MOD(Number, 2) <> 0
+      THEN
+        // If the current number is ODD,
+        // count it in
+        OddsCounter <- OddsCounter + 1
+    ENDIF
+UNTIL Number = 0
+
+OUTPUT "You entered ", OddsCounter, " odd numbers."

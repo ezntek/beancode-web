@@ -1,0 +1,58 @@
+// Example of NESTED IF statements:
+// Largest number of three
+DECLARE X, Y, Z: INTEGER
+
+OUTPUT "Enter three integers:"
+
+INPUT X
+INPUT Y
+INPUT Z
+
+IF X > Y AND X > Z
+  THEN
+    OUTPUT "The first number is bigger than the second and the third"
+  ELSE
+    IF Y > X AND Y > Z
+      THEN
+        OUTPUT "The second number is bigger than the first and the third"
+      ELSE
+        IF Z > X AND Z > Y
+          THEN
+            OUTPUT "The third number is bigger than the first and the second"
+          ELSE
+            IF X = Y AND Y = C
+              THEN
+                OUTPUT "All numbers are the same..."
+              ELSE
+                OUTPUT "Two of the numbers are tied for the biggest"
+            ENDIF
+        ENDIF
+    ENDIF
+ENDIF
+
+// Alternatively... Different approach to the largest of 3 inputs problem
+// Here we AVOID using nested ifs
+DECLARE Largest: INTEGER
+
+OUTPUT "Enter three integers:"
+
+INPUT X
+INPUT Y
+INPUT Z
+
+IF X > Y
+  THEN
+    Largest <- X
+ENDIF
+
+IF Y > Largest
+  THEN
+    Largest <- Y
+ENDIF
+
+IF Z > Largest
+  THEN
+    Largest <- Z
+ENDIF
+
+OUTPUT "The largest number of ", X, ", ", Y, ", ", Z, " is ", Largest

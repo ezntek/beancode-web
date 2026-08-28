@@ -1,0 +1,42 @@
+// This algorithm finds the smallest number of
+// a set of numbers input. Zero stops the input.
+DECLARE Number, Smallest, Counter, Total, Largest: INTEGER
+
+OUTPUT "Enter first number"
+INPUT Number
+Counter <- 1
+Smallest <- Number
+Total <- 0
+Largest <- 0
+
+// Keep going until the current number is 0
+// ITERATION using a PRE-CHECK LOOP (WHILE..DO-ENDWHILE)
+WHILE Number <> 0 DO
+    OUTPUT "Enter another number (0 to stop)"
+    INPUT Number
+    // If the current number is not equal to 0, do checks.
+    // If we do checks and output, it makes no sense, as 0
+    // means stop.
+    IF Number <> 0
+      THEN
+        // TOTALLING: Total
+        Total <- Total + Number
+        // COUNTING: Counter
+        Counter <- Counter + 1
+        // SELECTION with IF-ELSE-ENDIF
+        IF Number < Smallest
+          THEN
+            // If the current number is smaller than the smallest we have
+            // seen so far, it is now the smallest
+            Smallest <- Number
+          ELSE
+            IF Number > Largest
+              THEN
+                // Similar Logic
+                Largest <- Number
+            ENDIF
+        ENDIF
+    ENDIF
+ENDWHILE
+OUTPUT "Smallest: ", Smallest
+OUTPUT "You entered ", Counter, " numbers."

@@ -1,5 +1,6 @@
-#BubbleSort.bean
-#IterativeBinarySearch.bean
+CountOdds.bean
 LinearSearch.bean
-MinMax.bean
-#SelectionSort.bean
+MinMaxAverage.bean
+Minimum.bean
+NestedIfs.bean
+Totalling.bean
