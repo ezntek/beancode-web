@@ -38,14 +38,12 @@
 		return '';
 	}
 
-	export function focus() {}
-
-	function submitOk() {
+	function submitCancel() {
 		close();
 	}
 
-	function submitCancel() {
-		close();
+	function go(link: string) {
+		window.open(link, '_blank', 'noopener,noreferrer');
 	}
 </script>
 
@@ -71,20 +69,47 @@
 		</div>
 		<div class="middle">
 			{#if view === 'donate'}
+				<div class="donate-wrapper">
+					<p class="label">
+						<strong>
+							If you have found the beancode interpreter, or this IDE (beancode web) useful, please
+							consider supporting me.
+						</strong>
+					</p>
+					<p class="label">
+						You are funding development to make beancode web even better than it is for everybody.
+					</p>
+					<p class="label">
+						You can disable this pop-up in Settings -&gt; Advanced, found on the top-right of your
+						screen.
+					</p>
+					<div class="donate-buttons">
+						<button
+							class="donate-button liberapay"
+							onclick={() => go('https://liberapay.com/ezntek')}
+						>
+							<img alt="LiberaPay Logo" src="/liberapay_logo.svg" class="payment-logo" />
+							Support me on LiberaPay
+						</button>
+						<button class="donate-button kofi" onclick={() => go('https://ko-fi.com/ezntek')}>
+							<img alt="Ko-Fi Logo" src="/kofi_logo.svg" class="payment-logo" />
+							Support me on Ko-Fi
+						</button>
+					</div>
+				</div>
+			{:else if view === 'why donate'}
 				<p class="label">
-					The development and maintenance of beancode and beancode web is only done by one person,
-					that being
-					<a href="mailto:eason@ezntek.com">ezntek a.k.a. Eason</a>, that being myself. If you have
-					enjoyed the beancode interpreter, or this web IDE for it, and if it has helped you, do
-					consider supporting me.
+					The development and maintenance of beancode and beancode web is
+					<strong>only done by one person</strong>, that being
+					<a href="mailto:eason@ezntek.com">ezntek a.k.a. Eason</a>, that being myself.
 				</p>
 				<p class="label">The more support I receive, the more likely I am to:</p>
-				<ol>
+				<ol style="margin-top: 0px">
 					<li>
-						<strong
-							>Respond to <a href="https://github.com/ezntek/beancode-web/issues/">bug reports</a>,
-							over e-mail or GitHub faster.</strong
-						>
+						<strong>
+							Respond to <a href="https://github.com/ezntek/beancode-web/issues/">bug reports</a>,
+							over e-mail or GitHub faster.
+						</strong>
 					</li>
 					<li>
 						Add new features, like Java support, SQLite support, multiple projects, drag-and-drop to
@@ -96,7 +121,7 @@
 					All support that you give is extremely valuable for me. Even a small donation would make
 					my day, and help make beancode web better for the rest of us.
 				</p>
-			{:else if view === 'why donate'}{/if}
+			{/if}
 		</div>
 		<div class="bottom">
 			<button class="grayed" onclick={() => submitCancel()}> I'll think about it later </button>
@@ -120,6 +145,7 @@
 		flex-direction: column;
 		width: 40vw;
 		max-width: 40vw;
+		min-height: 60vh;
 	}
 
 	.top {
@@ -137,7 +163,8 @@
 		flex-direction: column;
 		margin: 0.5em;
 		gap: 0.5em;
-		margin-bottom: 3em;
+		margin-bottom: auto;
+		align-items: start;
 	}
 
 	.bottom {
@@ -147,6 +174,55 @@
 		margin: 0.5em;
 		margin-top: 0px;
 		gap: 0.5em;
+	}
+
+	.donate-wrapper {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		min-height: 100%;
+	}
+
+	.donate-buttons {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.donate-button {
+		display: flex;
+		gap: 10px;
+		font-family: 'IBM Plex Mono', monospace !important;
+		padding: 0.5em;
+		border-width: 0px;
+		border-radius: 3px;
+		color: var(--bw-text);
+		font-weight: bold;
+		font-size: 1.5em;
+		width: 100%;
+		transition:
+			background-color var(--bw-animation-delay) ease,
+			color var(--bw-animation-delay) ease,
+			font-weight var(--bw-animation-delay) ease;
+		background-color: var(--bw-surface1);
+		color: var(--bw-text);
+	}
+
+	.liberapay:hover {
+		color: var(--bw-yellow);
+	}
+
+	.kofi:hover {
+		color: var(--bw-red);
+	}
+
+	.donate-button:hover {
+		background-color: var(--bw-base3);
+	}
+
+	.payment-logo {
+		width: 1.5em;
+		margin-right: 0.75em;
 	}
 
 	.bottom button {

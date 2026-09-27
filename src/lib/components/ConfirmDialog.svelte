@@ -25,18 +25,34 @@
 	}
 	let { ok, cancel, okText = 'Ok', cancelText = 'Cancel' }: IProps = $props();
 
+	// XXX: absolute SHITCODE
+
+	// warning intended
+	let origOkText = okText;
+	let origCancelText = cancelText;
+
 	// @ts-ignore
 	export const close = () => {
 		innerDialog.close();
 	};
 	// @ts-ignore
-	export const open = (msgs: string[], _ok?: Function, _cancel?: Function) => {
+	export const open = (
+		msgs: string[],
+		_ok?: Function,
+		_cancel?: Function,
+		_okText?: string,
+		_cancelText?: string
+	) => {
 		messages = [];
 		msgs.forEach((itm) => messages.push(itm));
 		innerDialog.open();
 		setTimeout(() => focus(), 0);
 		if (_ok) ok = _ok;
 		if (_cancel) cancel = _cancel;
+		origOkText = okText;
+		origCancelText = cancelText;
+		if (_okText) okText = _okText;
+		if (_cancelText) cancelText = _cancelText;
 	};
 
 	export function focus() {
@@ -50,6 +66,8 @@
 
 	function submitCancel() {
 		if (cancel) cancel();
+		okText = origOkText;
+		cancelText = origCancelText;
 		close();
 	}
 </script>

@@ -109,6 +109,13 @@
 		ibuf = new Uint8Array(s.interruptBuf);
 		await setupWorker();
 
+		if (s.config.showDonationDialog) {
+			const openCount = +(localStorage.getItem('OpenCount') ?? '0');
+			if (openCount % 15 == 0 || openCount == 3) {
+				donationDialog.open();
+			}
+		}
+
 		setTermWidth();
 		setFileBrowserWidth();
 

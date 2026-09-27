@@ -9,6 +9,7 @@ export interface IConfig {
     terminalShown: boolean,
     reduceFlair: boolean,
     wordWrap: boolean,
+    showDonationDialog: boolean,
 };
 
 export function getDefaultConfig(): IConfig {
@@ -26,6 +27,7 @@ export function getDefaultConfig(): IConfig {
         terminalShown: true,
         reduceFlair: false,
         wordWrap: false,
+        showDonationDialog: true,
     };
 }
 
@@ -42,7 +44,8 @@ export function isValidConfig(obj: any): obj is IConfig {
         typeof obj.terminalFontSize === 'number' &&
         typeof obj.fileBrowserShown === 'boolean' &&
         typeof obj.terminalShown === 'boolean' && 
-        typeof obj.reduceFlair === 'boolean' 
+        typeof obj.reduceFlair === 'boolean' &&
+        typeof obj.showDonationDialog === 'boolean'
     );
 }
 
