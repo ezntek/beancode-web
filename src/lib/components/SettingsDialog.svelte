@@ -119,6 +119,23 @@
 		ourCfg = res satisfies IConfig;
 	}
 
+	function actuallyDisableDonations() {
+		s.config.showDonationDialog = false;
+	}
+
+	function disableDonations() {
+		confirmDialog.open(
+			[
+				'Are you sure you want to disable the donation box? It only appears periodically...',
+				"You can still donate by pressing the '$' Icon on the top-right."
+			],
+			actuallyDisableDonations,
+			undefined,
+			'Stop asking me for money.',
+			"I'll donate one day!"
+		);
+	}
+
 	const FONTS = [
 		'IBM Plex Mono',
 		'Fira Code',
@@ -276,9 +293,13 @@
 				>
 					<span class="fa-solid fa-upload"></span> Upload Settings
 				</button>
+				<button class="button normal" onclick={() => disableDonations()}>
+					<span class="fa-solid fa-ban"></span>
+					Disable Donation Dialog
+				</button>
 				<button class="button destructive-button" onclick={() => clearData()}>
 					<span class="fa-solid fa-trash"></span>
-					Clear all user data
+					Clear All User Data
 				</button>
 			{:else if view == 'about'}
 				<h1>About beancode web</h1>

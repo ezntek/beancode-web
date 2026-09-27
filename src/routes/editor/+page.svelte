@@ -54,7 +54,7 @@
 	let errorDialog: ErrorDialog;
 
 	onMount(() => {
-		const cfg = window.localStorage.getItem('Config');
+		const cfg = localStorage.getItem('Config');
 		if (cfg !== null) {
 			const userConfig = JSON.parse(cfg);
 			if (!isValidConfig(userConfig)) s.config = { ...getDefaultConfig(), ...userConfig };
@@ -68,7 +68,7 @@
 			s.config.editorFontSize = 17;
 		}
 
-		const theme = window.localStorage.getItem('EditorTheme');
+		const theme = localStorage.getItem('EditorTheme');
 		if (theme && (theme == s.config.preferredDarkTheme || theme == s.config.preferredLightTheme)) {
 			s.themeName = theme;
 		} else {
@@ -85,7 +85,7 @@
 		}
 
 		function noPersistErr() {
-			if (window.localStorage.getItem('IsFirstLaunch') !== 'no') {
+			if (localStorage.getItem('IsFirstLaunch') !== 'no') {
 				errorDialog.open(
 					[
 						'Could not request for persistent storage! Your data and settings could mysteriously vanish, especially if your computer ' +
@@ -111,15 +111,18 @@
 		}
 
 		// XXX: cursed JS
-		windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
-		window.localStorage.setItem('WindowCount', String(windowCount + 1));
+		windowCount = +(localStorage.getItem('WindowCount') ?? '0');
+		localStorage.setItem('WindowCount', String(windowCount + 1));
+
+		let openCount = +(localStorage.getItem('OpenCount') ?? '0');
+		localStorage.setItem('OpenCount', String(openCount + 1));
 
 		window.addEventListener('beforeunload', () => {
-			windowCount = +(window.localStorage.getItem('WindowCount') ?? '0');
-			window.localStorage.setItem('WindowCount', String(windowCount - 1));
+			windowCount = +(localStorage.getItem('WindowCount') ?? '0');
+			localStorage.setItem('WindowCount', String(windowCount - 1));
 
 			const cfg = JSON.stringify(s.config);
-			window.localStorage.setItem('Config', cfg);
+			localStorage.setItem('Config', cfg);
 		});
 	});
 </script>
