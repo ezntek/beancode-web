@@ -28,8 +28,7 @@
 		setDownloadCallback,
 		setDownloadCwdCallback,
 		saveFile,
-		INPUT_MAX,
-		markEditorReadWrite
+		INPUT_MAX
 	} from './state.svelte';
 	import { termState as ts } from './terminal_state.svelte';
 	import FileBrowser from './FileBrowser.svelte';
@@ -56,7 +55,7 @@
 	import prettierPostcss from 'prettier/plugins/postcss';
 	import prettierBabel from 'prettier/plugins/babel';
 	import prettierEstree from 'prettier/plugins/estree';
-	import { ArgList } from '$lib/highlighting/parser.terms';
+	import DonationDialog from '$lib/components/DonationDialog.svelte';
 
 	let ibuf: Uint8Array;
 	let terminalWidth = $state(300);
@@ -74,6 +73,7 @@
 	let errorDialog: ErrorDialog;
 	let messageDialog: MessageDialog;
 	let traceDialog: TraceDialog;
+	let donationDialog: DonationDialog;
 
 	function openStringAsHtml(src: string) {
 		const blob = new Blob([src], { type: 'text/html' });
@@ -178,7 +178,12 @@
 		traceDoneDialog.open(undefined, 'trace_table.thtml');
 	}
 
-	function fileResponseCallback(msgKind: string, path: string, response: FileResponse<any>, then?: EditorMessage) {
+	function fileResponseCallback(
+		msgKind: string,
+		path: string,
+		response: FileResponse<any>,
+		then?: EditorMessage
+	) {
 		if (response.kind != FileResponseKind.Ok) {
 			errorDialog.open(
 				[
@@ -238,8 +243,7 @@
 						//	es.curFilePath = path;
 						//	post({ kind: 'readfile', path: path });
 						//}
-                        if (then !== undefined)
-                            post(then); 
+						if (then !== undefined) post(then);
 					});
 				}
 				break;
@@ -662,6 +666,14 @@
 					<span class="fa-solid fa-bug"></span>
 				</button>
 				<button
+					aria-label="Make a donation"
+					title="Make a donation to us"
+					class="toolbar-aux-button"
+					onclick={() => donationDialog.open()}
+				>
+					<span class="fa-solid fa-dollar-sign"></span>
+				</button>
+				<button
 					aria-label="settings"
 					class="toolbar-aux-button"
 					title="Open Settings"
@@ -724,6 +736,7 @@
 	bind:cfg={s.config}
 	onClose={(cfg: IConfig) => applySettings(cfg)}
 />
+<DonationDialog bind:this={donationDialog} />
 
 <style>
 	.icon {
