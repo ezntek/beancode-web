@@ -73,7 +73,7 @@
 					<p class="label">
 						<strong>
 							If you have found the beancode interpreter, or this IDE (beancode web) useful, please
-							consider supporting me, by donating to this project.
+							consider supporting me, by making a donation.
 						</strong>
 					</p>
 					<p class="label">
@@ -89,8 +89,8 @@
 							class="donate-button liberapay"
 							onclick={() => go('https://liberapay.com/ezntek')}
 						>
-							<img alt="LiberaPay Logo" src="/liberapay_logo.svg" class="payment-logo" />
-							Support me on LiberaPay
+							<img alt="Liberapay Logo" src="/liberapay_logo.svg" class="payment-logo" />
+							Support me on Liberapay
 						</button>
 						<button class="donate-button kofi" onclick={() => go('https://ko-fi.com/ezntek')}>
 							<img alt="Ko-Fi Logo" src="/kofi_logo.svg" class="payment-logo" />
