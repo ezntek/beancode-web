@@ -77,12 +77,12 @@
 						</strong>
 					</p>
 					<p class="label">
-						You are funding development to make beancode web even better than it already is, for everybody.
-                        All donations are greatly appreciated.
+						You are funding development to make beancode and beancode web even better than it already is,
+                        for everybody. All donations are greatly appreciated.
 					</p>
 					<p class="label">
 						You can disable this pop-up in Settings -&gt; Advanced, found on the top-right of your
-						screen.
+						screen (The Gear Icon).
 					</p>
 					<div class="donate-buttons">
 						<button
@@ -93,8 +93,8 @@
 							Support me on Liberapay
 						</button>
 						<button class="donate-button kofi" onclick={() => go('https://ko-fi.com/ezntek')}>
-							<img alt="Ko-Fi Logo" src="/kofi_logo.svg" class="payment-logo" />
-							Support me on Ko-Fi
+							<img alt="Ko-fi Logo" src="/kofi_logo.svg" class="payment-logo" />
+							Support me on Ko-fi
 						</button>
 					</div>
 				</div>
@@ -102,7 +102,7 @@
 				<p class="label">
 					The development and maintenance of beancode and beancode web is
 					<strong>only done by one person</strong>, that being
-					<a href="mailto:eason@ezntek.com">ezntek a.k.a. Eason</a>, that being myself.
+					<a href="mailto:eason@ezntek.com">ezntek a.k.a. Eason</a> (me).
 				</p>
 				<p class="label">The more support I receive, the more likely I am to:</p>
 				<ol style="margin-top: 0px">
@@ -121,6 +121,10 @@
 				<p class="label">
 					All support that you give is extremely valuable for me. Even a small donation would make
 					my day, and help make beancode web better for the rest of us.
+				</p>
+				<p class="label">
+                    If you make a donation, and notify me of it, I may add an extra feature or two, at your
+                    request. Simply <a href="mailto:eason@ezntek.com">E-mail me</a>.
 				</p>
 			{/if}
 		</div>
