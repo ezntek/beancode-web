@@ -73,11 +73,12 @@
 					<p class="label">
 						<strong>
 							If you have found the beancode interpreter, or this IDE (beancode web) useful, please
-							consider supporting me.
+							consider supporting me, by donating to this project.
 						</strong>
 					</p>
 					<p class="label">
-						You are funding development to make beancode web even better than it is for everybody.
+						You are funding development to make beancode web even better than it already is, for everybody.
+                        All donations are greatly appreciated.
 					</p>
 					<p class="label">
 						You can disable this pop-up in Settings -&gt; Advanced, found on the top-right of your
