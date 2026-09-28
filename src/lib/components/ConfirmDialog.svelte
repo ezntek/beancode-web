@@ -28,8 +28,8 @@
 	// XXX: absolute SHITCODE
 
 	// warning intended
-	let origOkText = okText;
-	let origCancelText = cancelText;
+	let origOkText = '';
+	let origCancelText = '';
 
 	// @ts-ignore
 	export const close = () => {
