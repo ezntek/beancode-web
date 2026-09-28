@@ -129,10 +129,10 @@
 				'Are you sure you want to disable the donation box? It only appears periodically...',
 				"You can still donate by pressing the '$' Icon on the top-right."
 			],
-			actuallyDisableDonations,
 			undefined,
-			'Stop asking me for money.',
-			"I'll donate one day!"
+			actuallyDisableDonations,
+			"I'll donate now!",
+			'Stop asking me for money.'
 		);
 	}
 
