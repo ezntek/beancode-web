@@ -309,8 +309,8 @@
 					comfortable nor experienced with traditional text editors/IDEs.
 				</p>
 				<p>
-					This project is copyright (c) Eason Qin, 2025-2026. View the license tab for more
-					information.
+					<strong>This project is made by and copyright (c) Eason Qin, 2025-2026.</strong> View the license tab for more
+					information. <strong>E-mail me <a href="mailto:eason@ezntek.com">here</a>.</strong>
 				</p>
 				<hr />
 				<p><strong>Version info</strong></p>
@@ -341,11 +341,11 @@
 			{:else if view == 'license'}
 				<h1>License</h1>
 				<p>
-					Beancode Web is copyright (c) Eason Qin 2025-2026. It is licensed under the GNU Affero
-					General Public License, version 3.0 (or later).
+					<strong>Beancode Web is copyright (c) Eason Qin 2025-2026.</strong> It is licensed under the GNU Affero
+					General Public License, version 3.0 (or later). <strong>E-mail me <a href="mailto:eason@ezntek.com">here</a>.</strong>
 				</p>
 				<p>
-					If you would like to browse the GNU Affero General Public License, version 3.0, online,
+					If you would like to view the GNU Affero General Public License, version 3.0 online,
 					you may visit
 					<a href="https://www.gnu.org/licenses/agpl-3.0.en.html#license-text" target="_blank">
 						https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
